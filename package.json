@@ -4,6 +4,8 @@
   "description": "Open source text sharing and URL shortening app",
   "main": "index.js",
   "scripts": {
+    "serve": "node index.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,5 +17,11 @@
   "bugs": {
     "url": "https://github.com/danieldupriest/raviolink/issues"
   },
-  "homepage": "https://github.com/danieldupriest/raviolink#readme"
+  "homepage": "https://github.com/danieldupriest/raviolink#readme",
+  "dependencies": {
+    "express": "^4.17.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
 }
