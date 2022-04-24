@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const mustacheExpress = require("mustache-express");
 
@@ -5,21 +6,20 @@ const port = 8080;
 
 const app = express();
 
-app.set("views", `${__dirname}/views`);
+app.set("views", __dirname + "/views");
 app.set("view engine", "mustache");
 app.engine("mustache", mustacheExpress());
 app.use(express.static("public"));
 
 app.get("/:linkCode", (req, res) => {
     const data = {
-        appTitle: "Raviolink",
         content: req.params.linkCode,
     };
-    res.render("linkView", data);
+    res.render("viewLink", data);
 });
 
 app.get("/", (req, res) => {
-    res.send("Home page");
+    res.render("createLink");
 });
 
 app.listen(port, () => {

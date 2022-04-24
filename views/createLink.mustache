@@ -1,0 +1,44 @@
+{{> header}}
+<div class="wrapper">
+    <input class="radio" id="one" name="group" type="radio" checked>
+    <input class="radio" id="two" name="group" type="radio">
+    <input class="radio" id="three" name="group" type="radio">
+    <div class="tabs">
+        <label class="tab" id="one-tab" for="one">Shorten URL</label>
+        <label class="tab" id="two-tab" for="two">Share text</label>
+        <label class="tab" id="three-tab" for="three">Share code</label>
+    </div>
+    <div class="panels">
+        <div class="panel" id="one-panel">
+            <form>
+                <div class="form-group">
+                    <label for="url-input">URL</label>
+                    <input type="text" class="form-control is-valid" id="url-input" placeholder="http://example.com">
+                    <div class="help-text">Paste your link here. It does not need to begin with http/https.</div>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>  
+        </div>
+        <div class="panel" id="two-panel">
+            <form>
+                <div class="form-group">
+                    <label for="text-input">Text</label>
+                    <textarea class="form-control is-valid" id="text-input" placeholder="Paste your text here..."></textarea>
+                    <div class="help-text">You can paste up to around 500,000 characters, or about the length of the Mary Shelley novel Frankenstein.</div>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        <div class="panel" id="three-panel">
+            <form>
+                <div class="form-group">
+                    <label for="code-input">Code</label>
+                    <textarea class="form-control is-valid" id="code-input" placeholder="Paste your text here..."></textarea>
+                    <div class="help-text">You can paste up to around 500,000 characters, or about the length of the Mary Shelley novel Frankenstein.</div>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+  </div>
+</div>
+{{> footer}}
