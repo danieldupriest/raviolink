@@ -8,3 +8,16 @@ Raviolink is an open source Node application for text sharing and URL-shortening
 -   Link expiration
 -   Delete on read
 -   Exponential cooldown to prevent spamming
+
+## Setup
+
+1. Run `npm i`
+2. Copy `.env.sample` to `.env` and edit to configure
+
+## Development
+
+Run `npm run dev`
+
+## Deployment
+
+Run `node index.js`
