@@ -1,0 +1,58 @@
+{{> header}}
+<div class="wrapper">
+    <input class="radio" id="one" name="group" type="radio" checked>
+    <input class="radio" id="two" name="group" type="radio">
+    <input class="radio" id="three" name="group" type="radio">
+    {{#link}}<input class="radio" id="four" name="group" type="radio">{{/link}}
+    <div class="tabs">
+        <label class="tab" id="one-tab" for="one">Shorten URL</label>
+        <label class="tab" id="two-tab" for="two">Share text</label>
+        <label class="tab" id="three-tab" for="three">Share code</label>
+        {{#link}}<label class="tab" id="four-tab" for="four">Link</label>{{/link}}
+    </div>
+    <div class="panels">
+        <div class="panel" id="one-panel">
+            <form>
+                <p>Paste in a long URL to generate a short link. It should begin with <code>https://</code> or <code>http://</code>.</p>
+                <div class="form-group">
+                    <label for="url-input">URL to shorten</label>
+                    <input type="url" class="form-control is-valid" id="url-input" placeholder="http://example.com">
+                </div>
+                <button type="submit" class="btn btn-primary">Create link</button>
+            </form>  
+        </div>
+        <div class="panel" id="two-panel">
+            <form>
+                <p>Paste in the plain text you wish to share. The generated link will display the text. You can paste up to around 500,000 characters, or about the length of the Mary Shelley novel Frankenstein.</p>
+                <div class="form-group">
+                    <label for="text-input">Text to share</label>
+                    <textarea rows=5 maxlength=500000 class="form-control is-valid" id="text-input" placeholder="Paste your text here..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Create link</button>
+            </form>
+        </div>
+        <div class="panel" id="three-panel">
+            <form>
+                <p> Paste in the code you wish to share. The generated link will display the code with line numbers. You can paste up to around 500,000 characters, or about 7,000 lines of code.</p>
+                <div class="form-group">
+                    <label for="code-input">Code to share</label>
+                    <textarea rows=5 maxlength=500000 class="form-control is-valid" id="code-input" placeholder="Paste your text here..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Create link</button>
+            </form>
+        </div>
+        {{#link}}
+        <div class="panel" id="four-panel">
+            <h3>Link created on {{createdOn}}</h3>
+            <code id="content">
+                <div id="content-links">
+                    <a href="#" onclick=copyText()>Copy text</a>
+                    <a href="#" id="download")>Download</a>
+                </div>
+                {{&content}}
+            </code>
+        </div>
+        {{/link}}
+  </div>
+</div>
+{{> footer}}

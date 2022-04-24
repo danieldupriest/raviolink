@@ -1,29 +1,50 @@
+        <script>
+            var link = document.getElementById("download");
+            var file = new Blob([raw], {"type": "text/plain"});
+            link.href = URL.createObjectURL(file);
+            link.download = `{{linkCode}}.txt`;
+        </script>
     </body>
     <footer id="footer">
-        <section>
-            <h2>About Me</h2>
-            <p>My name is Dan Dupriest, and I am a software developer with a master's degree in computer science from Portland State University. I have a previous career as a Japanese interpreter and translator, and enjoy photography, board games and amateur astronomy.</p>
-            <ul class="actions">
-                <li><a href="https://docs.google.com/document/d/10rOAMa0dV43ctFUbePE9ajsMt-WPo2vs9APBdwfbo7I/edit?usp=sharing" class="button">Resume</a></li>
-            </ul>
-        </section>
-        <section>
-            <h2>Contact</h2>
-            <dl class="alt">
-                <dt>Location</dt>
-                <dd>Portland, OR</dd>
-                <dt>Phone</dt>
-                <dd>(503) 780-7087</dd>
-                <dt>Email</dt>
-                <dd><a href="mailto:daniel.jon.dupriest@gmail.com">daniel.jon.dupriest@gmail.com</a></dd>
-            </dl>
-            <ul class="social-icons">
-                <li><a href="https://www.facebook.com/daniel.dupriest" class="social-icon"> <i class="fa fa-facebook"></i></a></li>
-                <li><a href="https://www.youtube.com/kououken" class="social-icon"> <i class="fa fa-youtube"></i></a></li>
-                <li><a href="http://www.linkedin.com/in/daniel-dupriest-76a495188" class="social-icon"> <i class="fa fa-linkedin"></i></a></li>
-                <li><a href="https://www.github.com/danieldupriest" class="social-icon"> <i class="fa fa-github"></i></a></li>
-            </ul>
-        </section>
-        <p class="copyright">© Dan Dupriest. HTML/CSS design by <a href="https://twitter.com/ajlkn">@ajlkn</a>.</p>
+        <div class="row">
+            <section class="column">
+                <h3>About the app</h3>
+                <p>This app was built using <a href="https://nodejs.org/en/">Node.js</a>, HTML, CSS and Javascript. It is intended to be an open source alternative to commercial URL-shortening and text-sharing web services. It is a personal project and is not guaranteed to be free from bugs or security issues. Be sure to audit code before deployment.</p>
+                <p>The code is available under the <a href="https://opensource.org/licenses/MIT">MIT license</a>.</p>
+                <ul>
+                    <li>
+                        <a href="https://github.com/danieldupriest/raviolink">Source code</a>
+                    </li>
+                </ul>
+            </section>
+            <section class="column">
+                <h3>About me</h3>
+                <p>My name is Dan Dupriest. I am a software developer and recent graduate of Portland State University. I have a previous career as a Japanese interpreter and translator and enjoy photography, board games and amateur astronomy.</p>
+                <ul>
+                    <li>
+                        <a href="mailto:daniel.jon.dupriest@gmail.com">daniel.jon.dupriest@gmail.com</a>
+                    </li>
+                    <li>
+                        <a href="https://www.github.com/danieldupriest">Github</a>
+                    </li>
+                    <li>
+                        <a href="https://www.linkedin.com/in/daniel-dupriest-76a495188/">Linkedin</a>
+                    </li>
+                    <li>
+                        <a href="https://www.facebook.com/daniel.dupriest">Facebook</a>
+                    </li>
+                    <li>
+                        <a href="https://www.youtube.com/kououken">YouTube</a>
+                    </li>
+                    <li>
+                        <a href="https://dev.hypersweet.com">My website</a>
+                    </li>
+                    <li>
+                        <a href="https://docs.google.com/document/d/10rOAMa0dV43ctFUbePE9ajsMt-WPo2vs9APBdwfbo7I/edit?usp=sharing">My resume</a>
+                    </li>
+                </ul>
+            </section>
+        </div>
+        <p class="copyright">© Dan Dupriest 2022</p>
     </footer>
 </html>

@@ -5,8 +5,17 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="css/style.css">
+        <script>
+            var raw = `{{&raw}}`;
+            function copyText() {
+                const blob = new Blob([`{{&raw}}`], { type: "text/plain"})
+                const clip = new ClipboardItem({ "text/plain": blob });
+                var data = [ clip ];
+                navigator.clipboard.write(data).then(() => alert("Copied."));
+            }
+        </script>
     </head>
-    <body>
+    <body class="{{#link}}link{{/link}}">
         <header>
             <div id="title">
                 <img src="images/logo.png"/>
