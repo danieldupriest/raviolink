@@ -6,8 +6,10 @@
   "scripts": {
     "serve": "node index.js",
     "dev": "nodemon index.js",
+    "init": "node database/init.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/danieldupriest/raviolink.git"
@@ -21,7 +23,9 @@
   "dependencies": {
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
-    "mustache-express": "^1.3.2"
+    "fs": "^0.0.1-security",
+    "mustache-express": "^1.3.2",
+    "sqlite3": "^5.0.8"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"

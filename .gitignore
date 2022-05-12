@@ -1,3 +1,6 @@
+# Database
+database/*.db
+
 # Config
 .env
 
