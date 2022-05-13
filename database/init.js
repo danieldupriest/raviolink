@@ -10,7 +10,7 @@ console.log("Creating database tables...");
 
 db.serialize(() => {
     db.run(
-        "CREATE TABLE IF NOT EXISTS links (id INTEGER PRIMARY KEY AUTOINCREMENT, url TEXT, content TEXT);"
+        "CREATE TABLE IF NOT EXISTS links (id INTEGER PRIMARY KEY AUTOINCREMENT, url TEXT, content TEXT, type TEXT);"
     );
     db.run(
         "CREATE TABLE IF NOT EXISTS timers (id INTEGER PRIMARY KEY, ip TEXT, delay_in_ms INTEGER, revert_time TEXT);"

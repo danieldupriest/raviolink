@@ -1,24 +1,26 @@
-import db from "./database";
+import db from "./database.js";
 
+const INITIAL_DELAY = 1000;
 const GROWTH_RATE = 10.0;
 
 // Dataclass to store links
 export default class Timer {
     constructor(ip) {
         this.ip = ip;
-        this.delay_in_ms = 1;
+        this.delay_in_ms = INITIAL_DELAY;
         this.revert_time = new Date().getTime();
     }
 
     findByIp(ip) {
         return new Promise((resolve, reject) => {
-            db.all("SELECT * FROM timers WHERE ip = ?;",
-            [this.ip],
-            (err, rows) => {
-                if(err)
-                    reject(new Error("Error retrieving timer by IP.");
-                resolve(rows);
-            });
+            db.all(
+                "SELECT * FROM timers WHERE ip = ?;",
+                [this.ip],
+                (err, rows) => {
+                    if (err) reject(new Error("Error retrieving timer by IP."));
+                    resolve(rows);
+                }
+            );
         });
     }
 
@@ -33,12 +35,12 @@ export default class Timer {
                     }
                 );
                 db.get("SELECT last_insert_rowid();", (err, result) => {
-                    if(err) {
+                    if (err) {
                         reject(new Error("Error getting timer id."));
                     }
                     this.id = result;
                 });
-            })
+            });
             resolve(this);
         });
     }
@@ -54,10 +56,13 @@ export default class Timer {
         this.revert_time = now + this.delay_in_ms;
         await this.save();
     }
-    
+
     async decreaseDelay() {
         const now = new Date().getTime();
-        this.delay_in_ms = max(1, parseInt(this.delay_in_ms / GROWTH_RATE));
+        this.delay_in_ms = Math.max(
+            1,
+            parseInt(this.delay_in_ms / GROWTH_RATE)
+        );
         this.revert_time = now + this.delay_in_ms;
         await this.save();
     }

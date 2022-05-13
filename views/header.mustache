@@ -6,12 +6,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="css/style.css">
         <script>
-            var raw = `{{&raw}}`;
+            var raw = `{{list.content}}`;
             function copyText() {
-                const blob = new Blob([`{{&raw}}`], { type: "text/plain"})
-                const clip = new ClipboardItem({ "text/plain": blob });
-                var data = [ clip ];
-                navigator.clipboard.write(data).then(() => alert("Copied."));
+                const input = document.getElementById("hidden-content");
+                input.select();
+                input.setSelectionRange(0,999999999);
+                document.execCommand("copy");
+                window.alert("Text copied.");
             }
         </script>
     </head>
