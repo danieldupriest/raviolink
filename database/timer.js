@@ -1,4 +1,4 @@
-import db from "./database.js";
+import { run, all, get } from "./database.js";
 
 const INITIAL_DELAY = 1000;
 const GROWTH_RATE = 10.0;
@@ -12,37 +12,25 @@ export default class Timer {
     }
 
     findByIp(ip) {
-        return new Promise((resolve, reject) => {
-            db.all(
-                "SELECT * FROM timers WHERE ip = ?;",
-                [this.ip],
-                (err, rows) => {
-                    if (err) reject(new Error("Error retrieving timer by IP."));
-                    resolve(rows);
-                }
-            );
-        });
+        return all("SELECT * FROM timers WHERE ip = ?;", [this.ip]);
     }
 
-    save() {
-        return new Promise((resolve, reject) => {
-            db.serialize(() => {
-                db.run(
-                    `INSERT INTO timers (ip, delay_in_ms, revert_time) VALUES (?, ?, ?)`,
-                    [this.ip, this.delay_in_ms, this.revert_time],
-                    (err) => {
-                        reject(new Error("Error while inserting timer."));
-                    }
-                );
-                db.get("SELECT last_insert_rowid();", (err, result) => {
-                    if (err) {
-                        reject(new Error("Error getting timer id."));
-                    }
-                    this.id = result;
-                });
-            });
-            resolve(this);
-        });
+    async save() {
+        await run(
+            `INSERT INTO timers (ip, delay_in_ms, revert_time) VALUES (?, ?, ?)`,
+            [this.ip, this.delay_in_ms, this.revert_time]
+        );
+        const results = await get("SELECT last_insert_rowid();");
+        this.id = results["last_insert_rowid()"];
+        console.log("Saved timer: " + JSON.stringify(this));
+    }
+
+    async update() {
+        await run(
+            "UPDATE timers SET (ip = ?, delay_in_ms = ?, revert_time = ?) WHERE id = ?;",
+            [this.ip, this.delay_in_ms, this.revert_time, this.id]
+        );
+        console.log("Updated timer: " + JSON.stringify(this));
     }
 
     canPost() {
@@ -54,7 +42,7 @@ export default class Timer {
         const now = new Date().getTime();
         this.delay_in_ms *= GROWTH_RATE;
         this.revert_time = now + this.delay_in_ms;
-        await this.save();
+        await this.update();
     }
 
     async decreaseDelay() {
@@ -64,6 +52,6 @@ export default class Timer {
             parseInt(this.delay_in_ms / GROWTH_RATE)
         );
         this.revert_time = now + this.delay_in_ms;
-        await this.save();
+        await this.update();
     }
 }

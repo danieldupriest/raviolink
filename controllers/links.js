@@ -4,13 +4,8 @@ import validUrl from "../utils/urlChecker.js";
 
 export const handleLink = async (req, res) => {
     // Try to retrieve link
-    const { code } = req.params;
-    let link;
-    try {
-        link = await Link.findByHash(code);
-    } catch {
-        throw new Error("Requested link not found.");
-    }
+    const { hash } = req.params;
+    const link = await Link.findByHash(hash);
 
     // Handle URL type
     if (link.type == "link") return res.redirect(301, link.content);
@@ -38,26 +33,24 @@ export const frontPage = (req, res) => {
 };
 
 export const postLink = async (req, res) => {
-    // Check for an active timer and create new one if needed
+    /*// Check for an active timer and create new one if needed
     const ip = req.socket.remoteAddress;
     let userTimer;
     try {
         userTimer = await Timer.findByIp(ip);
         if (!userTimer.canPost()) {
             await userTimer.increaseDelay();
-            await userTimer.save();
+            await userTimer.update();
             throw new Error("Too soon to post again. Delay extended.");
         }
     } catch {
         userTimer = new Timer(ip);
-        await userTimer.save();
     }
 
     // Increase post timer.
     await userTimer.decreaseDelay();
-    await userTimer.save();
+    await userTimer.update();*/
 
-    console.log(req.body);
     // Filter input
     const { content, type } = req.body;
     switch (type) {
@@ -75,7 +68,6 @@ export const postLink = async (req, res) => {
 
     // Generate new link
     let newLink = new Link(content, type);
-    console.log("NewLink content: " + newLink.content);
     await newLink.save();
     return res.render("index", { link: newLink });
 };
