@@ -12,17 +12,17 @@ const db = new sqlite3.Database(dbFile, (err) => {
     } else {
         console.log("Connected to SQlite database");
         db.run(
-            "CREATE TABLE IF NOT EXISTS links (id INTEGER PRIMARY KEY AUTOINCREMENT, url TEXT, content TEXT, type TEXT, created_on TEXT);",
+            "CREATE TABLE IF NOT EXISTS links (id INTEGER PRIMARY KEY AUTOINCREMENT, hash TEXT, content TEXT, type TEXT, created_on INTEGER);",
             (err) => {
                 if (err) console.log(err);
-                console.log("Created table: links");
+                console.log("Checked/created table: links");
             }
         );
         db.run(
-            "CREATE TABLE IF NOT EXISTS timers (id INTEGER PRIMARY KEY, ip TEXT, delay_in_ms INTEGER, revert_time TEXT);",
+            "CREATE TABLE IF NOT EXISTS timers (id INTEGER PRIMARY KEY, ip TEXT, delay_in_ms INTEGER, revert_time INTEGER);",
             (err) => {
                 if (err) console.log(err);
-                console.log("Created table: timers");
+                console.log("Checked/created table: timers");
             }
         );
     }

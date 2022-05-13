@@ -2,30 +2,43 @@ import { run, all, get } from "./database.js";
 import crypto from "node:crypto";
 
 const URL_LENGTH = 7;
-const MAX_TRIES = 10;
+const MAX_HASH_TRIES = 10;
 
 // Dataclass to store links
 class Link {
-    constructor(content, type, id = 0) {
+    constructor(content, type, id = 0, createdOn = null, hash = "") {
         this.content = content;
         this.type = type;
-        this.createdOn = new Date().getTime();
         this.id = id;
+        if (!createdOn) this.createdOn = new Date();
+        else this.createdOn = createdOn;
+        this.hash = hash;
     }
 
     static async findByHash(hash) {
         console.log("Searching for hash: " + hash);
-        const result = get(`SELECT * FROM links WHERE url = ?`, [hash]);
-        console.log("Results: " + JSON.stringify(result));
-        return result;
+        const dbLink = await get(`SELECT * FROM links WHERE hash = ?`, [hash]);
+        if (dbLink) {
+            console.log("Found: " + JSON.stringify(dbLink));
+            let result = new Link(
+                dbLink["content"],
+                dbLink["type"],
+                dbLink["id"],
+                new Date(parseInt(dbLink["createdOn"])),
+                dbLink["hash"]
+            );
+            return result;
+        } else {
+            return null;
+        }
     }
 
     async save() {
         const hash = await this.generateUnusedHash();
-        this.url = hash;
+        this.hash = hash;
         await run(
-            `INSERT INTO links (url, content, type, created_on) VALUES (?, ?, ?, ?)`,
-            [this.url, this.content, this.type, this.createdOn]
+            `INSERT INTO links (hash, content, type, created_on) VALUES (?, ?, ?, ?)`,
+            [this.hash, this.content, this.type, this.createdOn.getTime()]
         );
         const results = await get("SELECT last_insert_rowid();");
         this.id = results["last_insert_rowid()"];
@@ -33,7 +46,7 @@ class Link {
     }
 
     async hashInDatabase(hash) {
-        const result = await this.findByHash(hash);
+        const result = await Link.findByHash(hash);
         if (result) return true;
         return false;
     }
@@ -43,9 +56,12 @@ class Link {
         let attempts = 1;
         while (true) {
             const time = new Date().getTime();
-            hash = this.hash(this.content + time);
-            if (!(await this.hashInDatabase(hash))) break;
-            if (attempts > MAX_TRIES)
+            hash = this.hashOnce(this.content + time);
+            if (!(await this.hashInDatabase(hash))) {
+                console.log("Hash is available.");
+                break;
+            }
+            if (attempts > MAX_HASH_TRIES)
                 throw new Error(
                     "Exceeded max attempts to generate unique hashs"
                 );
@@ -55,12 +71,11 @@ class Link {
         return hash;
     }
 
-    hash(data) {
-        const hash = crypto.createHash("shake256", {
-            outputLength: URL_LENGTH,
-        });
+    hashOnce(data) {
+        const hash = crypto.createHash("shake256");
         hash.update(data);
-        return hash.digest("hex");
+        const full = hash.digest("hex");
+        return full.substring(0, URL_LENGTH);
     }
 }
 export default Link;

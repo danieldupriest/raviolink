@@ -2,19 +2,20 @@ import Link from "../database/link.js";
 import Timer from "../database/timer.js";
 import validUrl from "../utils/urlChecker.js";
 
-export const handleLink = async (req, res) => {
-    // Try to retrieve link
-    const { hash } = req.params;
-    const link = await Link.findByHash(hash);
-
-    // Handle URL type
-    if (link.type == "link") return res.redirect(301, link.content);
-
-    // Prepare text
+function generatePageData(link) {
+    // Prepare text/code
     let split = link.content.split("\n");
     let output = [];
     split.forEach((row) => {
         output.push(row);
+    });
+
+    // Convert date
+    link.createdOn = link.createdOn.toLocaleDateString("en-us", {
+        weekday: "long",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
     });
 
     const data = {
@@ -24,7 +25,24 @@ export const handleLink = async (req, res) => {
         rows: output,
         link: link,
     };
-    data.link.createdOn = new Date(link.createdOn).toISOString();
+
+    return data;
+}
+
+export const handleLink = async (req, res) => {
+    // Try to retrieve link
+    const { hash } = req.params;
+    const link = await Link.findByHash(hash);
+
+    // Handle URL type
+    if (link.type == "link") {
+        console.log("Redirecting to: " + link.content);
+        return res.redirect(301, link.content);
+    }
+
+    const data = generatePageData(link);
+
+    console.log("Rendering link with data: " + JSON.stringify(data));
     res.render("index", data);
 };
 
@@ -69,5 +87,9 @@ export const postLink = async (req, res) => {
     // Generate new link
     let newLink = new Link(content, type);
     await newLink.save();
-    return res.render("index", { link: newLink });
+
+    const data = generatePageData(newLink);
+
+    console.log("Rendering link with data: " + JSON.stringify(data));
+    return res.render("index", data);
 };

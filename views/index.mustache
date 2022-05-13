@@ -45,41 +45,28 @@
             </form>
         </div>
         {{#link}}
-        <div class="panel" id="four-panel">
-            <h3>Link to {{link.content}}</h3>
-            {{#url}}
-            <div id="content">
-                <div id="content-links">
-                    <a href="#" onclick=copyText()>Copy text</a>
-                    <a href="#" id="download">Download</a>
+            <div class="panel" id="four-panel">
+                <h3>
+                    {{#url}}Link to {{link.content}}{{/url}}
+                    {{#code}}Code{{/code}}
+                    {{#text}}Text{{/text}} created on {{link.createdOn}}
+                </h3>
+                
+                <div id="content">
+                    <div id="link-container">
+                        <div id="link-label">Link</div>
+                        <div id="link-text">localhost:8080/{{link.hash}}</div>
+                        <a id="link-anchor" href="#" onclick=copyContent("hidden-link")>Copy</a>
+                    </div>
+                    <div id="content-links">
+                        {{^url}}<a href="#" onclick=copyContent("hidden-content")>Copy Text</a>
+                        <a href="#" id="download">Download RAW</a>{{/url}}
+                    </div>
+                    {{#code}}<code>{{/code}}{{#text}}<pre>{{/text}}{{#rows}}<span>{{.}}</span>{{/rows}}{{#code}}</code>{{/code}}{{#text}}</pre>{{/text}}
+                    <textarea id="hidden-link">localhost:8080/{{link.hash}}</textarea>
+                    {{^url}}<textarea id="hidden-content">{{link.content}}</textarea>{{/url}}
                 </div>
-                <div id="link-text">http://localhost:8080/{{link.url}}</div>
             </div>
-            {{/url}}
-            {{#code}}
-            <code id="content">
-                <div id="content-links">
-                    <a href="#" onclick=copyText()>Copy text</a>
-                    <a href="#" id="download">Download</a>
-                </div>
-                {{#rows}}
-                <span>{{.}}</span>
-                {{/rows}}
-            </code>
-            {{/code}}
-            {{#text}}
-            <pre id="content">
-                <div id="content-links">
-                    <a href="#" onclick=copyText()>Copy text</a>
-                    <a href="#" id="download">Download</a>
-                </div>
-                {{#rows}}
-                <span>{{.}}</span>
-                {{/rows}}
-            </pre>
-            {{/text}}
-            <textarea style="width: 0; height: 0; position:relative; left: 100000px;" id="hidden-content">http://localhost:8080/{{link.url}}</textarea>
-        </div>
         {{/link}}
   </div>
 </div>
