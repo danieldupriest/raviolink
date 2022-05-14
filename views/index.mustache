@@ -46,11 +46,9 @@
         </div>
         {{#link}}
             <div class="panel" id="four-panel">
-                <h3>
-                    {{#url}}Link to {{link.content}}{{/url}}
-                    {{#code}}Code{{/code}}
-                    {{#text}}Text{{/text}} created on {{link.createdOn}}
-                </h3>
+                <h2>
+                    {{#url}}Link to {{link.content}}{{/url}}{{#code}}Code{{/code}}{{#text}}Text{{/text}} created on {{link.createdOn}}
+                </h2>
                 
                 <div id="content">
                     <div id="link-container">
@@ -62,7 +60,7 @@
                         {{^url}}<a href="#" onclick=copyContent("hidden-content")>Copy Text</a>
                         <a href="#" id="download">Download RAW</a>{{/url}}
                     </div>
-                    {{#code}}<code>{{/code}}{{#text}}<pre>{{/text}}{{#rows}}<span>{{.}}</span>{{/rows}}{{#code}}</code>{{/code}}{{#text}}</pre>{{/text}}
+                    {{#code}}<code>{{/code}}{{#text}}<pre>{{/text}}{{^url}}{{#rows}}<span>{{.}}</span>{{/rows}}{{/url}}{{#code}}</code>{{/code}}{{#text}}</pre>{{/text}}
                     <textarea id="hidden-link">localhost:8080/{{link.hash}}</textarea>
                     {{^url}}<textarea id="hidden-content">{{link.content}}</textarea>{{/url}}
                 </div>

@@ -5,6 +5,8 @@
     --highlight: #e285ff;
     --offwhite: #eee;
     --disabled: #ccc;
+    --light-gray: #ccc;
+    --dark-gray: #aaa;
     --narrow: 500px;
     --wide: 700px;
 }
@@ -71,7 +73,7 @@ header{
     border-top-left-radius: 1em;
     border-top-right-radius: 1em;
     color: var(--accent);
-    padding: .75em 2em .5em 2em;
+    padding: .75em .125em .5em .125em;
     text-align: center;
 }
 .tab+.tab {
@@ -171,31 +173,34 @@ input, textarea, input[type=url] {
     margin-top: 1em;
 }
 #content-links a {
-    background: #aaa;
-    border-radius: 1em;
+    background: var(--light-gray);
+    border-top-right-radius: 1em;
+    border-top-left-radius: 1em;
     color: #000;
     font-size: 100%;
     padding: .25em .5em;
     margin-left: .5em;
 }
 #content-links a:hover {
-    background: #ddd;
+    background: #fff;
 }
 #content span {
-    background: #ccc;
+    background: #f6f6f6;
     display: block;
+    font-size: 150%;
     padding: .5em 1em .5em 3rem;
     position: relative;
 }
 #content span:nth-child(2n+1) {
-    background: #ddd;
+    background: #fff;
 }
 #content span:before{
     content: counter(line);
     counter-increment: line;
     display: block;
+    font-weight: bold;
     padding: 0 .5em;
-    color: #333;
+    color: #aaa;
     position: absolute;
     left: 0;
     text-align: right;
@@ -212,7 +217,7 @@ input, textarea, input[type=url] {
 }
 #link-label {
     background: var(--accent);
-    color: var(--highlight);
+    color: #fff;
     display: inline-block;
     font-size: 150%;
     font-weight: normal;
@@ -226,7 +231,7 @@ input, textarea, input[type=url] {
     padding: .5em;
 }
 #link-anchor {
-    background: #aaa;
+    background: var(--dark-gray);
     color: #000;
     display: block;
     font-family: sans-serif;
@@ -235,7 +240,7 @@ input, textarea, input[type=url] {
     padding: .5em 1em;
 }
 #link-anchor:hover {
-    background: #ddd;
+    background: var(--light-gray);
 }
 #hidden-link,
 #hidden-content {
@@ -243,7 +248,7 @@ input, textarea, input[type=url] {
 }
 #footer {
     color: #fff;
-    padding: 4em 1em 3em 1em;
+    padding: 2em 1em 3em 1em;
     opacity: 0.9;
     margin: 0 auto;
 }
