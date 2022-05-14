@@ -249,7 +249,11 @@ input, textarea, input[type=url] {
 }
 #hidden-link,
 #hidden-content {
-    width: 0; height: 0; position:relative; left: 100000px;
+    display: none;
+    width: 0;
+    height: 0;
+    position:relative;
+    left: 100000px;
 }
 #footer {
     color: #fff;

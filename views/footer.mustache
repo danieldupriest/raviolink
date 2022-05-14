@@ -1,9 +1,10 @@
         <script>
+            // Setup download link
             var link = document.getElementById("download");
             const text = document.getElementById("hidden-content").value;
             var file = new Blob([text], {"type": "text/plain"});
             link.href = URL.createObjectURL(file);
-            link.download = `{{link.hash}}.txt`;
+            link.download = `{{link.hash}}.txt`;            
         </script>
     </body>
     <footer id="footer">

@@ -9,9 +9,11 @@
             var raw = `{{list.content}}`;
             function copyContent(id) {
                 const input = document.getElementById(id);
+                input.style.display = "block";
                 input.select();
                 input.setSelectionRange(0,999999999);
                 document.execCommand("copy");
+                input.style.display = "none";
                 window.alert("Text copied.");
             }
         </script>

@@ -16,7 +16,7 @@ const app = express();
 app.set("views", "./views");
 app.set("view engine", "mustache");
 app.engine("mustache", mustacheExpress());
-app.use(express.static("./public"));
+app.use(express.static("./public", { etag: false }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/:uid", log, handleLink);
