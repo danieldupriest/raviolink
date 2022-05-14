@@ -53,7 +53,7 @@
                 <div id="content">
                     <div id="link-container">
                         <div id="link-label">Link</div>
-                        <div id="link-text">raviolink.com/{{link.hash}}</div>
+                        <div id="link-text">{{server}}/{{link.hash}}</div>
                         <a id="link-anchor" href="#" onclick=copyContent("hidden-link")>Copy</a>
                     </div>
                     <div id="content-links">
@@ -61,7 +61,7 @@
                         <a href="#" id="download">Download RAW</a>{{/url}}
                     </div>
                     {{#code}}<code>{{/code}}{{#text}}<pre>{{/text}}{{^url}}{{#rows}}<span>{{.}}</span>{{/rows}}{{/url}}{{#code}}</code>{{/code}}{{#text}}</pre>{{/text}}
-                    <textarea id="hidden-link">raviolink.com/{{link.hash}}</textarea>
+                    <textarea id="hidden-link">{{server}}/{{link.hash}}</textarea>
                     {{^url}}<textarea id="hidden-content">{{link.content}}</textarea>{{/url}}
                 </div>
             </div>

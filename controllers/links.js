@@ -1,6 +1,12 @@
+require("dotenv").config();
 const Link = require("../database/link.js");
 const Timer = require("../database/timer.js");
 const validUrl = require("../utils/urlChecker.js");
+
+console.log("Process.env.SERVER: " + process.env.SERVER);
+const serverString =
+    process.env.SERVER + (process.env.PORT == 80 ? "" : ":" + process.env.PORT);
+console.log("ServerString: " + serverString);
 
 function generatePageData(link) {
     // Prepare text/code
@@ -11,7 +17,6 @@ function generatePageData(link) {
     });
 
     // Convert date
-    console.log("Preparing date fom: " + link.createdOn);
     link.createdOn = link.createdOn.toLocaleDateString("en-us", {
         weekday: "long",
         year: "numeric",
@@ -25,6 +30,7 @@ function generatePageData(link) {
         code: link.type == "code",
         rows: output,
         link: link,
+        server: serverString,
     };
 
     return data;
@@ -41,8 +47,8 @@ const handleLink = async (req, res) => {
         return res.redirect(301, link.content);
     }
 
+    // Handle Text/Code types
     const data = generatePageData(link);
-
     console.log("Rendering link with data: " + JSON.stringify(data));
     res.render("index", data);
 };

@@ -1,6 +1,6 @@
 const dotenv = require("dotenv");
 dotenv.config();
-const express =require("express");
+const express = require("express");
 const mustacheExpress = require("mustache-express");
 const { handleLink, frontPage, postLink } = require("./controllers/links.js");
 const path = require("path");
@@ -13,7 +13,6 @@ const port = process.env.PORT || 8080;
 
 const app = express();
 
-//const dirname = path.dirname(fileURLToPath(import.meta.url));
 app.set("views", "./views");
 app.set("view engine", "mustache");
 app.engine("mustache", mustacheExpress());
