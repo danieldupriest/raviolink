@@ -11,6 +11,7 @@ function generatePageData(link) {
     });
 
     // Convert date
+    console.log("Preparing date fom: " + link.createdOn);
     link.createdOn = link.createdOn.toLocaleDateString("en-us", {
         weekday: "long",
         year: "numeric",

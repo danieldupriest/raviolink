@@ -19,12 +19,11 @@ class Link {
         console.log("Searching for hash: " + hash);
         const dbLink = await get(`SELECT * FROM links WHERE hash = ?`, [hash]);
         if (dbLink) {
-            console.log("Found: " + JSON.stringify(dbLink));
             let result = new Link(
                 dbLink["content"],
                 dbLink["type"],
                 dbLink["id"],
-                new Date(parseInt(dbLink["createdOn"])),
+                new Date(parseInt(dbLink["created_on"])),
                 dbLink["hash"]
             );
             return result;
