@@ -73,6 +73,7 @@ header{
     border-top-left-radius: 1em;
     border-top-right-radius: 1em;
     color: var(--accent);
+    flex-basis: 25%;
     padding: .75em .125em .5em .125em;
     text-align: center;
 }
@@ -165,6 +166,10 @@ input, textarea, input[type=url] {
     line-height: 1.5rem;
     white-space: normal;
     counter-reset: line;
+}
+#content pre,
+#content code {
+    margin-top: 0;
 }
 #content-links {
     display: flex;
