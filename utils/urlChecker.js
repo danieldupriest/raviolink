@@ -1,6 +1,6 @@
-import url from "node:url";
+const url = require("url");
 
-export default (input) => {
+const urlChecker = (input) => {
     try {
         const newUrl = url.parse(input);
     } catch {
@@ -8,3 +8,5 @@ export default (input) => {
     }
     return true;
 };
+
+module.exports = urlChecker;

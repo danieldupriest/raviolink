@@ -1,6 +1,6 @@
-import { config } from "dotenv";
+const { config } = require("dotenv");
 config();
-import sqlite3 from "sqlite3";
+const sqlite3 = require("sqlite3");
 sqlite3.verbose();
 
 const dbFile = process.env.DATABASE_FILE || "./database/sqlite.db";
@@ -55,4 +55,4 @@ const all = (sql, params) => {
     });
 };
 
-export { db, run, get, all };
+module.exports = { db, run, get, all };

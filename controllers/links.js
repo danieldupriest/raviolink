@@ -1,6 +1,6 @@
-import Link from "../database/link.js";
-import Timer from "../database/timer.js";
-import validUrl from "../utils/urlChecker.js";
+const Link = require("../database/link.js");
+const Timer = require("../database/timer.js");
+const validUrl = require("../utils/urlChecker.js");
 
 function generatePageData(link) {
     // Prepare text/code
@@ -29,7 +29,7 @@ function generatePageData(link) {
     return data;
 }
 
-export const handleLink = async (req, res) => {
+const handleLink = async (req, res) => {
     // Try to retrieve link
     const { hash } = req.params;
     const link = await Link.findByHash(hash);
@@ -46,11 +46,11 @@ export const handleLink = async (req, res) => {
     res.render("index", data);
 };
 
-export const frontPage = (req, res) => {
+const frontPage = (req, res) => {
     res.render("index", { link: null });
 };
 
-export const postLink = async (req, res) => {
+const postLink = async (req, res) => {
     /*// Check for an active timer and create new one if needed
     const ip = req.socket.remoteAddress;
     let userTimer;
@@ -93,3 +93,4 @@ export const postLink = async (req, res) => {
     console.log("Rendering link with data: " + JSON.stringify(data));
     return res.render("index", data);
 };
+module.exports = { handleLink, frontPage, postLink };

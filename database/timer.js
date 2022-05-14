@@ -1,10 +1,10 @@
-import { run, all, get } from "./database.js";
+const { run, all, get } = require("./database.js");
 
 const INITIAL_DELAY = 1000;
 const GROWTH_RATE = 10.0;
 
 // Dataclass to store links
-export default class Timer {
+class Timer {
     constructor(ip) {
         this.ip = ip;
         this.delay_in_ms = INITIAL_DELAY;
@@ -55,3 +55,5 @@ export default class Timer {
         await this.update();
     }
 }
+
+module.exports = Timer;

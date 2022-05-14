@@ -9,7 +9,6 @@
     "init": "node database/init.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/danieldupriest/raviolink.git"
@@ -22,6 +21,7 @@
   "homepage": "https://github.com/danieldupriest/raviolink#readme",
   "dependencies": {
     "body-parser": "^1.20.0",
+    "crypto-js": "^4.1.1",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "fs": "^0.0.1-security",

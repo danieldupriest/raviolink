@@ -1,5 +1,5 @@
-import { run, all, get } from "./database.js";
-import crypto from "node:crypto";
+const { run, all, get } = require("./database.js");
+const sha256 = require("crypto-js/sha256");
 
 const URL_LENGTH = 7;
 const MAX_HASH_TRIES = 10;
@@ -72,10 +72,9 @@ class Link {
     }
 
     hashOnce(data) {
-        const hash = crypto.createHash("shake256");
-        hash.update(data);
-        const full = hash.digest("hex");
-        return full.substring(0, URL_LENGTH);
+        const hash = sha256(data).toString();
+       	const short = hash.substring(0, URL_LENGTH);
+        return short;
     }
 }
-export default Link;
+module.exports = Link;
