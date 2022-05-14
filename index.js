@@ -19,7 +19,7 @@ app.engine("mustache", mustacheExpress());
 app.use(express.static("./public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get("/:hash", log, handleLink);
+app.get("/:uid", log, handleLink);
 app.get("/", log, frontPage);
 app.post("/", log, postLink);
 

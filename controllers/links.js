@@ -38,8 +38,8 @@ function generatePageData(link) {
 
 const handleLink = async (req, res) => {
     // Try to retrieve link
-    const { hash } = req.params;
-    const link = await Link.findByHash(hash);
+    const { uid } = req.params;
+    const link = await Link.findByUid(uid);
 
     // Handle URL type
     if (link.type == "link") {
