@@ -12,14 +12,14 @@ const db = new sqlite3.Database(dbFile, (err) => {
     } else {
         console.log("Connected to SQlite database");
         db.run(
-            "CREATE TABLE IF NOT EXISTS links (id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT, content TEXT, type TEXT, created_on INTEGER);",
+            "CREATE TABLE IF NOT EXISTS links (id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT, content TEXT, type TEXT, created_on INTEGER, expires_on INTEGER);",
             (err) => {
                 if (err) console.log(err);
                 console.log("Checked/created table: links");
             }
         );
         db.run(
-            "CREATE TABLE IF NOT EXISTS timers (id INTEGER PRIMARY KEY, ip TEXT, delay_in_ms INTEGER, revert_time INTEGER);",
+            "CREATE TABLE IF NOT EXISTS timers (id INTEGER PRIMARY KEY, ip TEXT, delay_in_ms INTEGER, revert_time INTEGER, created_on INTEGER);",
             (err) => {
                 if (err) console.log(err);
                 console.log("Checked/created table: timers");

@@ -2,6 +2,9 @@ require("dotenv").config();
 const Link = require("../database/link.js");
 const Timer = require("../database/timer.js");
 const validUrl = require("../utils/urlChecker.js");
+const RavioliDate = require("../utils/dates.js");
+
+const MAX_DATE_MS = 8640000000000000;
 
 console.log("Process.env.SERVER: " + process.env.SERVER);
 const serverString =
@@ -16,20 +19,12 @@ function generatePageData(link) {
         output.push(row);
     });
 
-    // Convert date
-    link.createdOn = link.createdOn.toLocaleDateString("en-us", {
-        weekday: "long",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-    });
-
     const data = {
         url: link.type == "link",
         text: link.type == "text",
         code: link.type == "code",
         rows: output,
-        link: link,
+        link: link.toJSON(),
         server: serverString,
     };
 
@@ -41,6 +36,28 @@ const handleLink = async (req, res) => {
     const { uid } = req.params;
     const link = await Link.findByUid(uid);
 
+    console.log("Link: " + link);
+    // Handle missing links
+    if (!link) {
+        res.status(404);
+        return res.render("error", {
+            server: serverString,
+            status: 404,
+            error: "Link not found",
+        });
+    }
+
+    // Handle expired links
+    const now = new RavioliDate(RavioliDate.now());
+    if (now > link.expiresOn) {
+        await link.delete();
+        return res.render("error", {
+            server: serverString,
+            status: 410,
+            error: "Link has expired",
+        });
+    }
+
     // Handle URL type
     if (link.type == "link") {
         console.log("Redirecting to: " + link.content);
@@ -49,7 +66,6 @@ const handleLink = async (req, res) => {
 
     // Handle Text/Code types
     const data = generatePageData(link);
-    console.log("Rendering link with data: " + JSON.stringify(data));
     res.render("index", data);
 };
 
@@ -77,7 +93,7 @@ const postLink = async (req, res) => {
     await userTimer.update();*/
 
     // Filter input
-    const { content, type } = req.body;
+    const { content, type, expires } = req.body;
     switch (type) {
         case "link":
             if (!validUrl(content))
@@ -91,13 +107,21 @@ const postLink = async (req, res) => {
             throw new Error(`Unsupported type: ${type}`);
     }
 
-    // Generate new link
-    let newLink = new Link(content, type);
+    // Calculate expiration date
+    let expireDate = null;
+    if (expires != "never") {
+        const msToAdd = parseInt(expires);
+        const now = new RavioliDate(RavioliDate.now());
+        console.log("msToAdd: " + msToAdd + " Now: " + now);
+        expireDate = new RavioliDate(now.getTime() + msToAdd);
+    }
+    console.log("generated expire date: " + expireDate);
+    let newLink = new Link(content, type, expireDate);
     await newLink.save();
 
     const data = generatePageData(newLink);
 
-    console.log("Rendering link with data: " + JSON.stringify(data));
+    console.log("Rendering link with data: ");
     return res.render("index", data);
 };
 module.exports = { handleLink, frontPage, postLink };

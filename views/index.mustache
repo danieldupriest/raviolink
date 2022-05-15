@@ -17,8 +17,19 @@
                 <div class="form-group">
                     <label for="url-input">URL to shorten</label>
                     <input type="url" name="content" class="form-control is-valid" id="url-input" placeholder="http://example.com">
-                    <input type="hidden" name="type" value="link"/>
                 </div>
+                <div class="form-group">
+                    <label for="expires-input">Link expires</label>
+                    <select name="expires" class="form-control" id="expires-input" value="never">
+                        <option value="never">Never</option>
+                        <option value="3600000">1 hour</option>
+                        <option value="86400000">1 day</option>
+                        <option value="604800000">1 week</option>
+                        <option value="2628000000">1 month</option>
+                        <option value="31540000000">1 year</option>
+                    </select>
+                </div>
+                <input type="hidden" name="type" value="link"/>
                 <button type="submit" class="btn btn-primary">Create link</button>
             </form>  
         </div>
@@ -28,8 +39,20 @@
                 <div class="form-group">
                     <label for="text-input">Text to share</label>
                     <textarea rows=5 maxlength=500000 name="content" class="form-control is-valid" id="text-input" placeholder="Paste your text here..."></textarea>
-                    <input type="hidden" name="type" value="text"/>
                 </div>
+                <div class="form-group">
+                    <label for="expires-input">Link expires</label>
+                    <select name="expires" class="form-control" id="expires-input" value="never">
+                        <option value="never">Never</option>
+                        <option value="30000">30 seconds</option>
+                        <option value="3600000">1 hour</option>
+                        <option value="86400000">1 day</option>
+                        <option value="604800000">1 week</option>
+                        <option value="2628000000">1 month</option>
+                        <option value="31540000000">1 year</option>
+                    </select>
+                </div>
+                <input type="hidden" name="type" value="text"/>
                 <button type="submit" class="btn btn-primary">Create link</button>
             </form>
         </div>
@@ -39,8 +62,19 @@
                 <div class="form-group">
                     <label for="code-input">Code to share</label>
                     <textarea rows=5 maxlength=500000 name="content" class="form-control is-valid" id="code-input" placeholder="Paste your text here..."></textarea>
-                    <input type="hidden" name="type" value="code"/>
                 </div>
+                <div class="form-group">
+                    <label for="expires-input">Link expires</label>
+                    <select name="expires" class="form-control" id="expires-input" value="never">
+                        <option value="never">Never</option>
+                        <option value="3600000">1 hour</option>
+                        <option value="86400000">1 day</option>
+                        <option value="604800000">1 week</option>
+                        <option value="2628000000">1 month</option>
+                        <option value="31540000000">1 year</option>
+                    </select>
+                </div>
+                <input type="hidden" name="type" value="code"/>
                 <button type="submit" class="btn btn-primary">Create link</button>
             </form>
         </div>
@@ -49,7 +83,12 @@
                 <h2>
                     {{#url}}Link to {{link.content}}{{/url}}{{#code}}Code{{/code}}{{#text}}Text{{/text}} created on {{link.createdOn}}
                 </h2>
-                
+                <dl>
+                    <div class="row">
+                        <dt>Link expires:</dt>
+                        <dd>{{link.expiresOn}}</dd>
+                    </div>
+                </dl>
                 <div id="content">
                     <div id="link-container">
                         <div id="link-label">Link</div>
@@ -68,4 +107,12 @@
         {{/link}}
   </div>
 </div>
+<script>
+    // Setup download link
+    var link = document.getElementById("download");
+    const text = document.getElementById("hidden-content").value;
+    var file = new Blob([text], {"type": "text/plain"});
+    link.href = URL.createObjectURL(file);
+    link.download = `{{link.hash}}.txt`;            
+</script>
 {{> footer}}

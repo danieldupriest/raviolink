@@ -134,7 +134,6 @@ input, textarea, input[type=url] {
     background: var(--accent);
     color: #fff;
 }
-]
 @keyframes fadein {
     from {
         opacity:0;
@@ -211,6 +210,15 @@ input, textarea, input[type=url] {
     text-align: right;
     width: 2rem;
 }
+#content .row {
+    display: flex;
+}
+dt {
+    font-weight: bold;
+}
+dd {
+    margin-left: 1em;
+}
 #link-container {
     background: #fff;
     display: flex;
@@ -254,6 +262,33 @@ input, textarea, input[type=url] {
     height: 0;
     position:relative;
     left: 100000px;
+}
+
+/** ERROR PAGE **/
+.error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.error-container .row {
+    align-items: center;
+}
+.error-status,
+.error-message {
+    font-size: 200%;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+.error-message {
+    font-size: 200%;
+    margin-left: 1em;
+}
+.error-link {
+    text-align: center;
+    color: var(--accent);
+}
+.error-link:hover {
+    text-decoration: underline;
 }
 #footer {
     color: #fff;

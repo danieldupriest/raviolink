@@ -16,7 +16,16 @@ const app = express();
 app.set("views", "./views");
 app.set("view engine", "mustache");
 app.engine("mustache", mustacheExpress());
-app.use(express.static("./public", { etag: false }));
+app.use(
+    express.static("./public", {
+        maxAge: "30 days",
+        setHeaders: (res, path) => {
+            if (express.static.mime.lookup(path) === "text/css") {
+                res.setHeader("Cache-Control", "public, max-age=0");
+            }
+        },
+    })
+);
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/:uid", log, handleLink);
