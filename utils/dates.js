@@ -26,7 +26,6 @@ const days = {
 module.exports = class RavioliDate extends Date {
     constructor(arg) {
         super(arg);
-        console.log("This: " + this);
     }
 
     toJSON() {

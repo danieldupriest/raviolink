@@ -7,7 +7,7 @@ const path = require("path");
 const { fileURLToPath } = require("url");
 const bodyParser = require("body-parser");
 const log = require("./utils/logger.js");
-const errorHandler = require("./controllers/errors.js");
+const { errorResponder } = require("./controllers/errors.js");
 
 const port = process.env.PORT || 8080;
 
@@ -16,23 +16,15 @@ const app = express();
 app.set("views", "./views");
 app.set("view engine", "mustache");
 app.engine("mustache", mustacheExpress());
-app.use(
-    express.static("./public", {
-        maxAge: "30 days",
-        setHeaders: (res, path) => {
-            if (express.static.mime.lookup(path) === "text/css") {
-                res.setHeader("Cache-Control", "public, max-age=0");
-            }
-        },
-    })
-);
+app.use(express.static("./public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get("/:uid", log, handleLink);
-app.get("/", log, frontPage);
-app.post("/", log, postLink);
+app.use(log);
+app.get("/:uid", handleLink);
+app.get("/", frontPage);
+app.post("/", postLink);
 
-app.use(errorHandler);
+app.use(errorResponder);
 
 app.listen(port, () => {
     console.log(`Raviolink listening on port ${port}`);

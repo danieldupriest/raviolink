@@ -31,42 +31,49 @@ function generatePageData(link) {
     return data;
 }
 
-const handleLink = async (req, res) => {
-    // Try to retrieve link
-    const { uid } = req.params;
-    const link = await Link.findByUid(uid);
+const handleLink = async (req, res, next) => {
+    try {
+        // Try to retrieve link
+        const { uid } = req.params;
+        const link = await Link.findByUid(uid);
 
-    console.log("Link: " + link);
-    // Handle missing links
-    if (!link) {
-        res.status(404);
-        return res.render("error", {
-            server: serverString,
-            status: 404,
-            error: "Link not found",
-        });
+        // Handle missing links
+        if (!link) {
+            res.status(404);
+            return res.render("error", {
+                status: 404,
+                error: "Link not found",
+            });
+        }
+
+        // Handle expired links
+        const now = new RavioliDate(RavioliDate.now());
+        if (link.expiresOn && now > link.expiresOn) {
+            await link.delete();
+            res.status(404);
+            return res.render("error", {
+                status: 404,
+                error: "Link not found",
+            });
+        }
+
+        // Delete if deleteOnView is true
+        if (link.deleteOnView) {
+            await link.delete();
+        }
+
+        // Handle URL type
+        if (link.type == "link") {
+            console.log("Redirecting to: " + link.content);
+            return res.redirect(301, link.content);
+        }
+
+        // Handle Text/Code types
+        const data = generatePageData(link);
+        res.render("index", data);
+    } catch (err) {
+        next(err);
     }
-
-    // Handle expired links
-    const now = new RavioliDate(RavioliDate.now());
-    if (now > link.expiresOn) {
-        await link.delete();
-        return res.render("error", {
-            server: serverString,
-            status: 410,
-            error: "Link has expired",
-        });
-    }
-
-    // Handle URL type
-    if (link.type == "link") {
-        console.log("Redirecting to: " + link.content);
-        return res.redirect(301, link.content);
-    }
-
-    // Handle Text/Code types
-    const data = generatePageData(link);
-    res.render("index", data);
 };
 
 const frontPage = (req, res) => {
@@ -93,7 +100,7 @@ const postLink = async (req, res) => {
     await userTimer.update();*/
 
     // Filter input
-    const { content, type, expires } = req.body;
+    const { content, type, expires, deleteOnView } = req.body;
     switch (type) {
         case "link":
             if (!validUrl(content))
@@ -112,16 +119,19 @@ const postLink = async (req, res) => {
     if (expires != "never") {
         const msToAdd = parseInt(expires);
         const now = new RavioliDate(RavioliDate.now());
-        console.log("msToAdd: " + msToAdd + " Now: " + now);
         expireDate = new RavioliDate(now.getTime() + msToAdd);
     }
-    console.log("generated expire date: " + expireDate);
-    let newLink = new Link(content, type, expireDate);
+
+    // Generate link and save
+    let newLink = new Link(
+        content,
+        type,
+        expireDate,
+        deleteOnView == "true" ? true : false
+    );
     await newLink.save();
 
     const data = generatePageData(newLink);
-
-    console.log("Rendering link with data: ");
     return res.render("index", data);
 };
 module.exports = { handleLink, frontPage, postLink };

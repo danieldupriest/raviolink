@@ -29,6 +29,10 @@
                         <option value="31540000000">1 year</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label for="delete-on-view-input">Delete on view</label>
+                    <input type="checkbox" class="form-control" id="delete-on-view-input" name="deleteOnView" value="true">
+                </div>
                 <input type="hidden" name="type" value="link"/>
                 <button type="submit" class="btn btn-primary">Create link</button>
             </form>  
@@ -50,6 +54,10 @@
                         <option value="2628000000">1 month</option>
                         <option value="31540000000">1 year</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label for="delete-on-view-input">Delete on view</label>
+                    <input type="checkbox" class="form-control" id="delete-on-view-input" name="deleteOnView" value="true">
                 </div>
                 <input type="hidden" name="type" value="text"/>
                 <button type="submit" class="btn btn-primary">Create link</button>
@@ -73,6 +81,10 @@
                         <option value="31540000000">1 year</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label for="delete-on-view-input">Delete on view</label>
+                    <input type="checkbox" class="form-control" id="delete-on-view-input" name="deleteOnView" value="true">
+                </div>
                 <input type="hidden" name="type" value="code"/>
                 <button type="submit" class="btn btn-primary">Create link</button>
             </form>
@@ -86,6 +98,10 @@
                     <div class="row">
                         <dt>Link expires:</dt>
                         <dd>{{link.expiresOn}}</dd>
+                    </div>
+                    <div class="row">
+                        <dt>Delete on view:</dt>
+                        <dd>{{link.deleteOnView}}</dd>
                     </div>
                 </dl>
                 <div id="content">
