@@ -17,12 +17,14 @@ app.set("views", "./views");
 app.set("view engine", "mustache");
 app.engine("mustache", mustacheExpress());
 app.use(express.static("./public"));
+app.use(process.env.BASE_URL, express.static("./public"));
+
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(log);
-app.get("/:uid", handleLink);
-app.get("/", frontPage);
-app.post("/", postLink);
+app.get(process.env.BASE_URL + "/:uid", handleLink);
+app.get(process.env.BASE_URL + "/", frontPage);
+app.post(process.env.BASE_URL + "/", postLink);
 
 app.use(errorResponder);
 

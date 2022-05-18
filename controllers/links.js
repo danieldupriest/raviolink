@@ -8,7 +8,9 @@ const MAX_DATE_MS = 8640000000000000;
 
 console.log("Process.env.SERVER: " + process.env.SERVER);
 const serverString =
-    process.env.SERVER + (process.env.PORT == 80 ? "" : ":" + process.env.PORT);
+    process.env.SERVER +
+    (process.env.PORT == 80 ? "" : ":" + process.env.PORT) +
+    process.env.BASE_URL;
 console.log("ServerString: " + serverString);
 
 function generatePageData(link) {
@@ -45,6 +47,7 @@ const handleLink = async (req, res, next) => {
             return res.render("error", {
                 status: 404,
                 error: "Link not found",
+                server: serverString,
             });
         }
 
@@ -56,6 +59,7 @@ const handleLink = async (req, res, next) => {
             return res.render("error", {
                 status: 404,
                 error: "Link not found",
+                server: serverString,
             });
         }
 

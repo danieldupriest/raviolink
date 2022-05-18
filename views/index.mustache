@@ -12,7 +12,7 @@
     </div>
     <div class="panels">
         <div class="panel" id="one-panel">
-            <form action="/" method="post">
+            <form action="{{server}}" method="post">
                 <p>Paste in a long URL to generate a short link. It should begin with <code>https://</code> or <code>http://</code>.</p>
                 <div class="form-group">
                     <label for="url-input">URL to shorten</label>
@@ -38,7 +38,7 @@
             </form>  
         </div>
         <div class="panel" id="two-panel">
-            <form action="/" method="post">
+            <form action="{{server}}" method="post">
                 <p>Paste in the plain text you wish to share. The generated link will display the text. You can paste up to around 500,000 characters, or about the length of the Mary Shelley novel Frankenstein.</p>
                 <div class="form-group">
                     <label for="text-input">Text to share</label>
@@ -64,7 +64,7 @@
             </form>
         </div>
         <div class="panel" id="three-panel">
-            <form action="/" method="post">
+            <form action="{{server}}" method="post">
                 <p> Paste in the code you wish to share. The generated link will display the code with line numbers. You can paste up to around 500,000 characters, or about 7,000 lines of code.</p>
                 <div class="form-group">
                     <label for="code-input">Code to share</label>
