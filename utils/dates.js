@@ -13,6 +13,21 @@ const months = {
     11: "December",
 };
 
+const shortMonths = {
+    0: "Jan",
+    1: "Feb",
+    2: "Mar",
+    3: "Apr",
+    4: "May",
+    5: "Jun",
+    6: "Jul",
+    7: "Aug",
+    8: "Sep",
+    9: "Oct",
+    10: "Nov",
+    11: "Dec",
+};
+
 const days = {
     0: "Sunday",
     1: "Monday",
@@ -23,30 +38,45 @@ const days = {
     6: "Saturday",
 };
 
-module.exports = class RavioliDate extends Date {
-    constructor(arg) {
-        super(arg);
+function createDate(input = null) {
+    let d;
+    if (input) {
+        d = new Date(input);
+    } else {
+        d = new Date();
     }
 
-    toJSON() {
-        return this.toAmericanDate();
-    }
-
-    toString() {
-        return this.toAmericanDate();
-    }
-
-    toAmericanDate() {
-        const day = days[this.getDay()];
-        const date = this.getDate();
-        const month = months[this.getMonth()];
-        const year = this.getFullYear();
-        let hours = this.getHours();
-        let minutes = this.getMinutes();
+    d.toFullDate = () => {
+        const day = days[d.getDay()];
+        const date = d.getDate();
+        const month = months[d.getMonth()];
+        const year = d.getFullYear();
+        let hours = d.getHours();
+        let minutes = d.getMinutes();
         if (minutes.toString().length == 1) minutes = "0" + minutes;
         const amPm = hours >= 12 ? "pm" : "am";
         if (hours > 12) hours = hours % 12;
 
         return `${day}, ${month} ${date}, ${year} at ${hours}:${minutes} ${amPm}`;
-    }
-};
+    };
+
+    d.toShortDate = () => {
+        const date = d.getDate();
+        const month = shortMonths[d.getMonth()];
+        const year = d.getFullYear();
+
+        return `${month}. ${date}, ${year}`;
+    };
+
+    d.toJSON = () => {
+        return d.toFullDate();
+    };
+
+    d.toString = () => {
+        return d.toFullDate();
+    };
+
+    return d;
+}
+
+module.exports = createDate;

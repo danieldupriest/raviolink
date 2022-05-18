@@ -92,16 +92,20 @@
         {{#link}}
             <div class="panel" id="four-panel">
                 <h2>
-                    {{#url}}Link to {{link.content}}{{/url}}{{#code}}Code{{/code}}{{#text}}Text{{/text}} created on {{link.createdOn}}
+                    {{#url}}Link to {{link.content}}{{/url}}{{#code}}Code{{/code}}{{#text}}Text{{/text}} created on {{shortDate}}
                 </h2>
                 <dl>
-                    <div class="row">
+                    <div class="definition">
                         <dt>Link expires:</dt>
                         <dd>{{link.expiresOn}}</dd>
                     </div>
-                    <div class="row">
+                    <div class="definition">
                         <dt>Delete on view:</dt>
                         <dd>{{link.deleteOnView}}</dd>
+                    </div>
+                    <div class="definition">
+                        <dt>QR Code</dt>
+                        <dd><canvas id="qr-code"></canvas></dd>
                     </div>
                 </dl>
                 <div id="content">
@@ -123,11 +127,19 @@
   </div>
 </div>
 <script>
+    {{#link}}
     // Setup download link
     var link = document.getElementById("download");
     const text = document.getElementById("hidden-content").value;
     var file = new Blob([text], {"type": "text/plain"});
     link.href = URL.createObjectURL(file);
-    link.download = `{{link.hash}}.txt`;            
+    link.download = `{{link.uid}}.txt`;
+
+    // Setup QR code
+    var qrContainer = document.getElementById("qr-code");
+    QRCode.toCanvas(qrContainer, 'http://{{server}}/{{link.uid}}', (error) => {
+        if(error) console.error(error);
+    });
+    {{/link}}
 </script>
 {{> footer}}

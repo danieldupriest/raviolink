@@ -28,6 +28,8 @@ function generatePageData(link) {
         server: serverString,
     };
 
+    data.link.shortDate = link.createdOn.toShortDate;
+
     return data;
 }
 
@@ -47,7 +49,7 @@ const handleLink = async (req, res, next) => {
         }
 
         // Handle expired links
-        const now = new RavioliDate(RavioliDate.now());
+        const now = RavioliDate();
         if (link.expiresOn && now > link.expiresOn) {
             await link.delete();
             res.status(404);
@@ -118,8 +120,8 @@ const postLink = async (req, res) => {
     let expireDate = null;
     if (expires != "never") {
         const msToAdd = parseInt(expires);
-        const now = new RavioliDate(RavioliDate.now());
-        expireDate = new RavioliDate(now.getTime() + msToAdd);
+        const now = RavioliDate();
+        expireDate = RavioliDate(now.getTime() + msToAdd);
     }
 
     // Generate link and save

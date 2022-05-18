@@ -21,7 +21,7 @@ class Link {
         this.expiresOn = expiresOn;
         this.deleteOnView = deleteOnView;
         this.id = id;
-        if (!createdOn) this.createdOn = new RavioliDate(RavioliDate.now());
+        if (!createdOn) this.createdOn = RavioliDate();
         else this.createdOn = createdOn;
         this.uid = uid;
     }
@@ -51,11 +51,11 @@ class Link {
                 dbLink["content"],
                 dbLink["type"],
                 dbLink["expires_on"]
-                    ? new RavioliDate(parseInt(dbLink["expires_on"]))
+                    ? RavioliDate(parseInt(dbLink["expires_on"]))
                     : null,
                 dbLink["delete_on_view"] == 1 ? true : false,
                 dbLink["id"],
-                new RavioliDate(parseInt(dbLink["created_on"])),
+                RavioliDate(parseInt(dbLink["created_on"])),
                 dbLink["uid"]
             );
             return result;
