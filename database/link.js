@@ -12,6 +12,7 @@ class Link {
         type,
         expiresOn,
         deleteOnView,
+        raw,
         id = 0,
         createdOn = null,
         uid = ""
@@ -20,6 +21,7 @@ class Link {
         this.type = type;
         this.expiresOn = expiresOn;
         this.deleteOnView = deleteOnView;
+        this.raw = raw;
         this.id = id;
         if (!createdOn) this.createdOn = RavioliDate();
         else this.createdOn = createdOn;
@@ -35,6 +37,7 @@ class Link {
             createdOn: this.createdOn,
             id: this.id,
             uid: this.uid,
+            raw: this.raw,
         };
         return result;
     }
@@ -54,6 +57,7 @@ class Link {
                     ? RavioliDate(parseInt(dbLink["expires_on"]))
                     : null,
                 dbLink["delete_on_view"] == 1 ? true : false,
+                dbLink["raw"] == 1 ? true : false,
                 dbLink["id"],
                 RavioliDate(parseInt(dbLink["created_on"])),
                 dbLink["uid"]
@@ -68,7 +72,7 @@ class Link {
         const uid = await this.generateUnusedUid();
         this.uid = uid;
         await run(
-            `INSERT INTO links (uid, content, type, created_on, expires_on, delete_on_view) VALUES (?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO links (uid, content, type, created_on, expires_on, delete_on_view, raw) VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [
                 this.uid,
                 this.content,
@@ -76,6 +80,7 @@ class Link {
                 this.createdOn.getTime(),
                 this.expiresOn ? this.expiresOn.getTime() : null,
                 this.deleteOnView ? 1 : 0,
+                this.raw ? 1 : 0,
             ]
         );
         const results = await get("SELECT last_insert_rowid();");

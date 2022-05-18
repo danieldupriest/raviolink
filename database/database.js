@@ -12,7 +12,7 @@ const db = new sqlite3.Database(dbFile, (err) => {
     } else {
         console.log("Connected to SQlite database");
         db.run(
-            "CREATE TABLE IF NOT EXISTS links (id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT, content TEXT, type TEXT, created_on INTEGER, expires_on INTEGER, delete_on_view INTEGER);",
+            "CREATE TABLE IF NOT EXISTS links (id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT, content TEXT, type TEXT, created_on INTEGER, expires_on INTEGER, delete_on_view INTEGER, raw INTEGER);",
             (err) => {
                 if (err) console.log(err);
                 console.log("Checked/created table: links");

@@ -74,7 +74,14 @@ const handleLink = async (req, res, next) => {
             return res.redirect(301, link.content);
         }
 
-        // Handle Text/Code types
+        // Handle links displayed as raw
+        if (link.raw) {
+            console.log("Displaying as raw text.");
+            res.setHeader("content-type", "text/plain");
+            return res.send(link.content);
+        }
+
+        // Handle links displayed normalls
         const data = generatePageData(link);
         res.render("index", data);
     } catch (err) {
@@ -83,7 +90,7 @@ const handleLink = async (req, res, next) => {
 };
 
 const frontPage = (req, res) => {
-    res.render("index", { link: null });
+    res.render("index", { link: null, server: serverString });
 };
 
 const postLink = async (req, res) => {
@@ -106,7 +113,7 @@ const postLink = async (req, res) => {
     await userTimer.update();*/
 
     // Filter input
-    const { content, type, expires, deleteOnView } = req.body;
+    const { content, type, expires, deleteOnView, raw } = req.body;
     switch (type) {
         case "link":
             if (!validUrl(content))
@@ -133,7 +140,8 @@ const postLink = async (req, res) => {
         content,
         type,
         expireDate,
-        deleteOnView == "true" ? true : false
+        deleteOnView == "true" ? true : false,
+        raw == "true" ? true : false
     );
     await newLink.save();
 

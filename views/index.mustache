@@ -12,7 +12,7 @@
     </div>
     <div class="panels">
         <div class="panel" id="one-panel">
-            <form action="{{server}}" method="post">
+            <form action="http://{{server}}" method="post">
                 <p>Paste in a long URL to generate a short link. It should begin with <code>https://</code> or <code>http://</code>.</p>
                 <div class="form-group">
                     <label for="url-input">URL to shorten</label>
@@ -38,7 +38,7 @@
             </form>  
         </div>
         <div class="panel" id="two-panel">
-            <form action="{{server}}" method="post">
+            <form action="http://{{server}}" method="post">
                 <p>Paste in the plain text you wish to share. The generated link will display the text. You can paste up to around 500,000 characters, or about the length of the Mary Shelley novel Frankenstein.</p>
                 <div class="form-group">
                     <label for="text-input">Text to share</label>
@@ -59,12 +59,16 @@
                     <label for="delete-on-view-input">Delete on view</label>
                     <input type="checkbox" class="form-control" id="delete-on-view-input" name="deleteOnView" value="true">
                 </div>
+                <div class="form-group">
+                    <label for="raw-input">Display as raw</label>
+                    <input type="checkbox" class="form-control" id="raw-input" name="raw" value="true">
+                </div>
                 <input type="hidden" name="type" value="text"/>
                 <button type="submit" class="btn btn-primary">Create link</button>
             </form>
         </div>
         <div class="panel" id="three-panel">
-            <form action="{{server}}" method="post">
+            <form action="http://{{server}}" method="post">
                 <p> Paste in the code you wish to share. The generated link will display the code with line numbers. You can paste up to around 500,000 characters, or about 7,000 lines of code.</p>
                 <div class="form-group">
                     <label for="code-input">Code to share</label>
@@ -85,6 +89,10 @@
                     <label for="delete-on-view-input">Delete on view</label>
                     <input type="checkbox" class="form-control" id="delete-on-view-input" name="deleteOnView" value="true">
                 </div>
+                <div class="form-group">
+                    <label for="raw-input">Display as raw</label>
+                    <input type="checkbox" class="form-control" id="raw-input" name="raw" value="true">
+                </div>
                 <input type="hidden" name="type" value="code"/>
                 <button type="submit" class="btn btn-primary">Create link</button>
             </form>
@@ -104,7 +112,11 @@
                         <dd>{{link.deleteOnView}}</dd>
                     </div>
                     <div class="definition">
-                        <dt>QR Code</dt>
+                        <dt>Display as raw:</dt>
+                        <dd>{{link.raw}}</dd>
+                    </div>
+                    <div class="definition">
+                        <dt>QR code:</dt>
                         <dd><canvas id="qr-code"></canvas></dd>
                     </div>
                 </dl>
