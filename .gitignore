@@ -5,6 +5,7 @@ database/*.db
 .env
 
 # Logs
+debug.log
 logs
 *.log
 npm-debug.log*
