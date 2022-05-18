@@ -23,9 +23,20 @@
                     if(error) console.error(error);
                 });
             }
+            function setupDownloadLink() {
+                var link = document.getElementById("download");
+                const text = document.getElementById("hidden-content").value;
+                var file = new Blob([text], {"type": "text/plain"});
+                link.href = URL.createObjectURL(file);
+                link.download = `{{link.uid}}.txt`;
+            }
+            function init() {
+                drawCanvas();
+                setupDownloadLink();
+            }
         </script>
     </head>
-    <body {{#link}}class="link" onload="drawCanvas()"{{/link}}>
+    <body {{#link}}class="link" onload="init()"{{/link}}>
         <header>
             <a id="title" href="http://{{server}}">
                 <img src="/images/logo.png"/>
