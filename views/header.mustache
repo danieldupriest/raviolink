@@ -17,9 +17,15 @@
                 input.style.display = "none";
                 window.alert("Text copied.");
             }
+            function drawCanvas() {
+                const canvas = document.getElementById("qr-code");
+                QRCode.toCanvas(canvas, 'http://{{server}}/{{link.uid}}', (error) => {
+                    if(error) console.error(error);
+                });
+            }
         </script>
     </head>
-    <body class="{{#link}}link{{/link}}">
+    <body {{#link}}class="link" onload="drawCanvas()"{{/link}}>
         <header>
             <a id="title" href="http://{{server}}">
                 <img src="/images/logo.png"/>

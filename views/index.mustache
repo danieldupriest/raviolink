@@ -146,12 +146,6 @@
     var file = new Blob([text], {"type": "text/plain"});
     link.href = URL.createObjectURL(file);
     link.download = `{{link.uid}}.txt`;
-
-    // Setup QR code
-    var qrContainer = document.getElementById("qr-code");
-    QRCode.toCanvas(qrContainer, 'http://{{server}}/{{link.uid}}', (error) => {
-        if(error) console.error(error);
-    });
     {{/link}}
 </script>
 {{> footer}}

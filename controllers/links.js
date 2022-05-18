@@ -113,7 +113,8 @@ const postLink = async (req, res) => {
     await userTimer.update();*/
 
     // Filter input
-    const { content, type, expires, deleteOnView, raw } = req.body;
+    let { content, type, expires, deleteOnView, raw } = req.body;
+    if (typeof raw == "undefined") raw = false;
     switch (type) {
         case "link":
             if (!validUrl(content))
