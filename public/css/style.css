@@ -189,6 +189,7 @@ input[type=text], textarea, input[type=url] {
     background: var(--light-gray);
     padding: .25em .25em .25em 3rem;
     overflow-x: hidden;
+    min-height: 4ex;
     position: relative;
 }
 
