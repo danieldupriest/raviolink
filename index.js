@@ -22,7 +22,7 @@ app.use(process.env.BASE_URL, express.static("./public"));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const limiter = rateLimiter({ window: 10 * 1000, limit: 3 });
+const limiter = rateLimiter({ window: 10 * 1000, limit: 5 });
 
 app.use(log);
 app.get(process.env.BASE_URL + "/:uid", limiter, handleLink);
