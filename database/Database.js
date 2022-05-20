@@ -11,7 +11,7 @@ class Database {
         this.db = new sqlite3.Database(memory ? ":memory:" : dbFile, (err) => {
             if (err) throw err;
             console.log(
-                "Opened database " + memory ? "in memory" : `file ${dbFile}`
+                "Opened database " + (memory ? "in memory" : `file ${dbFile}`)
             );
         });
     }
