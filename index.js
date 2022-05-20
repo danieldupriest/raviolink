@@ -17,14 +17,15 @@ const app = express();
 app.set("views", "./views");
 app.set("view engine", "mustache");
 app.engine("mustache", mustacheExpress());
+app.disable("x-powered-by");
 app.use(express.static("./public"));
 app.use(process.env.BASE_URL, express.static("./public"));
-
 app.use(bodyParser.urlencoded({ extended: true }));
-
-const limiter = rateLimiter({ window: 10 * 1000, limit: 5 });
-
 app.use(log);
+app.use((req, res, next) => {
+    res.setHeader("X-Content-Type-Options", "nosniff");
+});
+const limiter = rateLimiter({ window: 10 * 1000, limit: 5 });
 app.get(process.env.BASE_URL + "/:uid", limiter, handleLink);
 app.get(process.env.BASE_URL + "/", frontPage);
 app.post(process.env.BASE_URL + "/", limiter, postLink);
