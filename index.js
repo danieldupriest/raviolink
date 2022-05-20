@@ -24,6 +24,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(log);
 app.use((req, res, next) => {
     res.setHeader("X-Content-Type-Options", "nosniff");
+    next();
 });
 const limiter = rateLimiter({ window: 10 * 1000, limit: 5 });
 app.get(process.env.BASE_URL + "/:uid", limiter, handleLink);
