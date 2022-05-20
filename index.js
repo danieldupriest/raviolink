@@ -8,6 +8,7 @@ const { fileURLToPath } = require("url");
 const bodyParser = require("body-parser");
 const log = require("./utils/logger.js");
 const { errorResponder } = require("./controllers/errors.js");
+const rateLimiter = require("./utils/rateLimiter.js");
 
 const port = process.env.PORT || 8080;
 
@@ -21,11 +22,12 @@ app.use(process.env.BASE_URL, express.static("./public"));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(log);
-app.get(process.env.BASE_URL + "/:uid", handleLink);
-app.get(process.env.BASE_URL + "/", frontPage);
-app.post(process.env.BASE_URL + "/", postLink);
+const limiter = rateLimiter({ window: 10 * 1000, limit: 3 });
 
+app.use(log);
+app.get(process.env.BASE_URL + "/:uid", limiter, handleLink);
+app.get(process.env.BASE_URL + "/", frontPage);
+app.post(process.env.BASE_URL + "/", limiter, postLink);
 app.use(errorResponder);
 
 app.listen(port, () => {

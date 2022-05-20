@@ -1,9 +1,11 @@
-const { run, all, get } = require("./database.js");
+const Database = require("./Database.js");
 const genUid = require("../utils/genUid.js");
 const RavioliDate = require("../utils/dates.js");
 
 const URL_LENGTH = 7;
 const MAX_GEN_TRIES = 10;
+
+const db = new Database();
 
 // Dataclass to store links
 class Link {
@@ -44,11 +46,11 @@ class Link {
 
     async delete() {
         console.log(`Deleting link with id: ${this.id}`);
-        await run("DELETE FROM links WHERE uid = ?", [this.uid]);
+        await db.run("DELETE FROM links WHERE uid = ?", [this.uid]);
     }
 
     static async findByUid(uid) {
-        const dbLink = await get(`SELECT * FROM links WHERE uid = ?`, [uid]);
+        const dbLink = await db.get(`SELECT * FROM links WHERE uid = ?`, [uid]);
         if (dbLink) {
             let result = new Link(
                 dbLink["content"],
@@ -71,7 +73,7 @@ class Link {
     async save() {
         const uid = await this.generateUnusedUid();
         this.uid = uid;
-        await run(
+        await db.run(
             `INSERT INTO links (uid, content, type, created_on, expires_on, delete_on_view, raw) VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [
                 this.uid,
@@ -83,7 +85,7 @@ class Link {
                 this.raw ? 1 : 0,
             ]
         );
-        const results = await get("SELECT last_insert_rowid();");
+        const results = await db.get("SELECT last_insert_rowid();");
         this.id = results["last_insert_rowid()"];
     }
 

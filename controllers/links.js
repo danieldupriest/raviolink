@@ -1,17 +1,17 @@
 require("dotenv").config();
-const Link = require("../database/link.js");
-const Timer = require("../database/timer.js");
+const Link = require("../database/Link.js");
 const validUrl = require("../utils/urlChecker.js");
 const RavioliDate = require("../utils/dates.js");
 
 const MAX_DATE_MS = 8640000000000000;
 
 console.log("Process.env.SERVER: " + process.env.SERVER);
+
 const serverString =
     process.env.SERVER +
     (process.env.PORT == 80 ? "" : ":" + process.env.PORT) +
     process.env.BASE_URL;
-console.log("ServerString: " + serverString);
+process.env.SERVER_STRING = serverString;
 
 function generatePageData(link) {
     // Prepare text/code
@@ -94,24 +94,6 @@ const frontPage = (req, res) => {
 };
 
 const postLink = async (req, res) => {
-    /*// Check for an active timer and create new one if needed
-    const ip = req.socket.remoteAddress;
-    let userTimer;
-    try {
-        userTimer = await Timer.findByIp(ip);
-        if (!userTimer.canPost()) {
-            await userTimer.increaseDelay();
-            await userTimer.update();
-            throw new Error("Too soon to post again. Delay extended.");
-        }
-    } catch {
-        userTimer = new Timer(ip);
-    }
-
-    // Increase post timer.
-    await userTimer.decreaseDelay();
-    await userTimer.update();*/
-
     // Filter input
     let { content, type, expires, deleteOnView, raw } = req.body;
     if (typeof raw == "undefined") raw = false;
