@@ -171,14 +171,46 @@ input[type=text], textarea, input[type=url] {
 #content {
     font-family: monospace;
     line-height: 1.5rem;
-    white-space: normal;
     counter-reset: line;
 }
-#content pre,
-#content code {
+#content-text,
+#content-code {
+    font-size: 125%;
     margin-top: 0;
+    white-space: pre-wrap;
+}
+
+#content-text {
     white-space: break-spaces;
 }
+
+#content-text div,
+#content-code div {
+    background: var(--light-gray);
+    padding: .25em .25em .25em 3rem;
+    overflow-x: hidden;
+    position: relative;
+}
+
+#content-text div:nth-child(2n+1),
+#content-code div:nth-child(2n+1) {
+    background: #dfdfdf;
+}
+
+#content-text div:before,
+#content-code div:before {
+    content: counter(line);
+    counter-increment: line;
+    display: block;
+    font-weight: bold;
+    padding: 0 .5em;
+    color: #555;
+    position: absolute;
+    left: 0;
+    text-align: right;
+    width: 2rem;
+}
+   
 #content-links {
     display: flex;
     font-family: 'Lato', sans-serif;
@@ -197,28 +229,7 @@ input[type=text], textarea, input[type=url] {
 #content-links a:hover {
     background: #fff;
 }
-#content span {
-    background: #f6f6f6;
-    display: block;
-    font-size: 150%;
-    padding: .5em 1em .5em 3rem;
-    position: relative;
-}
-#content span:nth-child(2n+1) {
-    background: #fff;
-}
-#content span:before{
-    content: counter(line);
-    counter-increment: line;
-    display: block;
-    font-weight: bold;
-    padding: 0 .5em;
-    color: #aaa;
-    position: absolute;
-    left: 0;
-    text-align: right;
-    width: 2rem;
-}
+
 dl {
     display: table;
 }

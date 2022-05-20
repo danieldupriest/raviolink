@@ -5,9 +5,11 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" href="/css/style.css">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
         <script src="/js/qrcode.js"></script>
+        {{#code}}<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>{{/code}}
         <script>
-            var raw = `{{list.content}}`;
+            //var raw = `{{list.content}}`;
             function copyContent(id) {
                 const input = document.getElementById(id);
                 input.style.display = "block";
@@ -30,9 +32,17 @@
                 link.href = URL.createObjectURL(file);
                 link.download = `{{link.uid}}.txt`;
             }
+            function highlightCode() {
+                const input = document.getElementById("content-code");
+                const currentHTML = document.getElementById("hidden-content").textContent;
+                const newHTML = hljs.highlightAuto(currentHTML).value;
+                const replacedNewlines = newHTML.replace(/\n/g, '</div><div>');
+                input.innerHTML = "<div>" + replacedNewlines + "</div>";
+            }
             function init() {
                 drawCanvas();
                 setupDownloadLink();
+                {{#code}}highlightCode();{{/code}}
             }
         </script>
     </head>
