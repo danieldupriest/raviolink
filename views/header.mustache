@@ -7,7 +7,7 @@
         <link rel="stylesheet" type="text/css" href="/css/style.css">
         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
         <script src="/js/qrcode.js"></script>
-        {{#code}}<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>{{/code}}
+        {{#text}}<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>{{/text}}
         <script>
             //var raw = `{{list.content}}`;
             function copyContent(id) {
@@ -33,7 +33,7 @@
                 link.download = `{{link.uid}}.txt`;
             }
             function highlightCode() {
-                const input = document.getElementById("content-code");
+                const input = document.getElementById("content-text");
                 const currentHTML = document.getElementById("hidden-content").textContent;
                 const newHTML = hljs.highlightAuto(currentHTML).value;
                 const replacedNewlines = newHTML.replace(/\n/g, '</div><div>');
@@ -41,8 +41,8 @@
             }
             function init() {
                 drawCanvas();
-                setupDownloadLink();
-                {{#code}}highlightCode();{{/code}}
+                {{#text}}setupDownloadLink();
+                highlightCode();{{/text}}
             }
         </script>
     </head>

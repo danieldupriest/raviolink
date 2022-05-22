@@ -1,0 +1,5 @@
+const { config } = require("dotenv");
+const { get } = require("express/lib/response");
+config();
+const sqlite3 = require("sqlite3");
+sqlite3.verbose()

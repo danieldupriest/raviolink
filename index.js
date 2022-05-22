@@ -1,14 +1,19 @@
-const dotenv = require("dotenv");
-dotenv.config();
+require("dotenv").config();
 const express = require("express");
 const mustacheExpress = require("mustache-express");
-const { handleLink, frontPage, postLink } = require("./controllers/links.js");
+const {
+    handleLink,
+    frontPage,
+    postLink,
+    handleFile,
+} = require("./controllers/links.js");
 const path = require("path");
 const { fileURLToPath } = require("url");
 const bodyParser = require("body-parser");
 const log = require("./utils/logger.js");
 const { errorResponder } = require("./controllers/errors.js");
 const rateLimiter = require("./utils/rateLimiter.js");
+const multer = require("multer");
 
 const port = process.env.PORT || 8080;
 
@@ -27,10 +32,18 @@ app.use((req, res, next) => {
     res.setHeader("X-Frame-Options", "DENY");
     next();
 });
+
 const limiter = rateLimiter({ window: 10 * 1000, limit: 5 });
-app.get(process.env.BASE_URL + "/:uid", limiter, handleLink);
+app.get(process.env.BASE_URL + "/:uid/file", [limiter, handleFile]);
+app.get(process.env.BASE_URL + "/:uid", [limiter, handleLink]);
 app.get(process.env.BASE_URL + "/", frontPage);
-app.post(process.env.BASE_URL + "/", limiter, postLink);
+const upload = multer({ dest: process.env.TEMP_FILE_PATH });
+app.post(
+    process.env.BASE_URL + "/",
+    limiter,
+    upload.single("content"),
+    postLink
+);
 app.use(errorResponder);
 
 app.listen(port, () => {

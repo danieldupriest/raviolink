@@ -2,16 +2,17 @@ require("dotenv").config();
 const Link = require("../database/Link.js");
 const validUrl = require("../utils/urlChecker.js");
 const RavioliDate = require("../utils/dates.js");
+const { serveError } = require("./errors.js");
+const { generateServerString } = require("../utils/tools.js");
 
 const MAX_DATE_MS = 8640000000000000;
 
-console.log("Process.env.SERVER: " + process.env.SERVER);
-
-const serverString =
-    process.env.SERVER +
-    (process.env.PORT == 80 ? "" : ":" + process.env.PORT) +
-    process.env.BASE_URL;
-process.env.SERVER_STRING = serverString;
+function uidIsValid(uid) {
+    return true;
+    const match = uid.match(/[A-Z|a-z|0-9]{7}/);
+    console.dir(match);
+    return match;
+}
 
 function generatePageData(link) {
     // Prepare text/code
@@ -25,9 +26,11 @@ function generatePageData(link) {
         url: link.type == "link",
         text: link.type == "text",
         code: link.type == "code",
+        file: link.type == "file",
         rows: output,
         link: link.toJSON(),
-        server: serverString,
+        server: generateServerString(),
+        isImage: link.isImage(),
     };
 
     data.link.shortDate = link.createdOn.toShortDate;
@@ -36,79 +39,68 @@ function generatePageData(link) {
 }
 
 const handleLink = async (req, res, next) => {
-    try {
-        // Try to retrieve link
-        const { uid } = req.params;
-        const link = await Link.findByUid(uid);
+    const { uid } = req.params;
+    const link = await Link.findByUid(uid);
 
-        // Handle missing links
-        if (!link) {
-            res.status(404);
-            return res.render("error", {
-                status: 404,
-                error: "Link not found",
-                server: serverString,
-            });
-        }
+    if (!uidIsValid(uid) || !link || link.isDeleted() || link.isExpired())
+        return serveError(res, 404, "Link not found");
 
-        // Handle expired links
-        const now = RavioliDate();
-        if (link.expiresOn && now > link.expiresOn) {
-            await link.delete();
-            res.status(404);
-            return res.render("error", {
-                status: 404,
-                error: "Link not found",
-                server: serverString,
-            });
-        }
-
-        // Delete if deleteOnView is true
-        if (link.deleteOnView) {
-            await link.delete();
-        }
-
-        // Handle URL type
-        if (link.type == "link") {
-            console.log("Redirecting to: " + link.content);
+    //Handle redirects and raw links
+    switch (link.type) {
+        case "link":
+            await link.decrementViewsLeft();
             return res.redirect(301, link.content);
-        }
-
-        // Handle links displayed as raw
-        if (link.raw) {
-            console.log("Displaying as raw text.");
-            res.setHeader("content-type", "text/plain");
-            return res.send(link.content);
-        }
-
-        // Handle links displayed normalls
-        const data = generatePageData(link);
-        res.render("index", data);
-    } catch (err) {
-        next(err);
+            break;
+        case "text":
+            await link.decrementViewsLeft();
+            if (link.raw) {
+                res.setHeader("content-type", "text/plain");
+                return res.send(link.content);
+            }
+            break;
+        case "file":
+            if (link.raw) {
+                await link.decrementViewsLeft();
+                return res.download(
+                    "./files/" + link.uid + "/" + link.content,
+                    (err) => {
+                        if (err) throw err;
+                    }
+                );
+            }
+            break;
+        default:
+            throw new Error("Unsupported link type.");
     }
+
+    // Handle display of normal, non-raw links
+    return res.render("index", generatePageData(link));
+};
+
+const handleFile = async (req, res, next) => {
+    const { uid } = req.params;
+    const link = await Link.findByUid(uid);
+    if (
+        !uidIsValid(uid) ||
+        !link ||
+        link.isDeleted() ||
+        link.isExpired() ||
+        link.type != "file"
+    ) {
+        return serveError(res, 404, "Link not found");
+    }
+    await link.decrementViewsLeft();
+    return res.download("./files/" + link.uid + "/" + link.content);
 };
 
 const frontPage = (req, res) => {
-    res.render("index", { link: null, server: serverString });
+    return res.render("index", { link: null, server: generateServerString() });
 };
 
 const postLink = async (req, res) => {
     // Filter input
     let { content, type, expires, deleteOnView, raw } = req.body;
     if (typeof raw == "undefined") raw = false;
-    switch (type) {
-        case "link":
-            if (!validUrl(content))
-                throw new Error("URL contains unsupported characters.");
-            break;
-        case "text":
-            break;
-        case "code":
-            break;
-        default:
-            throw new Error(`Unsupported type: ${type}`);
-    }
 
     // Calculate expiration date
     let expireDate = null;
@@ -118,17 +110,45 @@ const postLink = async (req, res) => {
         expireDate = RavioliDate(now.getTime() + msToAdd);
     }
 
-    // Generate link and save
-    let newLink = new Link(
-        content,
-        type,
-        expireDate,
-        deleteOnView == "true" ? true : false,
-        raw == "true" ? true : false
-    );
+    // Conditional code
+    let newLink;
+    if (type == "link") {
+        if (!validUrl(content))
+            throw new Error("URL contains unsupported characters.");
+        newLink = new Link(
+            content,
+            type,
+            expireDate,
+            deleteOnView == "true" ? true : false,
+            raw == "true" ? true : false
+        );
+    } else if (type == "text") {
+        newLink = new Link(
+            content,
+            type,
+            expireDate,
+            deleteOnView == "true" ? true : false,
+            raw == "true" ? true : false
+        );
+    } else if (type == "file") {
+        if (!req.file) throw new Error("File not found");
+        newLink = new Link(
+            req.file.originalname,
+            type,
+            expireDate,
+            deleteOnView == "true" ? true : false,
+            raw == "true" ? true : false,
+            req.file["path"],
+            req.file["mimetype"]
+        );
+    } else {
+        throw new Error("Unsupported type");
+    }
+
     await newLink.save();
 
     const data = generatePageData(newLink);
     return res.render("index", data);
 };
-module.exports = { handleLink, frontPage, postLink };
+
+module.exports = { handleLink, frontPage, postLink, handleFile };

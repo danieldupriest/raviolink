@@ -168,13 +168,20 @@ input[type=text], textarea, input[type=url] {
   border-top: 5px solid var(--highlight);
   font-weight: bold;
 }
+#header-content {
+    display: inline-block;
+    max-width: 23ch;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+    vertical-align: bottom;
+    white-space: nowrap;
+}
 #content {
     font-family: monospace;
     line-height: 1.5rem;
     counter-reset: line;
 }
-#content-text,
-#content-code {
+#content-text {
     font-size: 125%;
     margin-top: 0;
     white-space: pre-wrap;
@@ -184,8 +191,7 @@ input[type=text], textarea, input[type=url] {
     white-space: break-spaces;
 }
 
-#content-text div,
-#content-code div {
+#content-text div {
     background: var(--light-gray);
     padding: .25em .25em .25em 3rem;
     overflow-x: hidden;
@@ -193,13 +199,11 @@ input[type=text], textarea, input[type=url] {
     position: relative;
 }
 
-#content-text div:nth-child(2n+1),
-#content-code div:nth-child(2n+1) {
+#content-text div:nth-child(2n+1) {
     background: #dfdfdf;
 }
 
-#content-text div:before,
-#content-code div:before {
+#content-text div:before {
     content: counter(line);
     counter-increment: line;
     display: block;
@@ -211,7 +215,34 @@ input[type=text], textarea, input[type=url] {
     text-align: right;
     width: 2rem;
 }
-   
+
+#content-file {
+    background: #fff;
+    display: flex;
+    align-items: center;
+}
+
+#content-file:hover {
+    background: #ccc;
+}
+
+#content-file-icon {
+    background: rgba(0,0,0,0.2);
+    height: 5rem;
+    padding: 1em;
+}
+
+#content-file-name {
+    color: #333;
+    font-size: 200%;
+    padding: 1em;
+    flex-grow: 1;
+}
+
+#content-image {
+    width: 100%;
+}
+
 #content-links {
     display: flex;
     font-family: 'Lato', sans-serif;
@@ -281,7 +312,7 @@ dd {
     padding: .5em;
 }
 #link-anchor {
-    background: var(--dark-gray);
+    background: var(--light-gray);
     color: #000;
     display: block;
     font-family: sans-serif;
@@ -290,7 +321,7 @@ dd {
     padding: .5em 1em;
 }
 #link-anchor:hover {
-    background: var(--light-gray);
+    background: #fff;
 }
 #hidden-link,
 #hidden-content {
