@@ -8,9 +8,7 @@ const { generateServerString } = require("../utils/tools.js");
 const MAX_DATE_MS = 8640000000000000;
 
 function uidIsValid(uid) {
-    return true;
-    const match = uid.match(/[A-Z|a-z|0-9]{7}/);
-    console.dir(match);
+    const match = uid.match(/[A-Za-z0-9]{7}/);
     return match;
 }
 
