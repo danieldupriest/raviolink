@@ -142,7 +142,7 @@
                     {{#text}}<pre id="content-text">{{#rows}}<div>{{.}}</div>{{/rows}}</pre>{{/text}}
                     {{#code}}<code id="content-text">{{link.content}}</code>{{/code}}
                     {{#file}}
-                        <a id="content-file" href="{{server}}/{{link.uid}}/file">
+                        <a id="content-file" href="http://{{server}}/{{link.uid}}/file">
                             {{#isImage}}
                                 <img id="content-image" src="./{{link.uid}}/file" alt="Image {{link.content}}"/>
                             {{/isImage}}
@@ -153,7 +153,7 @@
                         </a>
                     {{/file}}
                     <textarea id="hidden-content">{{link.content}}</textarea>
-                    <textarea id="hidden-link">{{server}}/{{link.uid}}</textarea>
+                    <textarea id="hidden-link">http://{{server}}/{{link.uid}}</textarea>
                 </div>
             </div>
         {{/link}}
