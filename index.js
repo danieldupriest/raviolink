@@ -11,7 +11,7 @@ const path = require("path");
 const { fileURLToPath } = require("url");
 const bodyParser = require("body-parser");
 const log = require("./utils/logger.js");
-const { errorResponder } = require("./controllers/errors.js");
+const { errorResponder, serveError } = require("./controllers/errors.js");
 const rateLimiter = require("./utils/rateLimiter.js");
 const multer = require("multer");
 
@@ -37,7 +37,10 @@ const limiter = rateLimiter({ window: 10 * 1000, limit: 5 });
 app.get(process.env.BASE_URL + "/:uid/file", [limiter, handleFile]);
 app.get(process.env.BASE_URL + "/:uid", [limiter, handleLink]);
 app.get(process.env.BASE_URL + "/", frontPage);
-const upload = multer({ dest: process.env.TEMP_FILE_PATH });
+const upload = multer({
+    limits: { fileSize: 10000000 },
+    dest: process.env.TEMP_FILE_PATH,
+});
 app.post(
     process.env.BASE_URL + "/",
     limiter,

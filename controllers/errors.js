@@ -4,8 +4,8 @@ const { generateServerString } = require("../utils/tools.js");
 const serveError = (res, code, message) => {
     res.status(code);
     return res.render("error", {
-        status: 404,
-        error: "Link not found",
+        status: code,
+        error: message,
         server: generateServerString(),
     });
 };
