@@ -7,7 +7,7 @@
     <div class="tabs">
         <label class="tab" id="one-tab" for="one">Shorten URL</label>
         <label class="tab" id="two-tab" for="two">Share text</label>
-        <label class="tab" id="three-tab" for="three">Share code</label>
+        <label class="tab" id="three-tab" for="three">Share file</label>
         {{#link}}<label class="tab" id="four-tab" for="four">Link</label>{{/link}}
     </div>
     <div class="panels">
@@ -39,10 +39,10 @@
         </div>
         <div class="panel" id="two-panel">
             <form action="http://{{server}}" method="post">
-                <p>Paste in the plain text you wish to share. The generated link will display the text. You can paste up to around 500,000 characters, or about the length of the Mary Shelley novel Frankenstein.</p>
+                <p>Paste in the text or code you wish to share. The generated link will display the text. You can paste up to around 500,000 characters, or about the length of the Mary Shelley novel Frankenstein.</p>
                 <div class="form-group">
                     <label for="text-input">Text to share</label>
-                    <textarea rows=5 maxlength=500000 name="content" class="form-control is-valid" id="text-input" placeholder="Paste or type your text here..." required></textarea>
+                    <textarea rows=5 maxlength=500000 name="content" class="form-control is-valid" id="text-input" placeholder="Paste or type your text/code here..." required></textarea>
                 </div>
                 <div class="form-group">
                     <label for="expires-input">Link expires</label>
@@ -68,11 +68,12 @@
             </form>
         </div>
         <div class="panel" id="three-panel">
-            <form action="http://{{server}}" method="post">
-                <p> Paste in the code you wish to share. The generated link will display the code with line numbers, and if the type can be detected, syntax hilighting will be applied. You can paste up to around 500,000 characters, or about 7,000 lines of code.</p>
+            <form action="http://{{server}}" method="post" enctype="multipart/form-data">
+                <p>Choose the file you wish to host. The generated link will display the file either as an image, or as a downloadable link. You can only upload files smaller than 10 MB.</p>
                 <div class="form-group">
-                    <label for="code-input">Code to share</label>
-                    <textarea rows=5 maxlength=500000 name="content" class="form-control is-valid" id="code-input" placeholder="Paste or type your code here..." required></textarea>
+                    <label for="file-input">File to share</label>
+                    
+                    <input type="file" name="content" class="form-control is-valid" id="file-input" required>
                 </div>
                 <div class="form-group">
                     <label for="expires-input">Link expires</label>
@@ -90,17 +91,17 @@
                     <input type="checkbox" class="form-control" id="delete-on-view-input" name="deleteOnView" value="true">
                 </div>
                 <div class="form-group">
-                    <label for="raw-input">Display as raw</label>
+                    <label for="raw-input">Direct download</label>
                     <input type="checkbox" class="form-control" id="raw-input" name="raw" value="true">
                 </div>
-                <input type="hidden" name="type" value="code"/>
+                <input type="hidden" name="type" value="file"/>
                 <button type="submit" class="btn btn-primary">Create link</button>
             </form>
         </div>
         {{#link}}
             <div class="panel" id="four-panel">
                 <h2>
-                    {{#url}}Link to {{link.content}}{{/url}}{{#code}}Code{{/code}}{{#text}}Text{{/text}} created on {{shortDate}}
+                    Link to {{#text}}text{{/text}}{{^text}}<span id="header-content">{{link.content}}</span>{{/text}} created on {{shortDate}}
                 </h2>
                 <dl>
                     <div class="definition">
@@ -111,10 +112,18 @@
                         <dt>Delete on view:</dt>
                         <dd>{{link.deleteOnView}}</dd>
                     </div>
+                    {{#text}}
                     <div class="definition">
                         <dt>Display as raw:</dt>
                         <dd>{{link.raw}}</dd>
                     </div>
+                    {{/text}}
+                    {{#file}}
+                    <div class="definition">
+                        <dt>Direct download:</dt>
+                        <dd>{{link.raw}}</dd>
+                    </div>
+                    {{/file}}
                     <div class="definition">
                         <dt>QR code:</dt>
                         <dd><canvas id="qr-code"></canvas></dd>
@@ -127,13 +136,24 @@
                         <a id="link-anchor" href="#" onclick=copyContent("hidden-link")>Copy</a>
                     </div>
                     <div id="content-links">
-                        {{^url}}<a href="#" onclick=copyContent("hidden-content")>Copy Text</a>
-                        <a href="#" id="download">Download RAW</a>{{/url}}
+                        {{#text}}<a href="#" onclick=copyContent("hidden-content")>Copy Text</a>
+                        <a href="#" id="download">Download RAW</a>{{/text}}
                     </div>
-                    {{#code}}<code id="content-code">{{link.content}}</code>{{/code}}
                     {{#text}}<pre id="content-text">{{#rows}}<div>{{.}}</div>{{/rows}}</pre>{{/text}}
-                    <textarea id="hidden-link">{{server}}/{{link.uid}}</textarea>
-                    {{^url}}<textarea id="hidden-content">{{{link.content}}}</textarea>{{/url}}
+                    {{#code}}<code id="content-text">{{link.content}}</code>{{/code}}
+                    {{#file}}
+                        <a id="content-file" href="http://{{server}}/{{link.uid}}/file">
+                            {{#isImage}}
+                                <img id="content-image" src="./{{link.uid}}/file" alt="Image {{link.content}}"/>
+                            {{/isImage}}
+                            {{^isImage}}
+                                <img id="content-file-icon" src="./images/file.png" alt="File icon"/>
+                                <div id="content-file-name">{{link.content}}</div>
+                            {{/isImage}}
+                        </a>
+                    {{/file}}
+                    <textarea id="hidden-content">{{link.content}}</textarea>
+                    <textarea id="hidden-link">http://{{server}}/{{link.uid}}</textarea>
                 </div>
             </div>
         {{/link}}

@@ -1,3 +1,6 @@
+# uploaded files
+files/*
+
 # Database
 database/*.db
 

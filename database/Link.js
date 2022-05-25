@@ -1,6 +1,8 @@
+require("dotenv").config();
 const Database = require("./Database.js");
 const genUid = require("../utils/genUid.js");
 const RavioliDate = require("../utils/dates.js");
+const fs = require("fs");
 
 const URL_LENGTH = 7;
 const MAX_GEN_TRIES = 10;
@@ -15,9 +17,13 @@ class Link {
         expiresOn,
         deleteOnView,
         raw,
+        tempFilename = "",
+        mimeType = "",
         id = 0,
         createdOn = null,
-        uid = ""
+        uid = "",
+        deleted = false,
+        viewsLeft = null
     ) {
         this.content = content;
         this.type = type;
@@ -28,6 +34,28 @@ class Link {
         if (!createdOn) this.createdOn = RavioliDate();
         else this.createdOn = createdOn;
         this.uid = uid;
+        this.tempFilename = tempFilename;
+        this.mimeType = mimeType;
+        this.deleted = deleted;
+        if (viewsLeft) {
+            this.viewsLeft = viewsLeft;
+        } else {
+            if (this.isImage()) this.viewsLeft = 2;
+            else this.viewsLeft = 1;
+        }
+    }
+
+    isImage() {
+        const mime = this.mimeType;
+        return (
+            mime == "image/jpeg" ||
+            mime == "image/apng" ||
+            mime == "image/avif" ||
+            mime == "image/png" ||
+            mime == "image/gif" ||
+            mime == "image/svg+xml" ||
+            mime == "image/webp"
+        );
     }
 
     toJSON() {
@@ -40,18 +68,31 @@ class Link {
             id: this.id,
             uid: this.uid,
             raw: this.raw,
+            tempFilename: this.tempFilename,
+            mimeType: this.mimeType,
+            deleted: this.deleted,
+            viewsLeft: this.viewsLeft,
         };
         return result;
     }
 
-    async delete() {
-        console.log(`Deleting link with id: ${this.id}`);
-        await db.run("DELETE FROM links WHERE uid = ?", [this.uid]);
+    async decrementViewsLeft() {
+        if (this.deleteOnView) {
+            if (this.viewsLeft > 0) {
+                console.log("ViewsLeft > 0: " + this.viewsLeft);
+                this.viewsLeft -= 1;
+                if (this.viewsLeft <= 0) {
+                    this.deleted = true;
+                }
+                await this.update();
+            }
+        }
     }
 
     static async findByUid(uid) {
         const dbLink = await db.get(`SELECT * FROM links WHERE uid = ?`, [uid]);
         if (dbLink) {
+            console.log("DB ViewsLeft: " + dbLink["views_left"]);
             let result = new Link(
                 dbLink["content"],
                 dbLink["type"],
@@ -60,9 +101,13 @@ class Link {
                     : null,
                 dbLink["delete_on_view"] == 1 ? true : false,
                 dbLink["raw"] == 1 ? true : false,
+                "",
+                dbLink["mime_type"],
                 dbLink["id"],
                 RavioliDate(parseInt(dbLink["created_on"])),
-                dbLink["uid"]
+                dbLink["uid"],
+                dbLink["deleted"] == 1 ? true : false,
+                parseInt(dbLink["views_left"])
             );
             return result;
         } else {
@@ -70,11 +115,44 @@ class Link {
         }
     }
 
+    isDeleted() {
+        return this.deleted;
+    }
+
+    isExpired() {
+        const now = RavioliDate();
+        return now < this.expiresOn;
+    }
+
     async save() {
-        const uid = await this.generateUnusedUid();
-        this.uid = uid;
+        console.log("Saving: " + JSON.stringify(this));
+        if (this.uid == 0) {
+            const uid = await this.generateUnusedUid();
+            this.uid = uid;
+        }
+
+        if (this.type == "file") {
+            const baseDir = "./files/" + this.uid;
+            //console.log("ExistsSync '" + baseDir + " : " + fs.existsSync(baseDir));
+            if (!fs.existsSync(baseDir)) {
+                console.log("Making base dir: " + baseDir);
+                fs.mkdirSync(baseDir);
+                const newFilePath = baseDir + "/" + this.content;
+                console.log(
+                    "Renaming '" +
+                        this.tempFilename +
+                        "' to '" +
+                        newFilePath +
+                        "'"
+                );
+                fs.renameSync(this.tempFilename, newFilePath, (err) => {
+                    if (err) throw err;
+                });
+            }
+        }
+
         await db.run(
-            `INSERT INTO links (uid, content, type, created_on, expires_on, delete_on_view, raw) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO links (uid, content, type, created_on, expires_on, delete_on_view, raw, mime_type, deleted, views_left) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 this.uid,
                 this.content,
@@ -83,10 +161,33 @@ class Link {
                 this.expiresOn ? this.expiresOn.getTime() : null,
                 this.deleteOnView ? 1 : 0,
                 this.raw ? 1 : 0,
+                this.mimeType,
+                this.deleted ? 1 : 0,
+                this.viewsLeft,
             ]
         );
         const results = await db.get("SELECT last_insert_rowid();");
         this.id = results["last_insert_rowid()"];
+    }
+
+    async update() {
+        console.log("Updating: " + JSON.stringify(this));
+        await db.run(
+            `UPDATE links SET content = ?, type = ?, created_on = ?, expires_on = ?, delete_on_view = ?, raw = ?, mime_type = ?, deleted = ?, views_left = ? WHERE uid = ?`,
+            [
+                this.content,
+                this.type,
+                this.createdOn.getTime(),
+                this.expiresOn ? this.expiresOn.getTime() : null,
+                this.deleteOnView ? 1 : 0,
+                this.raw ? 1 : 0,
+                this.mimeType,
+                this.deleted ? 1 : 0,
+                this.viewsLeft,
+                this.uid,
+            ]
+        );
+        return this;
     }
 
     async generateUnusedUid() {

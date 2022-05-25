@@ -56,7 +56,6 @@ const rateLimiter = (options = { window: WINDOW, limit: LIMIT }) => {
     let limit = options.limit;
     return async (req, res, next) => {
         let ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-        ip = ip.replace(/^:*/gm, "");
         const allowed = await Access.allowed(ip, window, limit);
         if (!allowed) {
             console.log("Too many requests from IP: " + ip);
