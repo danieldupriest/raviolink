@@ -5,9 +5,9 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" href="/css/style.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
+        {{#text}}<link rel="stylesheet" href="http://{{server}}/css/highlight/googlecode.min.css">{{/text}}
+        {{#text}}<script src="http://{{server}}/js/highlight.min.js"></script>{{/text}}
         <script src="/js/qrcode.js"></script>
-        {{#text}}<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>{{/text}}
         <script>
             //var raw = `{{list.content}}`;
             function copyContent(id) {
@@ -33,11 +33,13 @@
                 link.download = `{{link.uid}}.txt`;
             }
             function highlightCode() {
+                if ("{{link.textType}}" == "plain") return;
                 const input = document.getElementById("content-text");
-                const currentHTML = document.getElementById("hidden-content").textContent;
-                const newHTML = hljs.highlightAuto(currentHTML).value;
+                const currentHTML = input.textContent;
+                const newHTML = hljs.highlight(currentHTML, { language: "{{link.textType}}" }).value;
                 const replacedNewlines = newHTML.replace(/\n/g, '</div><div>');
                 input.innerHTML = "<div>" + replacedNewlines + "</div>";
+                //input.innerHTML = newHTML;
             }
             function init() {
                 drawCanvas();

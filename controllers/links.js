@@ -10,6 +10,7 @@ const MAX_DATE_MS = 8640000000000000;
 
 function uidIsValid(uid) {
     const match = uid.match(/[A-Za-z0-9]{7}/);
+    if (!match) console.log("Invalid UID: " + uid);
     return match;
 }
 
@@ -41,8 +42,9 @@ const handleLink = async (req, res, next) => {
     const { uid } = req.params;
     const link = await Link.findByUid(uid);
 
-    if (!uidIsValid(uid) || !link || link.isDeleted() || link.isExpired())
+    if (!uidIsValid(uid) || !link || link.isDeleted() || link.isExpired()) {
         return serveError(res, 404, "Link not found");
+    }
 
     //Handle redirects and raw links
     switch (link.type) {
@@ -98,8 +100,9 @@ const frontPage = (req, res) => {
 
 const postLink = async (req, res) => {
     // Filter input
-    let { content, type, expires, deleteOnView, raw } = req.body;
+    let { content, type, expires, deleteOnView, raw, textType } = req.body;
     if (typeof raw == "undefined") raw = false;
+    if (typeof textType == "undefined") textType = "plain";
 
     // Calculate expiration date
     let expireDate = null;
@@ -119,7 +122,8 @@ const postLink = async (req, res) => {
             type,
             expireDate,
             deleteOnView == "true" ? true : false,
-            raw == "true" ? true : false
+            raw == "true" ? true : false,
+            textType
         );
     } else if (type == "text") {
         newLink = new Link(
@@ -127,7 +131,8 @@ const postLink = async (req, res) => {
             type,
             expireDate,
             deleteOnView == "true" ? true : false,
-            raw == "true" ? true : false
+            raw == "true" ? true : false,
+            textType
         );
     } else if (type == "file") {
         if (!req.file) throw new Error("File not found");
@@ -139,6 +144,7 @@ const postLink = async (req, res) => {
             expireDate,
             deleteOnView == "true" ? true : false,
             raw == "true" ? true : false,
+            textType,
             req.file["path"],
             req.file["mimetype"]
         );

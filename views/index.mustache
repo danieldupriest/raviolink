@@ -16,7 +16,7 @@
                 <p>Paste in a long URL to generate a short link. It should begin with <code>https://</code> or <code>http://</code>.</p>
                 <div class="form-group">
                     <label for="url-input">URL to shorten</label>
-                    <input type="url" name="content" class="form-control is-valid" id="url-input" placeholder="http://example.com" required>
+                    <input type="url" name="content" class="form-control is-valid boxsizingBorder" id="url-input" placeholder="http://example.com" required>
                 </div>
                 {{> expirationDate}}
                 <div class="form-group">
@@ -31,8 +31,64 @@
             <form action="http://{{server}}" method="post">
                 <p>Paste in the text or code you wish to share. The generated link will display the text. You can paste up to around 500,000 characters, or about the length of the Mary Shelley novel Frankenstein.</p>
                 <div class="form-group">
-                    <label for="text-input">Text to share</label>
-                    <textarea rows=5 maxlength=500000 name="content" class="form-control is-valid" id="text-input" placeholder="Paste or type your text/code here..." required></textarea>
+                    <label for="text-input">Text or code to share</label>
+                    <textarea rows=5 maxlength=500000 name="content" class="form-control is-valid boxsizingBorder" id="text-input" placeholder="Paste or type your text/code here..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="text-type">Type of text</label>
+                    <select name="textType" class="form-control" id="text-type" value="plain">
+                        <option value="plain">Plain text</option>
+                        <option value="ada">Ada</option>
+                        <option value="apache">Apache</option>
+                        <option value="bash">Bash</option>
+                        <option value="cs">C#</option>
+                        <option value="c">C</option>
+                        <option value="cpp">C++</option>
+                        <option value="css">CSS</option>
+                        <option value="clojure">Clojure</option>
+                        <option value="coffee">CoffeeScript</option>
+                        <option value="d">D</option>
+                        <option value="dart">Dart</option>
+                        <option value="diff">Diff</option>
+                        <option value="django">Django</option>
+                        <option value="dockerfile">Dockerfile</option>
+                        <option value="elm">Elm</option>
+                        <option value="erlang">Erlang</option>
+                        <option value="fs">F#</option>
+                        <option value="fortran">Fortran</option>
+                        <option value="go">Go</option>
+                        <option value="graphql">GraphQL</option>
+                        <option value="html">HTML/XML</option>
+                        <option value="haskell">Haskell</option>
+                        <option value="json">JSON</option>
+                        <option value="java">Java</option>
+                        <option value="javascript">Javascript</option>
+                        <option value="julia">Julia</option>
+                        <option value="kotlin">Kotlin</option>
+                        <option value="tex">LaTeX</option>
+                        <option value="lisp">Lisp</option>
+                        <option value="lua">Lua</option>
+                        <option value="makefile">Makefile</option>
+                        <option value="markdown">Markdown</option>
+                        <option value="nginx">Nginx</option>
+                        <option value="nim">Nim</option>
+                        <option value="objectivec">Objective C</option>
+                        <option value="php">PHP</option>
+                        <option value="perl">Perl</option>
+                        <option value="prolog">Prolog</option>
+                        <option value="python">Python</option>
+                        <option value="r">R</option>
+                        <option value="ruby">Ruby</option>
+                        <option value="rust">Rust</option>
+                        <option value="scss">SCSS</option>
+                        <option value="sql">SQL</option>
+                        <option value="scala">Scala</option>
+                        <option value="scheme">Scheme</option>
+                        <option value="swift">Swift</option>
+                        <option value="typescript">TypeScript</option>
+                        <option value="x86asm">x86 assembly</option>
+                        <option value="yaml">YAML</option>
+                    </select>
                 </div>
                 {{> expirationDate}}
                 <div class="form-group">
@@ -109,8 +165,7 @@
                         {{#text}}<a href="#" onclick=copyContent("hidden-content")>Copy Text</a>
                         <a href="#" id="download">Download RAW</a>{{/text}}
                     </div>
-                    {{#text}}<pre id="content-text">{{#rows}}<div>{{.}}</div>{{/rows}}</pre>{{/text}}
-                    {{#code}}<code id="content-text">{{link.content}}</code>{{/code}}
+                    {{#text}}<code id="content-text" class="hljs">{{#rows}}<div>{{.}}</div>{{/rows}}</code>{{/text}}
                     {{#file}}
                         <a id="content-file" href="http://{{server}}/{{link.uid}}/file">
                             {{#isImage}}

@@ -3,6 +3,7 @@ const Database = require("./Database.js");
 const genUid = require("../utils/genUid.js");
 const RavioliDate = require("../utils/dates.js");
 const fs = require("fs");
+const { threadId } = require("worker_threads");
 
 const URL_LENGTH = 7;
 const MAX_GEN_TRIES = 10;
@@ -17,6 +18,7 @@ class Link {
         expiresOn,
         deleteOnView,
         raw,
+        textType,
         tempFilename = "",
         mimeType = "",
         id = 0,
@@ -37,6 +39,7 @@ class Link {
         this.tempFilename = tempFilename;
         this.mimeType = mimeType;
         this.deleted = deleted;
+        this.textType = textType;
         if (viewsLeft) {
             this.viewsLeft = viewsLeft;
         } else {
@@ -72,14 +75,19 @@ class Link {
             mimeType: this.mimeType,
             deleted: this.deleted,
             viewsLeft: this.viewsLeft,
+            textType: this.textType,
+            textClass:
+                this.textType == "plain"
+                    ? "nohighlight"
+                    : "language-" + this.textType,
         };
         return result;
     }
 
     async decrementViewsLeft() {
+        console.log("in decrementViewsLeft: " + this.viewsLeft);
         if (this.deleteOnView) {
             if (this.viewsLeft > 0) {
-                console.log("ViewsLeft > 0: " + this.viewsLeft);
                 this.viewsLeft -= 1;
                 if (this.viewsLeft <= 0) {
                     this.deleted = true;
@@ -87,12 +95,12 @@ class Link {
                 await this.update();
             }
         }
+        console.log("After decrementViewsLeft: " + this.viewsLeft);
     }
 
     static async findByUid(uid) {
         const dbLink = await db.get(`SELECT * FROM links WHERE uid = ?`, [uid]);
         if (dbLink) {
-            console.log("DB ViewsLeft: " + dbLink["views_left"]);
             let result = new Link(
                 dbLink["content"],
                 dbLink["type"],
@@ -101,6 +109,7 @@ class Link {
                     : null,
                 dbLink["delete_on_view"] == 1 ? true : false,
                 dbLink["raw"] == 1 ? true : false,
+                dbLink["text_type"],
                 "",
                 dbLink["mime_type"],
                 dbLink["id"],
@@ -116,12 +125,17 @@ class Link {
     }
 
     isDeleted() {
+        if (this.deleted) console.log("Link is deleted.");
         return this.deleted;
     }
 
     isExpired() {
         const now = RavioliDate();
-        return now < this.expiresOn;
+        if (now < this.expiresOn) {
+            console.log("Link is expired.");
+            return true;
+        }
+        return false;
     }
 
     async save() {
@@ -152,7 +166,7 @@ class Link {
         }
 
         await db.run(
-            `INSERT INTO links (uid, content, type, created_on, expires_on, delete_on_view, raw, mime_type, deleted, views_left) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO links (uid, content, type, created_on, expires_on, delete_on_view, raw, mime_type, deleted, views_left, text_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 this.uid,
                 this.content,
@@ -164,6 +178,7 @@ class Link {
                 this.mimeType,
                 this.deleted ? 1 : 0,
                 this.viewsLeft,
+                this.textType,
             ]
         );
         const results = await db.get("SELECT last_insert_rowid();");
@@ -173,7 +188,7 @@ class Link {
     async update() {
         console.log("Updating: " + JSON.stringify(this));
         await db.run(
-            `UPDATE links SET content = ?, type = ?, created_on = ?, expires_on = ?, delete_on_view = ?, raw = ?, mime_type = ?, deleted = ?, views_left = ? WHERE uid = ?`,
+            `UPDATE links SET content = ?, type = ?, created_on = ?, expires_on = ?, delete_on_view = ?, raw = ?, mime_type = ?, deleted = ?, views_left = ?, text_type = ?, WHERE uid = ?`,
             [
                 this.content,
                 this.type,
@@ -184,6 +199,7 @@ class Link {
                 this.mimeType,
                 this.deleted ? 1 : 0,
                 this.viewsLeft,
+                this.textType,
                 this.uid,
             ]
         );
