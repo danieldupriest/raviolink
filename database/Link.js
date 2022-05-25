@@ -131,7 +131,7 @@ class Link {
 
     isExpired() {
         const now = RavioliDate();
-        if (now < this.expiresOn) {
+        if (now > this.expiresOn) {
             console.log("Link is expired.");
             return true;
         }
