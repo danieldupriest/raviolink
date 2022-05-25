@@ -127,9 +127,13 @@
         {{#link}}
             <div class="panel" id="four-panel">
                 <h2>
-                    Link to {{#text}}text{{/text}}{{^text}}<span id="header-content">{{link.content}}</span>{{/text}} created on {{shortDate}}
+                    Link to {{#text}}text{{/text}}{{^text}}<span id="header-content">{{link.content}}</span>{{/text}}
                 </h2>
                 <dl>
+                    <div class="definition">
+                        <dt>Created on:</dt>
+                        <dd>{{link.createdOn}}
+                    </div>
                     <div class="definition">
                         <dt>Link expires:</dt>
                         <dd>{{link.expiresOn}}</dd>

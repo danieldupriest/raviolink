@@ -33,7 +33,8 @@ function generatePageData(link) {
         isImage: link.isImage(),
     };
 
-    data.link.shortDate = link.createdOn.toShortDate;
+    //data.link.createdOn = link.createdOn.toShortDate;
+    //data.link.expiresOn = link.expiresOn ? link.expiresOn.toShortDate : "never";
 
     return data;
 }
@@ -105,7 +106,7 @@ const postLink = async (req, res) => {
     if (typeof textType == "undefined") textType = "plain";
 
     // Calculate expiration date
-    let expireDate = RavioliDate(MAX_DATE_MS);
+    let expireDate = null;
     if (expires != "never") {
         const msToAdd = parseInt(expires);
         const now = RavioliDate();

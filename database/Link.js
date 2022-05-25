@@ -65,7 +65,7 @@ class Link {
         const result = {
             content: this.content,
             type: this.type,
-            expiresOn: this.expiresOn ? this.expiresOn : "never",
+            expiresOn: this.expiresOn,
             deleteOnView: this.deleteOnView,
             createdOn: this.createdOn,
             id: this.id,
@@ -130,8 +130,7 @@ class Link {
     }
 
     isExpired() {
-        const now = RavioliDate();
-        if (now > this.expiresOn) {
+        if (this.expiresOn && RavioliDate() > this.expiresOn) {
             console.log("Link is expired.");
             return true;
         }
