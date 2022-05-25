@@ -105,7 +105,7 @@ const postLink = async (req, res) => {
     if (typeof textType == "undefined") textType = "plain";
 
     // Calculate expiration date
-    let expireDate = null;
+    let expireDate = RavioliDate(MAX_DATE_MS);
     if (expires != "never") {
         const msToAdd = parseInt(expires);
         const now = RavioliDate();

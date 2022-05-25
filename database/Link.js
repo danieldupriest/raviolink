@@ -188,7 +188,7 @@ class Link {
     async update() {
         console.log("Updating: " + JSON.stringify(this));
         await db.run(
-            `UPDATE links SET content = ?, type = ?, created_on = ?, expires_on = ?, delete_on_view = ?, raw = ?, mime_type = ?, deleted = ?, views_left = ?, text_type = ?, WHERE uid = ?`,
+            `UPDATE links SET content = ?, type = ?, created_on = ?, expires_on = ?, delete_on_view = ?, raw = ?, mime_type = ?, deleted = ?, views_left = ?, text_type = ? WHERE uid = ?`,
             [
                 this.content,
                 this.type,
