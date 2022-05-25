@@ -4,6 +4,7 @@ const validUrl = require("../utils/urlChecker.js");
 const RavioliDate = require("../utils/dates.js");
 const { serveError } = require("./errors.js");
 const { generateServerString } = require("../utils/tools.js");
+const sanitize = require("sanitize-filename");
 
 const MAX_DATE_MS = 8640000000000000;
 
@@ -130,8 +131,10 @@ const postLink = async (req, res) => {
         );
     } else if (type == "file") {
         if (!req.file) throw new Error("File not found");
+        const sanitizedFilename = req.file.originalname;
+        if (sanitizedFilename == "") throw new Error("Invalid filename");
         newLink = new Link(
-            req.file.originalname,
+            sanitizedFilename,
             type,
             expireDate,
             deleteOnView == "true" ? true : false,
