@@ -134,10 +134,12 @@
                         <dt>Created on:</dt>
                         <dd>{{link.createdOn}}
                     </div>
+                    {{#link.expiresOn}}
                     <div class="definition">
                         <dt>Link expires:</dt>
                         <dd>{{link.expiresOn}}</dd>
                     </div>
+                    {{/link.expiresOn}}
                     <div class="definition">
                         <dt>Delete on view:</dt>
                         <dd>{{link.deleteOnView}}</dd>
