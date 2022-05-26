@@ -138,7 +138,9 @@ const postLink = async (req, res) => {
         );
     } else if (type == "file") {
         if (!req.file) throw new Error("File not found");
-        const sanitizedFilename = req.file.originalname;
+        const sanitizedFilename = sanitize(req.file.originalname);
+        if (sanitizedFilename.length > 255)
+            throw new Error("Filename too long");
         if (sanitizedFilename == "") throw new Error("Invalid filename");
         newLink = new Link(
             sanitizedFilename,

@@ -267,7 +267,7 @@ select {
 }
 
 #content-file {
-    background: #fff;
+    background: #e6e6e6;
     display: flex;
     align-items: center;
 }
@@ -277,17 +277,23 @@ select {
 }
 
 #content-file-icon {
-    background: rgba(0,0,0,0.1);
-    height: 5rem;
+    background: #e6e6e6;
+    max-width: 3rem;
     padding: 1em;
 }
 
 #content-file-name {
+    align-self: stretch;
+    background: #fff;
     color: #333;
-    font-size: 200%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 150%;
     overflow: hidden;
     padding: 1em;
     flex-grow: 1;
+    word-break: break-all;
 }
 
 #content-image {
