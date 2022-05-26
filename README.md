@@ -1,13 +1,22 @@
 # Raviolink
 
-Raviolink is an open source Node application for text sharing and URL-shortening. It generates short URLs which can either link to plain text, or forward the user to a longer URL.
+Raviolink is an open source web application for generating short URLS for longer addresses, which forward the user to the linked address, and it also can share text, code, images and other files smaller than 10MB.
 
-## Features
+## Current Features
 
--   HTML and raw display
--   Link expiration
--   Delete on read
--   Exponential cooldown to prevent spamming
+-   Shorten long URLs
+-   Share plain text or source code with syntax highlighting
+-   Share images, which are displayed, or files, which can be downloaded
+-   QR code generated for each link
+-   Optional expiration date
+-   Optional delete on first view/download
+-   Optional direct download of content
+-   Copy text/code to clipboard
+-   IP-based Rate-limiting of successive posts to prevent abuse
+
+## Planned Features
+
+-   Bandwidth monitoring and management on a per-link basis.
 
 ## Setup
 
