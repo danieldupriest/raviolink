@@ -19,7 +19,7 @@
                     <input type="url" name="content" class="form-control is-valid boxsizingBorder" id="url-input" placeholder="http://example.com" required>
                 </div>
                 {{> expirationDate}}
-                <div class="form-group">
+                <div class="form-group row">
                     <label for="delete-on-view-input">Delete on view</label>
                     <input type="checkbox" class="form-control" id="delete-on-view-input" name="deleteOnView" value="true">
                 </div>
@@ -34,10 +34,10 @@
                     <label for="text-input">Text or code to share</label>
                     <textarea rows=5 maxlength=500000 name="content" class="form-control is-valid boxsizingBorder" id="text-input" placeholder="Paste or type your text/code here..." required></textarea>
                 </div>
-                <div class="form-group">
-                    <label for="text-type">Type of text</label>
+                <div class="form-group row">
+                    <label for="text-type">Syntax highlighting</label>
                     <select name="textType" class="form-control" id="text-type" value="plain">
-                        <option value="plain">Plain text</option>
+                        <option value="plain">None</option>
                         <option value="ada">Ada</option>
                         <option value="apache">Apache</option>
                         <option value="bash">Bash</option>
@@ -91,11 +91,11 @@
                     </select>
                 </div>
                 {{> expirationDate}}
-                <div class="form-group">
+                <div class="form-group row">
                     <label for="delete-on-view-input">Delete on view</label>
                     <input type="checkbox" class="form-control" id="delete-on-view-input" name="deleteOnView" value="true">
                 </div>
-                <div class="form-group">
+                <div class="form-group row">
                     <label for="raw-input">Display as raw</label>
                     <input type="checkbox" class="form-control" id="raw-input" name="raw" value="true">
                 </div>
@@ -106,17 +106,17 @@
         <div class="panel" id="three-panel">
             <form action="http://{{server}}" method="post" enctype="multipart/form-data">
                 <p>Choose the file you wish to host. The generated link will display the file either as an image, or as a downloadable link. You can only upload files smaller than 10 MB.</p>
-                <div class="form-group">
+                <div class="form-group row">
                     <label for="file-input">File to share</label>
                     
                     <input type="file" name="content" class="form-control is-valid" id="file-input" required>
                 </div>
                 {{> expirationDate}}
-                <div class="form-group">
+                <div class="form-group row">
                     <label for="delete-on-view-input">Delete on view</label>
                     <input type="checkbox" class="form-control" id="delete-on-view-input" name="deleteOnView" value="true">
                 </div>
-                <div class="form-group">
+                <div class="form-group row">
                     <label for="raw-input">Direct download</label>
                     <input type="checkbox" class="form-control" id="raw-input" name="raw" value="true">
                 </div>
@@ -126,51 +126,29 @@
         </div>
         {{#link}}
             <div class="panel" id="four-panel">
-                <h2>
-                    Link to {{#text}}text{{/text}}{{^text}}<span id="header-content">{{link.content}}</span>{{/text}}
-                </h2>
-                <dl>
-                    <div class="definition">
-                        <dt>Created on:</dt>
-                        <dd>{{link.createdOn}}
-                    </div>
-                    {{#link.expiresOn}}
-                    <div class="definition">
-                        <dt>Link expires:</dt>
-                        <dd>{{link.expiresOn}}</dd>
-                    </div>
-                    {{/link.expiresOn}}
-                    <div class="definition">
-                        <dt>Delete on view:</dt>
-                        <dd>{{link.deleteOnView}}</dd>
-                    </div>
-                    {{#text}}
-                    <div class="definition">
-                        <dt>Display as raw:</dt>
-                        <dd>{{link.raw}}</dd>
-                    </div>
-                    {{/text}}
-                    {{#file}}
-                    <div class="definition">
-                        <dt>Direct download:</dt>
-                        <dd>{{link.raw}}</dd>
-                    </div>
-                    {{/file}}
-                    <div class="definition">
-                        <dt>QR code:</dt>
-                        <dd><canvas id="qr-code"></canvas></dd>
-                    </div>
-                </dl>
-                <div id="content">
-                    <div id="link-container">
-                        <div id="link-label">Link</div>
-                        <div id="link-text">{{server}}/{{link.uid}}</div>
-                        <a id="link-anchor" href="#" onclick=copyContent("hidden-link")>Copy</a>
-                    </div>
-                    <div id="content-links">
+                <div id="link-container" class="shadow">
+                    <div id="link-label">Link</div>
+                    <div id="link-text">{{server}}/{{link.uid}}</div>
+                    <a id="link-anchor" href="#" onclick=copyContent("hidden-link")>Copy</a>
+                </div>
+                {{#url}}<h2 id="content-title">Full URL</h2>{{/url}}
+                {{#file}}
+                    {{#isImage}}<h2 id="content-title">Image</h2>{{/isImage}}
+                    {{^isImage}}<h2 id="content-title">File</h2>{{/isImage}}
+                {{/file}}
+                {{#text}}<h2 id="content-title">Text</h2>{{/text}} 
+                    
+                <div id="content" class="shadow">
+                    {{^url}}
+                    <div id="content-header">
+                        <div id="content-size">{{link.size}}</div>
                         {{#text}}<a href="#" onclick=copyContent("hidden-content")>Copy Text</a>
-                        <a href="#" id="download">Download RAW</a>{{/text}}
+                        <a href="#" id="download">Download</a>{{/text}}
                     </div>
+                    {{/url}}
+                    {{#url}}
+                        <code id="content-text"><div>{{content}}</div></code>
+                    {{/url}}
                     {{#text}}<code id="content-text" class="hljs">{{#rows}}<div>{{.}}</div>{{/rows}}</code>{{/text}}
                     {{#file}}
                         <a id="content-file" href="http://{{server}}/{{link.uid}}/file">
@@ -186,6 +164,38 @@
                     <textarea id="hidden-content">{{link.content}}</textarea>
                     <textarea id="hidden-link">http://{{server}}/{{link.uid}}</textarea>
                 </div>
+                <dl>
+                    <div class="definition">
+                        <dt>Created on</dt>
+                        <dd>{{link.createdOn}}
+                    </div>
+                    {{#link.expiresOn}}
+                    <div class="definition">
+                        <dt>Link expires</dt>
+                        <dd>{{link.expiresOn}}</dd>
+                    </div>
+                    {{/link.expiresOn}}
+                    <div class="definition">
+                        <dt>Delete on view</dt>
+                        <dd>{{link.deleteOnView}}</dd>
+                    </div>
+                    {{#text}}
+                    <div class="definition">
+                        <dt>Display as raw</dt>
+                        <dd>{{link.raw}}</dd>
+                    </div>
+                    {{/text}}
+                    {{#file}}
+                    <div class="definition">
+                        <dt>Direct download</dt>
+                        <dd>{{link.raw}}</dd>
+                    </div>
+                    {{/file}}
+                    <div class="definition">
+                        <dt>QR code</dt>
+                        <dd><canvas id="qr-code" class="shadow"></canvas></dd>
+                    </div>
+                </dl>
             </div>
         {{/link}}
   </div>

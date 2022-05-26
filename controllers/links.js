@@ -32,7 +32,6 @@ function generatePageData(link) {
         server: generateServerString(),
         isImage: link.isImage(),
     };
-
     //data.link.createdOn = link.createdOn.toShortDate;
     //data.link.expiresOn = link.expiresOn ? link.expiresOn.toShortDate : "never";
 
@@ -46,6 +45,8 @@ const handleLink = async (req, res, next) => {
     if (!uidIsValid(uid) || !link || link.isDeleted() || link.isExpired()) {
         return serveError(res, 404, "Link not found");
     }
+
+    console.log("Handling link: " + JSON.stringify(link));
 
     //Handle redirects and raw links
     switch (link.type) {
@@ -152,10 +153,11 @@ const postLink = async (req, res) => {
     } else {
         throw new Error("Unsupported type");
     }
-
+    //console.log("Before newLink save");
     await newLink.save();
-
+    //console.log("After newLink save");
     const data = generatePageData(newLink);
+    //console.log("Before render");
     return res.render("index", data);
 };
 

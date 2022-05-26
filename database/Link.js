@@ -4,6 +4,7 @@ const genUid = require("../utils/genUid.js");
 const RavioliDate = require("../utils/dates.js");
 const fs = require("fs");
 const { threadId } = require("worker_threads");
+const { formatBytes } = require("../utils/tools.js");
 
 const URL_LENGTH = 7;
 const MAX_GEN_TRIES = 10;
@@ -61,7 +62,30 @@ class Link {
         );
     }
 
+    calculateSize() {
+        if (this.type == "file") {
+            console.log("size: type is file");
+            if (this.uid != "") {
+                console.log("UID is present");
+                try {
+                    const filePath = "./files/" + this.uid + "/" + this.content;
+                    const stats = fs.statSync(filePath);
+                    return formatBytes(stats.size);
+                } catch (err) {
+                    throw err;
+                }
+            } else {
+                console.log("UID not present");
+                return "";
+            }
+        } else {
+            console.log("size: this.content.length");
+            return formatBytes(this.content.length);
+        }
+    }
+
     toJSON() {
+        console.log("toJSON: calc: " + this.calculateSize());
         const result = {
             content: this.content,
             type: this.type,
@@ -80,12 +104,12 @@ class Link {
                 this.textType == "plain"
                     ? "nohighlight"
                     : "language-" + this.textType,
+            size: this.calculateSize(),
         };
         return result;
     }
 
     async decrementViewsLeft() {
-        console.log("in decrementViewsLeft: " + this.viewsLeft);
         if (this.deleteOnView) {
             if (this.viewsLeft > 0) {
                 this.viewsLeft -= 1;
@@ -95,7 +119,6 @@ class Link {
                 await this.update();
             }
         }
-        console.log("After decrementViewsLeft: " + this.viewsLeft);
     }
 
     static async findByUid(uid) {
@@ -138,7 +161,7 @@ class Link {
     }
 
     async save() {
-        console.log("Saving: " + JSON.stringify(this));
+        console.log(JSON.stringify(this));
         if (this.uid == 0) {
             const uid = await this.generateUnusedUid();
             this.uid = uid;
