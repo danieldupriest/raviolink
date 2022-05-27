@@ -13,15 +13,36 @@
     <div class="panels">
         <div class="panel" id="one-panel">
             <form action="http://{{server}}" method="post">
-                <p>Paste in a long URL to generate a short link. It should begin with <code>https://</code> or <code>http://</code>.</p>
                 <div class="form-group">
-                    <label for="url-input">URL to shorten</label>
+                    <div class="row">
+                        <label class="field-label" for="url-input">URL to shorten</label>
+                        <input id="url-toggle" type="checkbox" class="tip-checkbox"/>
+                        <label class="tip-label" for="url-toggle">?</label>
+                        <label class="tip-text" for="url-toggle">Paste in a long URL to generate a short link. It must begin with either <code>https://</code> or <code>http://</code></label>
+                    </div>
                     <input type="url" name="content" class="form-control is-valid boxsizingBorder" id="url-input" placeholder="http://example.com" required>
                 </div>
-                {{> expirationDate}}
                 <div class="form-group row">
-                    <label for="delete-on-view-input">Delete on view</label>
-                    <input type="checkbox" class="form-control" id="delete-on-view-input" name="deleteOnView" value="true">
+                    <label class="field-label" for="url-expires-input">Link expires</label>
+                    <input id="url-expires-toggle" type="checkbox" class="tip-checkbox"/>
+                    <label class="tip-label" for="url-expires-toggle">?</label>
+                    <label class="tip-text" for="url-expires-toggle">The link will become inaccessible if an expiration time is set.</label>
+                    <select name="expires" class="form-control" id="url-expires-input" value="never">
+                        <option value="never">Never</option>
+                        <option value="60000">1 minute</option>
+                        <option value="3600000">1 hour</option>
+                        <option value="86400000">1 day</option>
+                        <option value="604800000">1 week</option>
+                        <option value="2628000000">1 month</option>
+                        <option value="31540000000">1 year</option>
+                    </select>
+                </div>
+                <div class="form-group row">
+                    <label class="field-label" for="url-delete-input">Delete on view</label>
+                    <input id="url-delete-toggle" type="checkbox" class="tip-checkbox"/>
+                    <label class="tip-label" for="url-delete-toggle">?</label>
+                    <label class="tip-text" for="url-delete-toggle">The link will be deleted after the first view, not counting the preview page displayed after creating a link.</label>
+                    <input type="checkbox" class="form-control" id="url-delete-input" name="deleteOnView" value="true">
                 </div>
                 <input type="hidden" name="type" value="link"/>
                 <button type="submit" class="btn btn-primary">Create link</button>
@@ -29,14 +50,21 @@
         </div>
         <div class="panel" id="two-panel">
             <form action="http://{{server}}" method="post">
-                <p>Paste in the text or code you wish to share. The generated link will display the text. You can paste up to around 500,000 characters, or about the length of the Mary Shelley novel Frankenstein.</p>
                 <div class="form-group">
-                    <label for="text-input">Text or code to share</label>
+                    <div class="row">
+                        <label class="field-label" for="text-input">Text or code to share</label>
+                        <input id="text-toggle" type="checkbox" class="tip-checkbox"/>
+                        <label class="tip-label" for="text-toggle">?</label>
+                        <label class="tip-text" for="text-toggle">Paste in the text or code you wish to share. The generated link will display the text. You can paste up to around 500,000 characters, or about the length of the Mary Shelley novel Frankenstein.</label>
+                    </div>
                     <textarea rows=5 maxlength=500000 name="content" class="form-control is-valid boxsizingBorder" id="text-input" placeholder="Paste or type your text/code here..." required></textarea>
                 </div>
                 <div class="form-group row">
-                    <label for="text-type">Syntax highlighting</label>
-                    <select name="textType" class="form-control" id="text-type" value="plain">
+                    <label class="field-label" for="text-type-input">Syntax highlighting</label>
+                    <input id="text-type-toggle" type="checkbox" class="tip-checkbox"/>
+                    <label class="tip-label" for="text-type-toggle">?</label>
+                    <label class="tip-text" for="text-type-toggle">If a language or format is selected, the link's content will automatically apply color and styling when viewed.</label>
+                    <select name="textType" class="form-control" id="text-type-input" value="plain">
                         <option value="plain">None</option>
                         <option value="ada">Ada</option>
                         <option value="apache">Apache</option>
@@ -90,14 +118,34 @@
                         <option value="yaml">YAML</option>
                     </select>
                 </div>
-                {{> expirationDate}}
                 <div class="form-group row">
-                    <label for="delete-on-view-input">Delete on view</label>
-                    <input type="checkbox" class="form-control" id="delete-on-view-input" name="deleteOnView" value="true">
+                    <label class="field-label" for="text-expires-input">Link expires</label>
+                    <input id="text-expires-toggle" type="checkbox" class="tip-checkbox"/>
+                    <label class="tip-label" for="text-expires-toggle">?</label>
+                    <label class="tip-text" for="text-expires-toggle">The link will become inaccessible if an expiration time is set.</label>
+                    <select name="expires" class="form-control" id="text-expires-input" value="never">
+                        <option value="never">Never</option>
+                        <option value="60000">1 minute</option>
+                        <option value="3600000">1 hour</option>
+                        <option value="86400000">1 day</option>
+                        <option value="604800000">1 week</option>
+                        <option value="2628000000">1 month</option>
+                        <option value="31540000000">1 year</option>
+                    </select>
                 </div>
                 <div class="form-group row">
-                    <label for="raw-input">Display as raw</label>
-                    <input type="checkbox" class="form-control" id="raw-input" name="raw" value="true">
+                    <label class="field-label" for="text-delete-input">Delete on view</label>
+                    <input id="text-delete-toggle" type="checkbox" class="tip-checkbox"/>
+                    <label class="tip-label" for="text-delete-toggle">?</label>
+                    <label class="tip-text" for="text-delete-toggle">The link will be deleted after the first view, not counting the preview page displayed after creating a link.</label>
+                    <input type="checkbox" class="form-control" id="text-delete-input" name="deleteOnView" value="true">
+                </div>
+                <div class="form-group row">
+                    <label class="field-label" for="text-raw-input">Display as raw</label>
+                    <input id="text-raw-toggle" type="checkbox" class="tip-checkbox"/>
+                    <label class="tip-label" for="text-raw-toggle">?</label>
+                    <label class="tip-text" for="text-raw-toggle">When the link is accessed the contents will be displayed directly in the browser as plain text.</label>
+                    <input type="checkbox" class="form-control" id="text-raw-input" name="raw" value="true">
                 </div>
                 <input type="hidden" name="type" value="text"/>
                 <button type="submit" class="btn btn-primary">Create link</button>
@@ -105,20 +153,41 @@
         </div>
         <div class="panel" id="three-panel">
             <form action="http://{{server}}" method="post" enctype="multipart/form-data">
-                <p>Choose the file you wish to host. The generated link will display the file either as an image, or as a downloadable link. You can only upload files smaller than 10 MB.</p>
                 <div class="form-group row">
-                    <label for="file-input">File to share</label>
-                    
+                    <label class="field-label" for="file-input">Choose file</label>
+                    <input id="file-input-toggle" type="checkbox" class="tip-checkbox"/>
+                    <label class="tip-label" for="file-input-toggle">?</label>
+                    <label class="tip-text" for="file-input-toggle">Choose the file you wish to share. The generated link will display the file on this site either as an image, or as a downloadable link. File size is limited to 10 MB.</label>
                     <input type="file" name="content" class="form-control is-valid" id="file-input" required>
                 </div>
-                {{> expirationDate}}
                 <div class="form-group row">
-                    <label for="delete-on-view-input">Delete on view</label>
-                    <input type="checkbox" class="form-control" id="delete-on-view-input" name="deleteOnView" value="true">
+                    <label class="field-label" for="file-expires-input">Link expires</label>
+                    <input id="file-expires-toggle" type="checkbox" class="tip-checkbox"/>
+                    <label class="tip-label" for="file-expires-toggle">?</label>
+                    <label class="tip-text" for="file-expires-toggle">The link will become inaccessible if an expiration time is set.</label>
+                    <select name="expires" class="form-control" id="file-expires-input" value="never">
+                        <option value="never">Never</option>
+                        <option value="60000">1 minute</option>
+                        <option value="3600000">1 hour</option>
+                        <option value="86400000">1 day</option>
+                        <option value="604800000">1 week</option>
+                        <option value="2628000000">1 month</option>
+                        <option value="31540000000">1 year</option>
+                    </select>
                 </div>
                 <div class="form-group row">
-                    <label for="raw-input">Direct download</label>
-                    <input type="checkbox" class="form-control" id="raw-input" name="raw" value="true">
+                    <label class="field-label" for="file-delete-input">Delete on view</label>
+                    <input id="file-delete-toggle" type="checkbox" class="tip-checkbox"/>
+                    <label class="tip-label" for="file-delete-toggle">?</label>
+                    <label class="tip-text" for="file-delete-toggle">The link will be deleted after the first view, not counting the preview page displayed after creating a link.</label>
+                    <input type="checkbox" class="form-control" id="file-delete-input" name="deleteOnView" value="true">
+                </div>
+                <div class="form-group row">
+                    <label class="field-label" for="file-raw-input">Direct download</label>
+                    <input id="file-raw-toggle" type="checkbox" class="tip-checkbox"/>
+                    <label class="tip-label" for="file-raw-toggle">?</label>
+                    <label class="tip-text" for="file-raw-toggle">If direct download is enabled, when the link is accessed the file will begin downloading immediately.</label>
+                    <input type="checkbox" class="form-control" id="file-raw-input" name="raw" value="true">
                 </div>
                 <input type="hidden" name="type" value="file"/>
                 <button type="submit" class="btn btn-primary">Create link</button>
