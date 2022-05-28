@@ -195,11 +195,13 @@
         </div>
         {{#link}}
             <div class="panel" id="four-panel">
+                {{#showLink}}
                 <div id="link-container" class="shadow">
                     <div id="link-label">Link</div>
                     <div id="link-text">{{server}}/{{link.uid}}</div>
                     <a id="link-anchor" href="#" onclick=copyContent("hidden-link")>Copy</a>
                 </div>
+                {{/showLink}}
                 {{#url}}<h2 id="content-title">Full URL</h2>{{/url}}
                 {{#file}}
                     {{#isImage}}<h2 id="content-title">Image</h2>{{/isImage}}

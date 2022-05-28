@@ -277,6 +277,10 @@ select {
     text-transform: uppercase;
 }
 
+#content-title:first-child {
+    margin-top: 0;
+}
+
 #content-text {
     border-left: 4ch solid #eee;
     display: block;

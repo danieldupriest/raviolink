@@ -77,7 +77,9 @@ const handleLink = async (req, res, next) => {
     }
 
     // Handle display of normal, non-raw links
-    return res.render("index", generatePageData(link));
+    const data = generatePageData(link);
+    data.showLink = false;
+    return res.render("index", data);
 };
 
 const handleFile = async (req, res, next) => {
@@ -155,11 +157,9 @@ const postLink = async (req, res) => {
     } else {
         throw new Error("Unsupported type");
     }
-    //console.log("Before newLink save");
     await newLink.save();
-    //console.log("After newLink save");
     const data = generatePageData(newLink);
-    //console.log("Before render");
+    data.showLink = true;
     return res.render("index", data);
 };
 
