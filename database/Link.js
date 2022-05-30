@@ -62,6 +62,18 @@ class Link {
         );
     }
 
+    isFile() {
+        return this.type == "file";
+    }
+
+    isText() {
+        return this.type == "text";
+    }
+
+    isUrl() {
+        return this.type == "link";
+    }
+
     calculateSize() {
         if (this.type == "file") {
             console.log("size: type is file");
@@ -84,11 +96,18 @@ class Link {
         }
     }
 
+    shortContent() {
+        const shortContent = this.content.substr(0, 100);
+        if (shortContent.length != this.content.length) {
+            return shortContent + "...";
+        }
+        return this.content;
+    }
+
     toJSON() {
-        console.log("toJSON: calc: " + this.calculateSize());
         const result = {
             content: this.content,
-            shortContent: this.content.substr(0, 100),
+            shortContent: this.shortContent,
             type: this.type,
             expiresOn: this.expiresOn,
             deleteOnView: this.deleteOnView,
@@ -107,6 +126,9 @@ class Link {
                     : "language-" + this.textType,
             size: this.calculateSize(),
             isImage: this.isImage,
+            isFile: this.isFile,
+            isText: this.isText,
+            isUrl: this.isUrl,
         };
         return result;
     }

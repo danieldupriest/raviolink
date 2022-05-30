@@ -196,14 +196,21 @@
         <div class="panel" id="four-panel">
             <h2>Links</h2>
             <p>Below are shown all links which are not deleted, expired, or set to delete on view.</p>
+            <p>Test</p>
             <table class="styled-table">
                 <tr><th>UID</th><th>Type</th><th>Content</th><th>Date Created</th></tr>
                 {{#links}}
                 <tr><td class="uid"><a href="http://{{server}}/{{uid}}">{{uid}}</a></td>
                     <td class="type">{{type}}</td>
                     <td>
-                        {{#isImage}}<img src="http://{{server}}/{{uid}}/file" alt="{{content}}" />{{/isImage}}
-                        {{^isImage}}{{shortContent}}{{/isImage}}
+                        {{#isFile}}
+                            <a href="http://{{server}}/{{uid}}/file">
+                            {{#isImage}}<img src="http://{{server}}/{{uid}}/file" alt="{{content}}" />{{/isImage}}
+                            {{^isImage}}{{content}}{{/isImage}}
+                            </a>
+                        {{/isFile}}
+                        {{#isText}}{{shortContent}}{{/isText}}
+                        {{#isUrl}}<a href="{{content}}">{{shortContent}}</a>{{/isUrl}}
                     </td>
                     <td class="date">{{createdOn.toShortDate}}</td>
                 </tr>
