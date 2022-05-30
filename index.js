@@ -38,9 +38,9 @@ app.use((req, res, next) => {
     next();
 });
 
-const limiter = rateLimiter({ window: 10 * 1000, limit: 100 });
-app.get(process.env.BASE_URL + "/links", [limiter, linkList]);
-app.get(process.env.BASE_URL + "/:uid/file", [limiter, handleFile]);
+const limiter = rateLimiter({ window: 10 * 1000, limit: 5 });
+app.get(process.env.BASE_URL + "/links", linkList);
+app.get(process.env.BASE_URL + "/:uid/file", handleFile);
 app.get(process.env.BASE_URL + "/:uid", [limiter, handleLink]);
 app.get(process.env.BASE_URL + "/", frontPage);
 const upload = multer({
