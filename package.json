@@ -4,8 +4,8 @@
   "description": "Open source text sharing and URL shortening app",
   "main": "index.js",
   "scripts": {
-    "serve": "node --experimental-worker index.js",
-    "dev": "nodemon --experimental-worker index.js",
+    "serve": "node index.js",
+    "dev": "nodemon index.js",
     "init": "node database/initialize.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
