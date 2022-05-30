@@ -116,7 +116,7 @@ class Link {
             const baseDir = "./files/" + this.uid;
             console.log("Attempting to unlink: " + baseDir);
             try {
-                fs.rmSync(baseDir, { recursive: true, force: true });
+                await fs.promises.rm(baseDir, { recursive: true, force: true });
             } catch (err) {
                 throw err;
             }
