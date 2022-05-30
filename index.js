@@ -38,7 +38,7 @@ app.use((req, res, next) => {
     next();
 });
 
-const limiter = rateLimiter({ window: 10 * 1000, limit: 5 });
+const limiter = rateLimiter({ window: 10 * 1000, limit: 100 });
 app.get(process.env.BASE_URL + "/links", [limiter, linkList]);
 app.get(process.env.BASE_URL + "/:uid/file", [limiter, handleFile]);
 app.get(process.env.BASE_URL + "/:uid", [limiter, handleLink]);
