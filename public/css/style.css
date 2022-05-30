@@ -36,8 +36,13 @@ body{
 body > * {
     max-width: var(--narrow);
 }
+.wrapper.full-width {
+    max-width: initial;
+}
 h1, h2, h3, h4, h5 {
     position: relative;
+    margin: var(--padding-small) 0 0 0;
+    padding: 0;
 }
 .link header,
 .link .wrapper,
@@ -106,17 +111,14 @@ header{
   animation: fadein .8s;
 }
 .panel p {
-    margin: 0
-    padding: var(--padding-small) 0 0 0;
+    margin: var(--padding-small) 0 0 0;
+    padding: 0;
 }
 .form-group {
     margin-top: var(--padding-small);
 }
 label {
     display: block;
-}
-.field-label {
-
 }
 input[type=text], textarea, input[type=url] {
     background: #fff;
@@ -475,6 +477,39 @@ dd {
 .error-link:hover {
     text-decoration: underline;
 }
+
+/* LINKS */
+.styled-table {
+    margin-top: var(--padding-small);
+}
+.styled-table th {
+    background: #aaa;
+    font-weight: bold;
+    text-align: center;
+}
+.styled-table td,
+.styled-table th {
+    padding: .25rem .5rem;
+}
+.styled-table td {
+    word-wrap: anywhere;
+}
+.styled-table tr {
+    background: #fff;
+}
+.styled-table tr:nth-child(2n+1) {
+    background: #f9f9f9;
+}
+.styled-table .date {
+    white-space: nowrap;
+}
+.styled-table img {
+    height: 100px;
+}
+.styled-table .uid {
+    word-wrap: normal;
+}
+
 #footer {
     color: #fff;
     padding: 2em 1em 3em 1em;

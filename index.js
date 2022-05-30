@@ -6,6 +6,7 @@ const {
     frontPage,
     postLink,
     handleFile,
+    linkList,
 } = require("./controllers/links.js");
 const path = require("path");
 const { fileURLToPath } = require("url");
@@ -38,6 +39,7 @@ app.use((req, res, next) => {
 });
 
 const limiter = rateLimiter({ window: 10 * 1000, limit: 5 });
+app.get(process.env.BASE_URL + "/links", [limiter, linkList]);
 app.get(process.env.BASE_URL + "/:uid/file", [limiter, handleFile]);
 app.get(process.env.BASE_URL + "/:uid", [limiter, handleLink]);
 app.get(process.env.BASE_URL + "/", frontPage);

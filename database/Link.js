@@ -88,6 +88,7 @@ class Link {
         console.log("toJSON: calc: " + this.calculateSize());
         const result = {
             content: this.content,
+            shortContent: this.content.substr(0, 100),
             type: this.type,
             expiresOn: this.expiresOn,
             deleteOnView: this.deleteOnView,
@@ -105,6 +106,7 @@ class Link {
                     ? "nohighlight"
                     : "language-" + this.textType,
             size: this.calculateSize(),
+            isImage: this.isImage,
         };
         return result;
     }
@@ -119,6 +121,35 @@ class Link {
                 await this.update();
             }
         }
+    }
+
+    static async findAll() {
+        const dbLinks = await db.all(
+            `SELECT * FROM links WHERE deleted = 0`,
+            []
+        );
+        let result = [];
+        for (const dbLink of dbLinks) {
+            let link = new Link(
+                dbLink["content"],
+                dbLink["type"],
+                dbLink["expires_on"]
+                    ? RavioliDate(parseInt(dbLink["expires_on"]))
+                    : null,
+                dbLink["delete_on_view"] == 1 ? true : false,
+                dbLink["raw"] == 1 ? true : false,
+                dbLink["text_type"],
+                "",
+                dbLink["mime_type"],
+                dbLink["id"],
+                RavioliDate(parseInt(dbLink["created_on"])),
+                dbLink["uid"],
+                dbLink["deleted"] == 1 ? true : false,
+                parseInt(dbLink["views_left"])
+            );
+            result.push(link);
+        }
+        return result;
     }
 
     static async findByUid(uid) {

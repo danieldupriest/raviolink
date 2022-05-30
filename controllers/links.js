@@ -163,4 +163,25 @@ const postLink = async (req, res) => {
     return res.render("index", data);
 };
 
-module.exports = { handleLink, frontPage, postLink, handleFile };
+const linkList = async (req, res, next) => {
+    let links = await Link.findAll();
+    links = links.filter((link) => {
+        return !link.isDeleted() && !link.isExpired() && !link.expiresOn;
+    });
+
+    let data = {
+        server: generateServerString(),
+        showLink: true,
+        links: [],
+    };
+
+    for (const link of links) {
+        data.links.push(link.toJSON());
+    }
+
+    console.log(`Showing ${data.links.length} links`);
+
+    return res.render("links", data);
+};
+
+module.exports = { handleLink, frontPage, postLink, handleFile, linkList };

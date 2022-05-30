@@ -1,0 +1,215 @@
+{{> header}}
+<div class="wrapper full-width">
+    <input class="radio" id="one" name="group" type="radio">
+    <input class="radio" id="two" name="group" type="radio">
+    <input class="radio" id="three" name="group" type="radio">
+    <input class="radio" id="four" name="group" type="radio" checked>
+    <div class="tabs">
+        <label class="tab" id="one-tab" for="one">Shorten URL</label>
+        <label class="tab" id="two-tab" for="two">Share text</label>
+        <label class="tab" id="three-tab" for="three">Share file</label>
+        <label class="tab" id="four-tab" for="four">View links</label>
+    </div>
+    <div class="panels">
+        <div class="panel" id="one-panel">
+            <form action="http://{{server}}" method="post">
+                <div class="form-group">
+                    <div class="row">
+                        <label class="field-label" for="url-input">URL to shorten</label>
+                        <input id="url-toggle" type="checkbox" class="tip-checkbox"/>
+                        <label class="tip-label" for="url-toggle">?</label>
+                        <label class="tip-text" for="url-toggle">Paste in a long URL to generate a short link. It must begin with either <code>https://</code> or <code>http://</code></label>
+                    </div>
+                    <input type="url" name="content" class="form-control is-valid boxsizingBorder" id="url-input" placeholder="http://example.com" required>
+                </div>
+                <div class="form-group row">
+                    <label class="field-label" for="url-expires-input">Link expires</label>
+                    <input id="url-expires-toggle" type="checkbox" class="tip-checkbox"/>
+                    <label class="tip-label" for="url-expires-toggle">?</label>
+                    <label class="tip-text" for="url-expires-toggle">The link will become inaccessible if an expiration time is set.</label>
+                    <select name="expires" class="form-control" id="url-expires-input" value="never">
+                        <option value="never">Never</option>
+                        <option value="60000">1 minute</option>
+                        <option value="3600000">1 hour</option>
+                        <option value="86400000">1 day</option>
+                        <option value="604800000">1 week</option>
+                        <option value="2628000000">1 month</option>
+                        <option value="31540000000">1 year</option>
+                    </select>
+                </div>
+                <div class="form-group row">
+                    <label class="field-label" for="url-delete-input">Delete on view</label>
+                    <input id="url-delete-toggle" type="checkbox" class="tip-checkbox"/>
+                    <label class="tip-label" for="url-delete-toggle">?</label>
+                    <label class="tip-text" for="url-delete-toggle">The link will be deleted after the first view, not counting the preview page displayed after creating a link.</label>
+                    <input type="checkbox" class="form-control" id="url-delete-input" name="deleteOnView" value="true">
+                </div>
+                <input type="hidden" name="type" value="link"/>
+                <button type="submit" class="btn btn-primary">Create link</button>
+            </form>  
+        </div>
+        <div class="panel" id="two-panel">
+            <form action="http://{{server}}" method="post">
+                <div class="form-group">
+                    <div class="row">
+                        <label class="field-label" for="text-input">Text or code to share</label>
+                        <input id="text-toggle" type="checkbox" class="tip-checkbox"/>
+                        <label class="tip-label" for="text-toggle">?</label>
+                        <label class="tip-text" for="text-toggle">Paste in the text or code you wish to share. The generated link will display the text. You can paste up to around 500,000 characters, or about the length of the Mary Shelley novel Frankenstein.</label>
+                    </div>
+                    <textarea rows=5 maxlength=500000 name="content" class="form-control is-valid boxsizingBorder" id="text-input" placeholder="Paste or type your text/code here..." required></textarea>
+                </div>
+                <div class="form-group row">
+                    <label class="field-label" for="text-type-input">Syntax highlighting</label>
+                    <input id="text-type-toggle" type="checkbox" class="tip-checkbox"/>
+                    <label class="tip-label" for="text-type-toggle">?</label>
+                    <label class="tip-text" for="text-type-toggle">If a language or format is selected, the link's content will automatically apply color and styling when viewed.</label>
+                    <select name="textType" class="form-control" id="text-type-input" value="plain">
+                        <option value="plain">None</option>
+                        <option value="ada">Ada</option>
+                        <option value="apache">Apache</option>
+                        <option value="bash">Bash</option>
+                        <option value="cs">C#</option>
+                        <option value="c">C</option>
+                        <option value="cpp">C++</option>
+                        <option value="css">CSS</option>
+                        <option value="clojure">Clojure</option>
+                        <option value="coffee">CoffeeScript</option>
+                        <option value="d">D</option>
+                        <option value="dart">Dart</option>
+                        <option value="diff">Diff</option>
+                        <option value="django">Django</option>
+                        <option value="dockerfile">Dockerfile</option>
+                        <option value="elm">Elm</option>
+                        <option value="erlang">Erlang</option>
+                        <option value="fs">F#</option>
+                        <option value="fortran">Fortran</option>
+                        <option value="go">Go</option>
+                        <option value="graphql">GraphQL</option>
+                        <option value="html">HTML/XML</option>
+                        <option value="haskell">Haskell</option>
+                        <option value="json">JSON</option>
+                        <option value="java">Java</option>
+                        <option value="javascript">Javascript</option>
+                        <option value="julia">Julia</option>
+                        <option value="kotlin">Kotlin</option>
+                        <option value="tex">LaTeX</option>
+                        <option value="lisp">Lisp</option>
+                        <option value="lua">Lua</option>
+                        <option value="makefile">Makefile</option>
+                        <option value="markdown">Markdown</option>
+                        <option value="nginx">Nginx</option>
+                        <option value="nim">Nim</option>
+                        <option value="objectivec">Objective C</option>
+                        <option value="php">PHP</option>
+                        <option value="perl">Perl</option>
+                        <option value="prolog">Prolog</option>
+                        <option value="python">Python</option>
+                        <option value="r">R</option>
+                        <option value="ruby">Ruby</option>
+                        <option value="rust">Rust</option>
+                        <option value="scss">SCSS</option>
+                        <option value="sql">SQL</option>
+                        <option value="scala">Scala</option>
+                        <option value="scheme">Scheme</option>
+                        <option value="swift">Swift</option>
+                        <option value="typescript">TypeScript</option>
+                        <option value="x86asm">x86 assembly</option>
+                        <option value="yaml">YAML</option>
+                    </select>
+                </div>
+                <div class="form-group row">
+                    <label class="field-label" for="text-expires-input">Link expires</label>
+                    <input id="text-expires-toggle" type="checkbox" class="tip-checkbox"/>
+                    <label class="tip-label" for="text-expires-toggle">?</label>
+                    <label class="tip-text" for="text-expires-toggle">The link will become inaccessible if an expiration time is set.</label>
+                    <select name="expires" class="form-control" id="text-expires-input" value="never">
+                        <option value="never">Never</option>
+                        <option value="60000">1 minute</option>
+                        <option value="3600000">1 hour</option>
+                        <option value="86400000">1 day</option>
+                        <option value="604800000">1 week</option>
+                        <option value="2628000000">1 month</option>
+                        <option value="31540000000">1 year</option>
+                    </select>
+                </div>
+                <div class="form-group row">
+                    <label class="field-label" for="text-delete-input">Delete on view</label>
+                    <input id="text-delete-toggle" type="checkbox" class="tip-checkbox"/>
+                    <label class="tip-label" for="text-delete-toggle">?</label>
+                    <label class="tip-text" for="text-delete-toggle">The link will be deleted after the first view, not counting the preview page displayed after creating a link.</label>
+                    <input type="checkbox" class="form-control" id="text-delete-input" name="deleteOnView" value="true">
+                </div>
+                <div class="form-group row">
+                    <label class="field-label" for="text-raw-input">Display as raw</label>
+                    <input id="text-raw-toggle" type="checkbox" class="tip-checkbox"/>
+                    <label class="tip-label" for="text-raw-toggle">?</label>
+                    <label class="tip-text" for="text-raw-toggle">When the link is accessed the contents will be displayed directly in the browser as plain text.</label>
+                    <input type="checkbox" class="form-control" id="text-raw-input" name="raw" value="true">
+                </div>
+                <input type="hidden" name="type" value="text"/>
+                <button type="submit" class="btn btn-primary">Create link</button>
+            </form>
+        </div>
+        <div class="panel" id="three-panel">
+            <form action="http://{{server}}" method="post" enctype="multipart/form-data">
+                <div class="form-group row">
+                    <label class="field-label" for="file-input">Choose file</label>
+                    <input id="file-input-toggle" type="checkbox" class="tip-checkbox"/>
+                    <label class="tip-label" for="file-input-toggle">?</label>
+                    <label class="tip-text" for="file-input-toggle">Choose the file you wish to share. The generated link will display the file on this site either as an image, or as a downloadable link. File size is limited to 10 MB.</label>
+                    <input type="file" name="content" class="form-control is-valid" id="file-input" required>
+                </div>
+                <div class="form-group row">
+                    <label class="field-label" for="file-expires-input">Link expires</label>
+                    <input id="file-expires-toggle" type="checkbox" class="tip-checkbox"/>
+                    <label class="tip-label" for="file-expires-toggle">?</label>
+                    <label class="tip-text" for="file-expires-toggle">The link will become inaccessible if an expiration time is set.</label>
+                    <select name="expires" class="form-control" id="file-expires-input" value="never">
+                        <option value="never">Never</option>
+                        <option value="60000">1 minute</option>
+                        <option value="3600000">1 hour</option>
+                        <option value="86400000">1 day</option>
+                        <option value="604800000">1 week</option>
+                        <option value="2628000000">1 month</option>
+                        <option value="31540000000">1 year</option>
+                    </select>
+                </div>
+                <div class="form-group row">
+                    <label class="field-label" for="file-delete-input">Delete on view</label>
+                    <input id="file-delete-toggle" type="checkbox" class="tip-checkbox"/>
+                    <label class="tip-label" for="file-delete-toggle">?</label>
+                    <label class="tip-text" for="file-delete-toggle">The link will be deleted after the first view, not counting the preview page displayed after creating a link.</label>
+                    <input type="checkbox" class="form-control" id="file-delete-input" name="deleteOnView" value="true">
+                </div>
+                <div class="form-group row">
+                    <label class="field-label" for="file-raw-input">Direct download</label>
+                    <input id="file-raw-toggle" type="checkbox" class="tip-checkbox"/>
+                    <label class="tip-label" for="file-raw-toggle">?</label>
+                    <label class="tip-text" for="file-raw-toggle">If direct download is enabled, when the link is accessed the file will begin downloading immediately.</label>
+                    <input type="checkbox" class="form-control" id="file-raw-input" name="raw" value="true">
+                </div>
+                <input type="hidden" name="type" value="file"/>
+                <button type="submit" class="btn btn-primary">Create link</button>
+            </form>
+        </div>
+        <div class="panel" id="four-panel">
+            <h2>Links</h2>
+            <p>Below are shown all links which are not deleted, expired, or set to delete on view.</p>
+            <table class="styled-table">
+                <tr><th>UID</th><th>Type</th><th>Content</th><th>Date Created</th></tr>
+                {{#links}}
+                <tr><td class="uid"><a href="http://{{server}}/{{uid}}">{{uid}}</a></td>
+                    <td class="type">{{type}}</td>
+                    <td>
+                        {{#isImage}}<img src="http://{{server}}/{{uid}}/file" alt="{{content}}" />{{/isImage}}
+                        {{^isImage}}{{shortContent}}{{/isImage}}
+                    </td>
+                    <td class="date">{{createdOn.toShortDate}}</td>
+                </tr>
+                {{/links}}
+            </table>
+        </div>
+  </div>
+</div>
+{{> footer}}
