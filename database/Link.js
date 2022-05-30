@@ -101,22 +101,38 @@ class Link {
     }
 
     shortContent() {
-        const shortContent = this.content.substr(0, 100);
+        const shortContent = this.content.substr(0, 48);
         if (shortContent.length != this.content.length) {
             return shortContent + "...";
         }
         return this.content;
     }
 
-    async decrementViewsLeft() {
-        if (this.deleteOnView) {
-            if (this.viewsLeft > 0) {
-                this.viewsLeft -= 1;
-                if (this.viewsLeft <= 0) {
-                    this.deleted = true;
-                }
-                await this.update();
+    async delete() {
+        this.deleted = true;
+
+        // Delete file if file
+        if (this.type == "file") {
+            const baseDir = "./files/" + this.uid;
+            console.log("Attempting to unlink: " + baseDir);
+            try {
+                fs.rmSync(baseDir, { recursive: true, force: true });
+            } catch (err) {
+                throw err;
             }
+        }
+
+        await this.update();
+    }
+
+    async decrementViewsLeft() {
+        if (!this.deleteOnView) return;
+        if (this.viewsLeft > 0) {
+            this.viewsLeft -= 1;
+            if (this.viewsLeft <= 0) {
+                await this.delete();
+            }
+            await this.update();
         }
     }
 
@@ -176,16 +192,30 @@ class Link {
     }
 
     isDeleted() {
-        if (this.deleted) console.log("Link is deleted.");
-        return this.deleted;
-    }
-
-    isExpired() {
-        if (this.expiresOn && RavioliDate() > this.expiresOn) {
-            console.log("Link is expired.");
+        if (this.deleted) {
+            console.log("Link is deleted.");
             return true;
         }
         return false;
+    }
+
+    isExpired() {
+        return this.expiresOn && RavioliDate() > this.expiresOn;
+    }
+
+    async checkExpiration() {
+        if (!this.expiresOn)
+            // Expiration date is not set
+            return;
+        if (this.isExpired()) {
+            console.log("Link is expired: " + this.uid);
+            if (!this.isDeleted()) {
+                console.log(
+                    "Link has not yet been deleted. Deleting: " + this.uid
+                );
+                await this.delete();
+            }
+        }
     }
 
     async save() {

@@ -18,6 +18,17 @@ const handleLink = async (req, res, next) => {
     const { uid } = req.params;
     const link = await Link.findByUid(uid);
 
+    if (!link) return serveError(res, 404, "Link not found");
+
+    await link.checkExpiration();
+
+    const valid = uidIsValid(uid);
+    const exists = link != "undefined";
+    const deleted = link.isDeleted();
+    const expired = link.isExpired();
+    console.log(
+        `Valid: ${valid}, Exists: ${exists}, Deleted: ${deleted}, Expired: ${expired}`
+    );
     if (!uidIsValid(uid) || !link || link.isDeleted() || link.isExpired()) {
         return serveError(res, 404, "Link not found");
     }
@@ -63,11 +74,14 @@ const handleLink = async (req, res, next) => {
 const handleFile = async (req, res, next) => {
     const { uid } = req.params;
     const link = await Link.findByUid(uid);
+
+    await link.checkExpiration();
+
     if (
         !uidIsValid(uid) ||
         !link ||
         link.isDeleted() ||
-        link.isExpired() ||
+        (await link.isExpired()) ||
         link.type != "file"
     ) {
         return serveError(res, 404, "Link not found");
@@ -146,8 +160,11 @@ const postLink = async (req, res) => {
 
 const linkList = async (req, res, next) => {
     let links = await Link.findAll();
+    for (const link of links) {
+        await link.checkExpiration();
+    }
     links = links.filter((link) => {
-        return !link.isDeleted() && !link.isExpired() && !link.expiresOn;
+        return !link.isDeleted() && !link.isExpired() && !link.deleteOnView;
     });
     const data = {
         server: generateServerString(),
