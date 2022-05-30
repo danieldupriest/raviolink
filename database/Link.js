@@ -70,15 +70,21 @@ class Link {
         return this.type == "text";
     }
 
+    isCode() {
+        return this.textType != "plain";
+    }
+
     isUrl() {
         return this.type == "link";
     }
 
-    calculateSize() {
+    rows() {
+        return this.content.split("\n");
+    }
+
+    size() {
         if (this.type == "file") {
-            console.log("size: type is file");
             if (this.uid != "") {
-                console.log("UID is present");
                 try {
                     const filePath = "./files/" + this.uid + "/" + this.content;
                     const stats = fs.statSync(filePath);
@@ -87,11 +93,9 @@ class Link {
                     throw err;
                 }
             } else {
-                console.log("UID not present");
                 return "";
             }
         } else {
-            console.log("size: this.content.length");
             return formatBytes(this.content.length);
         }
     }
@@ -102,35 +106,6 @@ class Link {
             return shortContent + "...";
         }
         return this.content;
-    }
-
-    toJSON() {
-        const result = {
-            content: this.content,
-            shortContent: this.shortContent,
-            type: this.type,
-            expiresOn: this.expiresOn,
-            deleteOnView: this.deleteOnView,
-            createdOn: this.createdOn,
-            id: this.id,
-            uid: this.uid,
-            raw: this.raw,
-            tempFilename: this.tempFilename,
-            mimeType: this.mimeType,
-            deleted: this.deleted,
-            viewsLeft: this.viewsLeft,
-            textType: this.textType,
-            textClass:
-                this.textType == "plain"
-                    ? "nohighlight"
-                    : "language-" + this.textType,
-            size: this.calculateSize(),
-            isImage: this.isImage,
-            isFile: this.isFile,
-            isText: this.isText,
-            isUrl: this.isUrl,
-        };
-        return result;
     }
 
     async decrementViewsLeft() {

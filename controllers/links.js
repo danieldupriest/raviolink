@@ -14,30 +14,6 @@ function uidIsValid(uid) {
     return match;
 }
 
-function generatePageData(link) {
-    // Prepare text/code
-    let split = link.content.split("\n");
-    let output = [];
-    split.forEach((row) => {
-        output.push(row);
-    });
-
-    const data = {
-        url: link.type == "link",
-        text: link.type == "text",
-        code: link.type == "code",
-        file: link.type == "file",
-        rows: output,
-        link: link.toJSON(),
-        server: generateServerString(),
-        isImage: link.isImage(),
-    };
-    //data.link.createdOn = link.createdOn.toShortDate;
-    //data.link.expiresOn = link.expiresOn ? link.expiresOn.toShortDate : "never";
-
-    return data;
-}
-
 const handleLink = async (req, res, next) => {
     const { uid } = req.params;
     const link = await Link.findByUid(uid);
@@ -77,8 +53,10 @@ const handleLink = async (req, res, next) => {
     }
 
     // Handle display of normal, non-raw links
-    const data = generatePageData(link);
-    data.showLink = false;
+    const data = {
+        link: link,
+        server: generateServerString(),
+    };
     return res.render("index", data);
 };
 
@@ -158,8 +136,11 @@ const postLink = async (req, res) => {
         throw new Error("Unsupported type");
     }
     await newLink.save();
-    const data = generatePageData(newLink);
-    data.showLink = true;
+    const data = {
+        link: newLink,
+        server: generateServerString(),
+        showLink: true,
+    };
     return res.render("index", data);
 };
 
@@ -168,19 +149,10 @@ const linkList = async (req, res, next) => {
     links = links.filter((link) => {
         return !link.isDeleted() && !link.isExpired() && !link.expiresOn;
     });
-
-    let data = {
+    const data = {
         server: generateServerString(),
-        showLink: true,
-        links: [],
+        links: links,
     };
-
-    for (const link of links) {
-        data.links.push(link.toJSON());
-    }
-
-    console.log(`Showing ${data.links.length} links`);
-
     return res.render("links", data);
 };
 

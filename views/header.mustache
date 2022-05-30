@@ -5,11 +5,14 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" href="/css/style.css">
-        {{#text}}<link rel="stylesheet" href="http://{{server}}/css/highlight/googlecode.min.css">{{/text}}
-        {{#text}}<script src="http://{{server}}/js/highlight.min.js"></script>{{/text}}
+        {{#link}}
+            {{#isText}}
+                <link rel="stylesheet" href="http://{{server}}/css/highlight/googlecode.min.css">
+                <script src="http://{{server}}/js/highlight.min.js"></script>
+            {{/isText}}
+        {{/link}}
         <script src="/js/qrcode.js"></script>
         <script>
-            //var raw = `{{list.content}}`;
             function copyContent(id) {
                 const input = document.getElementById(id);
                 input.style.display = "block";
@@ -39,16 +42,19 @@
                 const newHTML = hljs.highlight(currentHTML, { language: "{{link.textType}}" }).value;
                 const replacedNewlines = newHTML.replace(/\n/g, '</div><div>');
                 input.innerHTML = "<div>" + replacedNewlines + "</div>";
-                //input.innerHTML = newHTML;
             }
             function init() {
                 drawCanvas();
-                {{#text}}setupDownloadLink();
-                highlightCode();{{/text}}
+                {{#link}}
+                    {{#isText}}
+                        setupDownloadLink();
+                        highlightCode();
+                    {{/isText}}
+                {{/link}}
             }
         </script>
     </head>
-    <body {{#link}}class="link" onload="init()"{{/link}}>
+    <body {{#link}}class="link"{{/link}}>
         <header>
             <a id="title" href="http://{{server}}">
                 <img src="/images/logo.png"/>
