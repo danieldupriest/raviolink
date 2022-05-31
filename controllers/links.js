@@ -94,7 +94,7 @@ const frontPage = (req, res) => {
     return res.render("index", { link: null, server: generateServerString() });
 };
 
-const postLink = async (req, res) => {
+const postLink = async (req, res, next) => {
     // Filter input
     let { content, type, expires, deleteOnView, raw, textType } = req.body;
     if (typeof raw == "undefined") raw = false;
@@ -147,7 +147,7 @@ const postLink = async (req, res) => {
             req.file["mimetype"]
         );
     } else {
-        throw new Error("Unsupported type");
+        return next(Error("Unsupported type"));
     }
     await newLink.save();
     const data = {
