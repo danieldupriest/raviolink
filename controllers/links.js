@@ -54,7 +54,9 @@ const handleLink = async (req, res, next) => {
                 return res.download(
                     "./files/" + link.uid + "/" + link.content,
                     (err) => {
-                        if (err) return next(err);
+                        if (err) {
+                            return console.log(err);
+                        }
                     }
                 );
             }
