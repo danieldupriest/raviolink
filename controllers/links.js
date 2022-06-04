@@ -54,13 +54,13 @@ const handleLink = async (req, res, next) => {
                 return res.download(
                     "./files/" + link.uid + "/" + link.content,
                     (err) => {
-                        if (err) throw err;
+                        if (err) return next(err);
                     }
                 );
             }
             break;
         default:
-            throw new Error("Unsupported link type.");
+            return next(new Error("Unsupported link type."));
     }
 
     // Handle display of normal, non-raw links
@@ -112,7 +112,7 @@ const postLink = async (req, res, next) => {
     let newLink;
     if (type == "link") {
         if (!validUrl(content))
-            throw new Error("URL contains unsupported characters.");
+            return next(new Error("URL contains unsupported characters."));
         newLink = new Link(
             content,
             type,
@@ -131,11 +131,11 @@ const postLink = async (req, res, next) => {
             textType
         );
     } else if (type == "file") {
-        if (!req.file) throw new Error("File not found");
+        if (!req.file) return next(new Error("File not found"));
         const sanitizedFilename = sanitize(req.file.originalname);
         if (sanitizedFilename.length > 255)
-            throw new Error("Filename too long");
-        if (sanitizedFilename == "") throw new Error("Invalid filename");
+            return next(new Error("Filename too long"));
+        if (sanitizedFilename == "") return next(new Error("Invalid filename"));
         newLink = new Link(
             sanitizedFilename,
             type,
