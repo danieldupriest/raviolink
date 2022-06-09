@@ -117,6 +117,10 @@ header{
 .form-group {
     margin-top: var(--padding-small);
 }
+#spinner {
+    display: none;
+    margin-top: var(--padding-small);
+}
 label {
     display: block;
 }
