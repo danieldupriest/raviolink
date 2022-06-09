@@ -41,7 +41,7 @@ class Link {
         this.mimeType = mimeType;
         this.deleted = deleted;
         this.textType = textType;
-        if (viewsLeft) {
+        if (viewsLeft != null) {
             this.viewsLeft = viewsLeft;
         } else {
             if (this.isImage()) this.viewsLeft = 2;
@@ -125,15 +125,17 @@ class Link {
         await this.update();
     }
 
-    async decrementViewsLeft() {
+    async checkViewsLeft() {
         if (!this.deleteOnView) return;
-        if (this.viewsLeft > 0) {
-            this.viewsLeft -= 1;
-            if (this.viewsLeft <= 0) {
-                await this.delete();
-            }
-            await this.update();
-        }
+        if (this.viewsLeft <= 0) await this.delete();
+    }
+
+    async decrementViewsLeft() {
+        console.log("ViewsLeft: " + this.viewsLeft);
+        if (!this.deleteOnView) return;
+        this.viewsLeft = this.viewsLeft - 1;
+        await this.update();
+        console.log("ViewsLeft after: " + this.viewsLeft);
     }
 
     static async findAll() {
@@ -192,11 +194,7 @@ class Link {
     }
 
     isDeleted() {
-        if (this.deleted) {
-            console.log("Link is deleted.");
-            return true;
-        }
-        return false;
+        return this.deleted;
     }
 
     isExpired() {
@@ -219,7 +217,7 @@ class Link {
     }
 
     async save() {
-        console.log(JSON.stringify(this));
+        //console.log(JSON.stringify(this));
         if (this.uid == 0) {
             const uid = await this.generateUnusedUid();
             this.uid = uid;
@@ -266,7 +264,7 @@ class Link {
     }
 
     async update() {
-        console.log("Updating: " + JSON.stringify(this));
+        //console.log("Updating: " + JSON.stringify(this));
         await db.run(
             `UPDATE links SET content = ?, type = ?, created_on = ?, expires_on = ?, delete_on_view = ?, raw = ?, mime_type = ?, deleted = ?, views_left = ?, text_type = ? WHERE uid = ?`,
             [

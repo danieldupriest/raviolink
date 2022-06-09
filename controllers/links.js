@@ -5,6 +5,7 @@ const RavioliDate = require("../utils/dates.js");
 const { serveError } = require("./errors.js");
 const { generateServerString } = require("../utils/tools.js");
 const sanitize = require("sanitize-filename");
+const path = require("path");
 
 const MAX_DATE_MS = 8640000000000000;
 
@@ -21,6 +22,7 @@ const handleLink = async (req, res, next) => {
     if (!link) return serveError(res, 404, "Link not found");
 
     await link.checkExpiration();
+    await link.checkViewsLeft();
 
     const valid = uidIsValid(uid);
     const exists = link != "undefined";
@@ -50,15 +52,20 @@ const handleLink = async (req, res, next) => {
             break;
         case "file":
             if (link.raw) {
-                await link.decrementViewsLeft();
-                return res.download(
-                    "./files/" + link.uid + "/" + link.content,
-                    (err) => {
-                        if (err) {
-                            return console.log(err);
-                        }
-                    }
+                const fullPath = path.resolve(
+                    __dirname,
+                    "..",
+                    "files",
+                    link.uid,
+                    link.content
                 );
+                console.log(fullPath);
+                await link.decrementViewsLeft();
+                return res.sendFile(fullPath, {}, (err) => {
+                    if (err) {
+                        return console.log(err);
+                    }
+                });
             }
             break;
         default:
@@ -77,19 +84,32 @@ const handleFile = async (req, res, next) => {
     const { uid } = req.params;
     const link = await Link.findByUid(uid);
 
-    await link.checkExpiration();
+    if (!link) return serveError(res, 404, "Link not found");
 
+    await link.checkExpiration();
+    await link.checkViewsLeft();
     if (
         !uidIsValid(uid) ||
-        !link ||
         link.isDeleted() ||
         (await link.isExpired()) ||
         link.type != "file"
     ) {
         return serveError(res, 404, "Link not found");
     }
+    const fullPath = path.resolve(
+        __dirname,
+        "..",
+        "files",
+        link.uid,
+        link.content
+    );
+    console.log("Sending file: " + fullPath);
     await link.decrementViewsLeft();
-    return res.download("./files/" + link.uid + "/" + link.content);
+    return res.sendFile(fullPath, {}, (err) => {
+        if (err) {
+            return console.log(err);
+        }
+    });
 };
 
 const frontPage = (req, res) => {
