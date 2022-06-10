@@ -44,8 +44,8 @@
                 input.innerHTML = "<div>" + replacedNewlines + "</div>";
             }
             function init() {
-                drawCanvas();
                 {{#link}}
+                    drawCanvas();
                     {{#isText}}
                         setupDownloadLink();
                         highlightCode();
@@ -62,6 +62,12 @@
                     currFrame=(currFrame==spinnerFrames.length-1)? 0:currFrame+1;
                 }
                 setInterval(nextFrame, 100);
+            }
+            function checkFileSize(inputElement) {
+                if(inputElement.files[0].size > {{maxUploadSize}}) {
+                    alert("Files must be less than {{maxUploadSize}} bytes.");
+                    inputElement.value = "";
+                }
             }
         </script>
     </head>

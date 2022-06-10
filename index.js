@@ -44,7 +44,7 @@ app.get(process.env.BASE_URL + "/:uid/file", handleFile);
 app.get(process.env.BASE_URL + "/:uid", [limiter, handleLink]);
 app.get(process.env.BASE_URL + "/", frontPage);
 const upload = multer({
-    limits: { fileSize: 10000000 },
+    limits: { fileSize: process.env.MAX_UPLOAD_SIZE },
     dest: process.env.TEMP_FILE_PATH,
 });
 app.post(

@@ -76,6 +76,7 @@ const handleLink = async (req, res, next) => {
     const data = {
         link: link,
         server: generateServerString(),
+        maxUploadSize: process.env.MAX_UPLOAD_SIZE,
     };
     return res.render("index", data);
 };
@@ -113,7 +114,12 @@ const handleFile = async (req, res, next) => {
 };
 
 const frontPage = (req, res) => {
-    return res.render("index", { link: null, server: generateServerString() });
+    const data = {
+        link: null,
+        server: generateServerString(),
+        maxUploadSize: process.env.MAX_UPLOAD_SIZE,
+    };
+    return res.render("index", data);
 };
 
 const postLink = async (req, res, next) => {
@@ -175,6 +181,7 @@ const postLink = async (req, res, next) => {
     const data = {
         link: newLink,
         server: generateServerString(),
+        maxUploadSize: process.env.MAX_UPLOAD_SIZE,
         showLink: true,
     };
     return res.render("index", data);
@@ -190,6 +197,7 @@ const linkList = async (req, res, next) => {
     });
     const data = {
         server: generateServerString(),
+        maxUploadSize: process.env.MAX_UPLOAD_SIZE,
         links: links,
     };
     return res.render("links", data);
