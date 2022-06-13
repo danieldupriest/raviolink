@@ -1,14 +1,19 @@
 const fs = require("fs");
-const logFile = fs.createWriteStream("./debug.log", { flags: "w" });
+const path = require("path");
+const fullPath = path.resolve(__dirname, "..");
 
-module.exports["log"] = function (input) {
-    logFile.write(input);
+const logFile = fs.createWriteStream(fullPath + "/debug.log");
+
+const log = (input) => {
+    logFile.write(input + "\n");
 };
 
-module.exports["debug"] = function (input) {
+const debug = (input) => {
     console.debug(input);
 };
 
-module.exports["error"] = function (input) {
+const error = (input) => {
     console.error(input);
 };
+
+module.exports = { log, debug, error };
