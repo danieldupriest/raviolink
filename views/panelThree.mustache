@@ -1,0 +1,43 @@
+<div class="panel" id="three-panel">
+    <form action="http://{{server}}" method="post" onsubmit="showSpinner()" enctype="multipart/form-data">
+        <div class="form-group row">
+            <label class="field-label" for="file-input">Choose file</label>
+            <input id="file-input-toggle" type="checkbox" class="tip-checkbox"/>
+            <label class="tip-label" for="file-input-toggle">?</label>
+            <label class="tip-text" for="file-input-toggle">Choose the file you wish to share. The generated link will display the file on this site either as an image, or as a downloadable link. File size is limited to 10 MB.</label>
+            <input type="file" name="content" class="form-control is-valid" id="file-input" onchange="checkFileSize(this)" required>
+        </div>
+        <div class="form-group row">
+            <label class="field-label" for="file-expires-input">Link expires</label>
+            <input id="file-expires-toggle" type="checkbox" class="tip-checkbox"/>
+            <label class="tip-label" for="file-expires-toggle">?</label>
+            <label class="tip-text" for="file-expires-toggle">The link will become inaccessible if an expiration time is set.</label>
+            <select name="expires" class="form-control" id="file-expires-input" value="never">
+                <option value="never">Never</option>
+                <option value="60000">1 minute</option>
+                <option value="3600000">1 hour</option>
+                <option value="86400000">1 day</option>
+                <option value="604800000">1 week</option>
+                <option value="2628000000">1 month</option>
+                <option value="31540000000">1 year</option>
+            </select>
+        </div>
+        <div class="form-group row">
+            <label class="field-label" for="file-delete-input">Delete on view</label>
+            <input id="file-delete-toggle" type="checkbox" class="tip-checkbox"/>
+            <label class="tip-label" for="file-delete-toggle">?</label>
+            <label class="tip-text" for="file-delete-toggle">The link will be deleted after the first view, not counting the preview page displayed after creating a link.</label>
+            <input type="checkbox" class="form-control" id="file-delete-input" name="deleteOnView" value="true">
+        </div>
+        <div class="form-group row">
+            <label class="field-label" for="file-raw-input">Direct download</label>
+            <input id="file-raw-toggle" type="checkbox" class="tip-checkbox"/>
+            <label class="tip-label" for="file-raw-toggle">?</label>
+            <label class="tip-text" for="file-raw-toggle">If direct download is enabled, when the link is accessed the file will begin downloading immediately.</label>
+            <input type="checkbox" class="form-control" id="file-raw-input" name="raw" value="true">
+        </div>
+        <input type="hidden" name="type" value="file"/>
+        <button type="submit" class="btn btn-primary">Create link</button>
+        <div id="spinner">-</div>
+    </form>
+</div>

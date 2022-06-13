@@ -1,0 +1,37 @@
+<div class="panel" id="one-panel">
+    <form action="http://{{server}}" method="post">
+        <div class="form-group">
+            <div class="row">
+                <label class="field-label" for="url-input">URL to shorten</label>
+                <input id="url-toggle" type="checkbox" class="tip-checkbox"/>
+                <label class="tip-label" for="url-toggle">?</label>
+                <label class="tip-text" for="url-toggle">Paste in a long URL to generate a short link. It must begin with either <code>https://</code> or <code>http://</code></label>
+            </div>
+            <input type="url" name="content" class="form-control is-valid boxsizingBorder" id="url-input" placeholder="http://example.com" required>
+        </div>
+        <div class="form-group row">
+            <label class="field-label" for="url-expires-input">Link expires</label>
+            <input id="url-expires-toggle" type="checkbox" class="tip-checkbox"/>
+            <label class="tip-label" for="url-expires-toggle">?</label>
+            <label class="tip-text" for="url-expires-toggle">The link will become inaccessible if an expiration time is set.</label>
+            <select name="expires" class="form-control" id="url-expires-input" value="never">
+                <option value="never">Never</option>
+                <option value="60000">1 minute</option>
+                <option value="3600000">1 hour</option>
+                <option value="86400000">1 day</option>
+                <option value="604800000">1 week</option>
+                <option value="2628000000">1 month</option>
+                <option value="31540000000">1 year</option>
+            </select>
+        </div>
+        <div class="form-group row">
+            <label class="field-label" for="url-delete-input">Delete on view</label>
+            <input id="url-delete-toggle" type="checkbox" class="tip-checkbox"/>
+            <label class="tip-label" for="url-delete-toggle">?</label>
+            <label class="tip-text" for="url-delete-toggle">The link will be deleted after the first view, not counting the preview page displayed after creating a link.</label>
+            <input type="checkbox" class="form-control" id="url-delete-input" name="deleteOnView" value="true">
+        </div>
+        <input type="hidden" name="type" value="link"/>
+        <button type="submit" class="btn btn-primary">Create link</button>
+    </form>  
+</div>

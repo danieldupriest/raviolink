@@ -36,9 +36,6 @@ body{
 body > * {
     max-width: var(--narrow);
 }
-.wrapper.full-width {
-    max-width: initial;
-}
 h1, h2, h3, h4, h5 {
     position: relative;
     margin: var(--padding-small) 0 0 0;
@@ -48,6 +45,9 @@ h1, h2, h3, h4, h5 {
 .link .wrapper,
 .link footer{
     max-width: var(--wide);
+}
+.link .wrapper.full-width {
+    max-width: initial;
 }
 .hidden {
     display: none;
@@ -512,6 +512,9 @@ dd {
 }
 .styled-table .uid {
     word-wrap: normal;
+}
+.table-content {
+    width: 100%;
 }
 
 #footer {
