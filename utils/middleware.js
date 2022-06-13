@@ -5,8 +5,10 @@ function logRequest(req, res, next) {
     const message = `Handling request to: ${req.url}`;
     log(message);
     debug(message);
-    debug("  With params: " + JSON.stringify(req.params));
-    debug("  With body: " + JSON.stringify(req.body));
+    if (Object.keys(req.params).length > 0)
+        debug("  With params: " + JSON.stringify(req.params));
+    if (Object.keys(req.body).length > 0)
+        debug("  With body: " + JSON.stringify(req.body));
     next();
 }
 

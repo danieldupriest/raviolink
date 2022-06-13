@@ -11,7 +11,7 @@ const serveError = (res, code, message) => {
 };
 
 const errorResponder = (err, req, res, next) => {
-    const message = `Server error: ${JSON.stringify(err)}`;
+    const message = `Server error: ${err}`;
     debug(message);
     log(message);
     serveError(res, 500, "Server error");

@@ -38,33 +38,12 @@ app.use(setupTemplateData); // Set up data for reuse in page templates
 app.use(setCSPHeaders); // Set custom Content Security Policy header
 
 /**
- * DEFINE MAIN APP ROUTES
+ * APP ROUTES
  */
 
-// Configure a rate limiter for use in certain routes
-const rateLimiter = require("./utils/rateLimiter.js");
-const limiter = rateLimiter({ window: 10 * 1000, limit: 5 });
-
-// Configure upload middleware
-const multer = require("multer");
-const upload = multer({
-    limits: { fileSize: process.env.MAX_UPLOAD_SIZE },
-    dest: process.env.TEMP_FILE_PATH,
-}).single("content");
-
-// Routes
-const {
-    handleLink,
-    frontPage,
-    postLink,
-    handleFile,
-    linkList,
-} = require("./controllers/links.js");
-app.get(process.env.BASE_URL + "/links", linkList); // Shows overview list of all links
-app.get(process.env.BASE_URL + "/:uid/file", handleFile); // Serves directly linked files
-app.get(process.env.BASE_URL + "/:uid", [limiter, handleLink]); // Retrieves specified link
-app.get(process.env.BASE_URL + "/", frontPage); // Shows default home page
-app.post(process.env.BASE_URL + "/", [limiter, upload, postLink]); // Handle creation of link
+const mainRoutes = require("./routes/main.js");
+const base = process.env.BASE_URL ? process.env.BASE_URL : "/";
+app.use(base, mainRoutes);
 
 /**
  *  ERROR HANDLING

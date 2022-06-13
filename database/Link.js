@@ -86,13 +86,9 @@ class Link {
     size() {
         if (this.type == "file") {
             if (this.uid != "") {
-                try {
-                    const filePath = "./files/" + this.uid + "/" + this.content;
-                    const stats = fs.statSync(filePath);
-                    return formatBytes(stats.size);
-                } catch (err) {
-                    throw err;
-                }
+                const filePath = "./files/" + this.uid + "/" + this.content;
+                const stats = fs.statSync(filePath);
+                return formatBytes(stats.size);
             } else {
                 return "";
             }

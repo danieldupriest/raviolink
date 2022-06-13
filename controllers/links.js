@@ -6,6 +6,7 @@ const { serveError } = require("./errors.js");
 const sanitize = require("sanitize-filename");
 const path = require("path");
 const { log, debug } = require("../utils/logger.js");
+const fs = require("fs");
 
 const MAX_DATE_MS = 8640000000000000;
 
@@ -13,6 +14,17 @@ function uidIsValid(uid) {
     const match = uid.match(/[A-Za-z0-9]{7}/);
     if (!match) debug(`Searched for UID ${uid} but did not find.`);
     return match;
+}
+
+function fileExists(link) {
+    const fullPath = path.resolve(
+        __dirname,
+        "..",
+        "files",
+        link.uid,
+        link.content
+    );
+    return fs.existsSync(fullPath);
 }
 
 const handleLink = async (req, res, next) => {
@@ -48,14 +60,17 @@ const handleLink = async (req, res, next) => {
             }
             break;
         case "file":
-            if (link.raw) {
-                const fullPath = path.resolve(
-                    __dirname,
-                    "..",
-                    "files",
-                    link.uid,
-                    link.content
+            // Check that file exists
+            if (!fileExists(link)) {
+                return next(
+                    new Error(
+                        `File ${link.content} for UID ${link.uid} not found.`
+                    )
                 );
+            }
+
+            // Handle direct downloads
+            if (link.raw) {
                 await link.decrementViewsLeft();
                 return res.sendFile(fullPath, {}, (err) => {
                     if (err) {
@@ -69,7 +84,7 @@ const handleLink = async (req, res, next) => {
     }
 
     // Handle display of normal, non-raw links
-    return res.render("index", { link: link, ...res.locals.pageData });
+    res.render("index", { link: link, ...res.locals.pageData });
 };
 
 const handleFile = async (req, res, next) => {
@@ -88,6 +103,12 @@ const handleFile = async (req, res, next) => {
     ) {
         return serveError(res, 404, "Link not found");
     }
+
+    if (!fileExists(link)) {
+        return next(
+            new Error(`File ${link.content} for UID ${link.uid} not found.`)
+        );
+    }
     const fullPath = path.resolve(
         __dirname,
         "..",
@@ -95,11 +116,11 @@ const handleFile = async (req, res, next) => {
         link.uid,
         link.content
     );
-    debug(`Attempting to send file: ${fullPath}`);
+    debug(`Sending file: ${fullPath}`);
     await link.decrementViewsLeft();
     return res.sendFile(fullPath, {}, (err) => {
         if (err) {
-            return next(err);
+            next(err);
         }
     });
 };
