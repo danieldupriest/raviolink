@@ -1,11 +1,13 @@
 const fs = require("fs");
 const path = require("path");
-const fullPath = path.resolve(__dirname, "..");
+const RavioliDate = require("./dates.js");
 
+const fullPath = path.resolve(__dirname, "..");
 const logFile = fs.createWriteStream(fullPath + "/debug.log");
 
 const log = (input) => {
-    logFile.write(input + "\n");
+    const d = new RavioliDate();
+    logFile.write(d.toISODate() + ": " + input + "\n");
 };
 
 const debug = (input) => {
