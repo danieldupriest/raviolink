@@ -207,7 +207,11 @@ const linkList = async (req, res, next) => {
     links = links.filter((link) => {
         return !link.isDeleted() && !link.isExpired() && !link.deleteOnView;
     });
-    return res.render("links", { links: links, ...res.locals.pageData });
+    return res.render("links", {
+        links: links,
+        fullWidth: true,
+        ...res.locals.pageData,
+    });
 };
 
 module.exports = { handleLink, frontPage, postLink, handleFile, linkList };

@@ -36,18 +36,13 @@ body{
 body > * {
     max-width: var(--narrow);
 }
+body.full-width > * {
+    max-width: 100%;
+}
 h1, h2, h3, h4, h5 {
     position: relative;
     margin: var(--padding-small) 0 0 0;
     padding: 0;
-}
-.link header,
-.link .wrapper,
-.link footer{
-    max-width: var(--wide);
-}
-.link .wrapper.full-width {
-    max-width: initial;
 }
 .hidden {
     display: none;
