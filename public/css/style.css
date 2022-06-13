@@ -37,7 +37,7 @@ body > * {
     max-width: var(--narrow);
 }
 body.full-width > * {
-    max-width: 100%;
+    max-width: var(--wide);
 }
 h1, h2, h3, h4, h5 {
     position: relative;
