@@ -71,6 +71,13 @@ const handleLink = async (req, res, next) => {
 
             // Handle direct downloads
             if (link.raw) {
+                const fullPath = path.resolve(
+                    __dirname,
+                    "..",
+                    "files",
+                    link.uid,
+                    link.content
+                );
                 await link.decrementViewsLeft();
                 return res.sendFile(fullPath, {}, (err) => {
                     if (err) {
