@@ -5,6 +5,7 @@ const RavioliDate = require("../utils/dates.js");
 const fs = require("fs");
 const { threadId } = require("worker_threads");
 const { formatBytes } = require("../utils/tools.js");
+const { log, debug, error } = require("../utils/logger.js");
 
 const URL_LENGTH = 7;
 const MAX_GEN_TRIES = 10;
@@ -114,7 +115,7 @@ class Link {
         // Delete file if file
         if (this.type == "file") {
             const baseDir = "./files/" + this.uid;
-            console.log("Attempting to unlink: " + baseDir);
+            debug("Attempting to unlink: " + baseDir);
             try {
                 fs.rmSync(baseDir, { recursive: true, force: true });
             } catch (err) {
@@ -131,11 +132,9 @@ class Link {
     }
 
     async decrementViewsLeft() {
-        console.log("ViewsLeft: " + this.viewsLeft);
         if (!this.deleteOnView) return;
         this.viewsLeft = this.viewsLeft - 1;
         await this.update();
-        console.log("ViewsLeft after: " + this.viewsLeft);
     }
 
     static async findAll() {
@@ -206,31 +205,29 @@ class Link {
             // Expiration date is not set
             return;
         if (this.isExpired()) {
-            console.log("Link is expired: " + this.uid);
+            debug("Link is expired: " + this.uid);
             if (!this.isDeleted()) {
-                console.log(
-                    "Link has not yet been deleted. Deleting: " + this.uid
-                );
+                debug("Link has not yet been deleted. Deleting: " + this.uid);
                 await this.delete();
             }
         }
     }
 
     async save() {
-        //console.log(JSON.stringify(this));
         if (this.uid == 0) {
             const uid = await this.generateUnusedUid();
             this.uid = uid;
         }
 
+        debug(`Saving link with UID ${this.uid}`);
+
         if (this.type == "file") {
             const baseDir = "./files/" + this.uid;
-            //console.log("ExistsSync '" + baseDir + " : " + fs.existsSync(baseDir));
             if (!fs.existsSync(baseDir)) {
-                console.log("Making base dir: " + baseDir);
+                debug("Making base dir: " + baseDir);
                 fs.mkdirSync(baseDir);
                 const newFilePath = baseDir + "/" + this.content;
-                console.log(
+                debug(
                     "Renaming '" +
                         this.tempFilename +
                         "' to '" +
@@ -264,7 +261,6 @@ class Link {
     }
 
     async update() {
-        //console.log("Updating: " + JSON.stringify(this));
         await db.run(
             `UPDATE links SET content = ?, type = ?, created_on = ?, expires_on = ?, delete_on_view = ?, raw = ?, mime_type = ?, deleted = ?, views_left = ?, text_type = ? WHERE uid = ?`,
             [

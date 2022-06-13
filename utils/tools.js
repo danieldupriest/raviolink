@@ -1,13 +1,6 @@
 require("dotenv").config();
 
-const generateServerString = () => {
-    return (
-        process.env.SERVER +
-        (process.env.PORT == 80 ? "" : ":" + process.env.PORT) +
-        process.env.BASE_URL
-    );
-};
-
+// Generate a short unit representation for various file sizes
 function formatBytes(bytes, decimals = 2) {
     if (bytes === 0) return "0 Bytes";
 
@@ -20,4 +13,4 @@ function formatBytes(bytes, decimals = 2) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
 }
 
-module.exports = { generateServerString, formatBytes };
+module.exports = { formatBytes };

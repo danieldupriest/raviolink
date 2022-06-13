@@ -1,5 +1,6 @@
 const { config } = require("dotenv");
 const { get } = require("express/lib/response");
+const { log, debug } = require("../utils/logger.js");
 config();
 const sqlite3 = require("sqlite3");
 sqlite3.verbose();
@@ -10,7 +11,7 @@ class Database {
     constructor(memory = false) {
         this.db = new sqlite3.Database(memory ? ":memory:" : dbFile, (err) => {
             if (err) throw err;
-            console.log(
+            debug(
                 "Opened database " + (memory ? "in memory" : `file ${dbFile}`)
             );
         });

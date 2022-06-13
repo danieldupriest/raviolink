@@ -3,15 +3,15 @@ const Link = require("../database/Link.js");
 const validUrl = require("../utils/urlChecker.js");
 const RavioliDate = require("../utils/dates.js");
 const { serveError } = require("./errors.js");
-const { generateServerString } = require("../utils/tools.js");
 const sanitize = require("sanitize-filename");
 const path = require("path");
+const { log, debug } = require("../utils/logger.js");
 
 const MAX_DATE_MS = 8640000000000000;
 
 function uidIsValid(uid) {
     const match = uid.match(/[A-Za-z0-9]{7}/);
-    if (!match) console.log("Invalid UID: " + uid);
+    if (!match) debug(`Searched for UID ${uid} but did not find.`);
     return match;
 }
 
@@ -28,14 +28,11 @@ const handleLink = async (req, res, next) => {
     const exists = link != "undefined";
     const deleted = link.isDeleted();
     const expired = link.isExpired();
-    console.log(
-        `Valid: ${valid}, Exists: ${exists}, Deleted: ${deleted}, Expired: ${expired}`
-    );
     if (!uidIsValid(uid) || !link || link.isDeleted() || link.isExpired()) {
         return serveError(res, 404, "Link not found");
     }
 
-    console.log("Handling link: " + JSON.stringify(link));
+    log("Loading link: " + JSON.stringify(link));
 
     //Handle redirects and raw links
     switch (link.type) {
@@ -59,11 +56,10 @@ const handleLink = async (req, res, next) => {
                     link.uid,
                     link.content
                 );
-                console.log(fullPath);
                 await link.decrementViewsLeft();
                 return res.sendFile(fullPath, {}, (err) => {
                     if (err) {
-                        return console.log(err);
+                        return next(err);
                     }
                 });
             }
@@ -73,12 +69,7 @@ const handleLink = async (req, res, next) => {
     }
 
     // Handle display of normal, non-raw links
-    const data = {
-        link: link,
-        server: generateServerString(),
-        maxUploadSize: process.env.MAX_UPLOAD_SIZE,
-    };
-    return res.render("index", data);
+    return res.render("index", { link: link, ...res.locals.pageData });
 };
 
 const handleFile = async (req, res, next) => {
@@ -104,22 +95,17 @@ const handleFile = async (req, res, next) => {
         link.uid,
         link.content
     );
-    console.log("Sending file: " + fullPath);
+    debug(`Attempting to send file: ${fullPath}`);
     await link.decrementViewsLeft();
     return res.sendFile(fullPath, {}, (err) => {
         if (err) {
-            return console.log(err);
+            return next(err);
         }
     });
 };
 
 const frontPage = (req, res) => {
-    const data = {
-        link: null,
-        server: generateServerString(),
-        maxUploadSize: process.env.MAX_UPLOAD_SIZE,
-    };
-    return res.render("index", data);
+    return res.render("index", { link: null, ...res.locals.pageData });
 };
 
 const postLink = async (req, res, next) => {
@@ -178,13 +164,11 @@ const postLink = async (req, res, next) => {
         return next(Error("Unsupported type"));
     }
     await newLink.save();
-    const data = {
+    return res.render("index", {
         link: newLink,
-        server: generateServerString(),
-        maxUploadSize: process.env.MAX_UPLOAD_SIZE,
         showLink: true,
-    };
-    return res.render("index", data);
+        ...res.locals.pageData,
+    });
 };
 
 const linkList = async (req, res, next) => {
@@ -195,12 +179,7 @@ const linkList = async (req, res, next) => {
     links = links.filter((link) => {
         return !link.isDeleted() && !link.isExpired() && !link.deleteOnView;
     });
-    const data = {
-        server: generateServerString(),
-        maxUploadSize: process.env.MAX_UPLOAD_SIZE,
-        links: links,
-    };
-    return res.render("links", data);
+    return res.render("links", { links: links, ...res.locals.pageData });
 };
 
 module.exports = { handleLink, frontPage, postLink, handleFile, linkList };

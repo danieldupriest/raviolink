@@ -1,5 +1,7 @@
 require("dotenv").config();
 const Database = require("../database/Database.js");
+const { serveError } = require("../controllers/errors.js");
+const { debug } = require("../utils/logger.js");
 
 const WINDOW = 10 * 1000; //Access window in ms
 const LIMIT = 2; //Max number of accesses to allow within window
@@ -11,8 +13,6 @@ async function init() {
         "CREATE TABLE IF NOT EXISTS accesses (id INTEGER PRIMARY KEY AUTOINCREMENT, ip TEXT, access_time INTEGER);"
     );
 }
-null;
-
 class Access {
     constructor(ip, accessTime, id = 0) {
         this.ip = ip;
@@ -56,19 +56,15 @@ const rateLimiter = (options = { window: WINDOW, limit: LIMIT }) => {
     let limit = options.limit;
     return async (req, res, next) => {
         let ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+        debug("Logged access from ip:" + ip);
         const allowed = await Access.allowed(ip, window, limit);
         if (!allowed) {
-            console.log("Too many requests from IP: " + ip);
+            debug("Too many requests from IP: " + ip);
             res.status(429);
-            return res.render("error", {
-                status: 429,
-                error: "Too many requests",
-                server: process.env.SERVER_STRING,
-            });
+            return serveError(res, 429, "Too many requests");
         }
         const access = new Access(ip, new Date());
         await access.save();
-        console.log("Logged access from ip:" + ip);
         next();
     };
 };
