@@ -34,10 +34,10 @@ body{
     overflow-x: hidden;
 }
 body > * {
-    max-width: var(--narrow);
+    max-width: var(--wide);
 }
 body.full-width > * {
-    max-width: var(--wide);
+    max-width: 100%;
 }
 h1, h2, h3, h4, h5 {
     position: relative;
@@ -529,7 +529,7 @@ dd {
     display: flex;
     gap: var(--padding-small);
 }
-.row > *:first-child {
+form .row > *:first-child {
     flex-grow: 1;
 }
 .column {

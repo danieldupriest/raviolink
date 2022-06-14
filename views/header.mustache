@@ -59,7 +59,7 @@
                 const spinner = document.getElementById("spinner");
                 spinner.style.display = "block";
                 function nextFrame(){
-                    spinner.innerHTML = `<div class="row"><div>${spinnerFrames[currFrame]}</div><div>Uploading and scanning for viruses. This may take around 20 seconds.</div></div>`;
+                    spinner.innerHTML = `<div class="row"><div>${spinnerFrames[currFrame]}</div><div>Uploading and scanning for viruses. This may take a while.</div></div>`;
                     currFrame=(currFrame==spinnerFrames.length-1)? 0:currFrame+1;
                 }
                 setInterval(nextFrame, 100);
