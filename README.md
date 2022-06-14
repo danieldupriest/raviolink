@@ -4,24 +4,26 @@ Raviolink is an open source web application for generating short URLS for longer
 
 ## Current Features
 
-* Shorten long URLs
-* Share plain text or source code with syntax highlighting
-* Share images, which are displayed, or files, which can be downloaded
-* QR code generated for each link
-* Optional expiration date
-* Optional delete on first view/download
-* Optional direct download of content
-* Copy text/code to clipboard
-* IP-based Rate-limiting of successive posts to prevent abuse
+-   Shorten long URLs
+-   Share plain text or source code with syntax highlighting
+-   Share images, which are displayed, or files, which can be downloaded
+-   QR code generated for each link
+-   Optional expiration date
+-   Optional delete on first view/download
+-   Optional direct download of content
+-   Copy text/code to clipboard
+-   IP-based Rate-limiting of successive posts to prevent abuse
+-   Scanning files for viruses with ClamAV
 
 ## Planned Features
 
-* Bandwidth monitoring and management on a per-link basis.
+-   Bandwidth monitoring and management on a per-link basis.
 
 ## Setup
 
-1. Run `npm i`
-2. Copy `.env.sample` to `.env` and edit to configure
+1. Install ClamAV on the server. On Debian this can be done with `sudo apt-get install clamav`. Note that ClamAV will not run on Google's smallest VM with 512MB of memory. It requires more than that. I am currently running it on a 1.7 MB machine with no problems.
+2. Ensure npm is installed and run `npm i` in the root directory of the project
+3. Copy `.env.sample` to `.env` and edit to configure
 
 ## Development
 
