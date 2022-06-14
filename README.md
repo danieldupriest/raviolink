@@ -21,7 +21,7 @@ Raviolink is an open source web application for generating short URLS for longer
 
 ## Setup
 
-1. Install ClamAV on the server. On Debian this can be done with `sudo apt-get install clamav`. Note that ClamAV will not run on Google's smallest VM with 512MB of memory. It requires more than that. I am currently running it on a 1.7 GB machine with no problems.
+1. Install ClamAV on the server. On Debian this can be done with `sudo apt-get install clamav`. Note that ClamAV will not run on Google's smallest VM with 512MB of memory. They recommend at least 2 GB of memory, though I am currently running it on a 1.7 GB machine with no problems.
 2. Ensure npm is installed and run `npm i` in the root directory of the project
 3. Copy `.env.sample` to `.env` and edit to configure
 
