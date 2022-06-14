@@ -7,6 +7,7 @@ const sanitize = require("sanitize-filename");
 const path = require("path");
 const { log, debug } = require("../utils/logger.js");
 const fs = require("fs");
+const Clamscan = require("clamscan");
 
 const MAX_DATE_MS = 8640000000000000;
 
@@ -173,11 +174,29 @@ const postLink = async (req, res, next) => {
             textType
         );
     } else if (type == "file") {
-        if (!req.file) return next(new Error("File not found"));
+        if (!req.file) return next(new Error("File not found in form data."));
+
+        // Check for bad filename
         const sanitizedFilename = sanitize(req.file.originalname);
         if (sanitizedFilename.length > 255)
             return next(new Error("Filename too long"));
         if (sanitizedFilename == "") return next(new Error("Invalid filename"));
+
+        // Perform virus scan
+        const scanner = new Clamscan();
+        await scanner.init();
+        const { _, isInfected, viruses } = await scanner.scanFile(
+            req.file["path"]
+        );
+        if (isInfected) {
+            fs.unlinkSync(req.file["path"]);
+            const message = `Virus detected in file: ${viruses.join(", ")}`;
+            log(message);
+            debug(message);
+            return serveError(res, 409, message);
+        }
+
+        // Create the link
         newLink = new Link(
             sanitizedFilename,
             type,
