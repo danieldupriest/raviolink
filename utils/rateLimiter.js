@@ -64,7 +64,7 @@ const rateLimiter = (options = { window: WINDOW, limit: LIMIT }) => {
             res.statusCode = 429;
             return next(
                 new Error(
-                    "Too many requests from IP. Please 10 seconds before submitting again.",
+                    "Too many requests from IP. Please wait at least 10 seconds between submissions.",
                     {
                         cause: `Too many requests from IP ${ip}`,
                     }

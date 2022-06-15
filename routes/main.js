@@ -21,7 +21,7 @@ const {
 } = require("../controllers/links.js");
 router.get(process.env.BASE_URL + "/links", linkList); // Shows overview list of all links
 router.get(process.env.BASE_URL + "/:uid/file", handleFile); // Serves directly linked files
-router.get(process.env.BASE_URL + "/:uid", [limiter, handleLink]); // Retrieves specified link
+router.get(process.env.BASE_URL + "/:uid", handleLink); // Retrieves specified link
 router.get(process.env.BASE_URL + "/", frontPage); // Shows default home page
 router.post(process.env.BASE_URL + "/", [limiter, upload, postLink]); // Handle creation of link
 
