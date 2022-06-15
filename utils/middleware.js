@@ -1,4 +1,5 @@
 const { log, debug } = require("./logger.js");
+const mcache = require("memory-cache");
 
 // Middleware to log requests
 function logRequest(req, res, next) {
@@ -35,4 +36,22 @@ function setCSPHeaders(req, res, next) {
     next();
 }
 
-module.exports = { logRequest, setupTemplateData, setCSPHeaders };
+// Simple memory cache for thumbnails.
+function cache(duration) {
+    return (req, res, next) => {
+        let key = "__express__" + req.originalUrl || req.url;
+        let cachedBody = mcache.get(key);
+        if (cachedBody) {
+            return res.send(cachedBody);
+        } else {
+            res.sendResponse = res.send;
+            res.send = (body) => {
+                mcache.put(key, body, duration * 1000);
+                res.sendResponse(body);
+            };
+            next();
+        }
+    };
+}
+
+module.exports = { logRequest, setupTemplateData, setCSPHeaders, cache };
