@@ -42,6 +42,7 @@ function cache(duration) {
         let key = "__express__" + req.originalUrl || req.url;
         let cachedBody = mcache.get(key);
         if (cachedBody) {
+            debug(`Using cache for ${key}`);
             return res.send(cachedBody);
         } else {
             res.sendResponse = res.send;
