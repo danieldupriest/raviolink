@@ -48,8 +48,9 @@ app.use(base, mainRoutes);
 /**
  *  ERROR HANDLING
  */
-const { errorResponder } = require("./controllers/errors.js");
-app.use(errorResponder); // Serve 500 error for uncaught problems
+const { customErrorResponder, serverErrorResponder } = require("./controllers/errors.js");
+app.use(customErrorResponder);
+app.use(serverErrorResponder); // Serve 500 error and log uncaught problems
 
 /**
  * APP STARTUP

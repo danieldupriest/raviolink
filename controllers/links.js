@@ -2,7 +2,6 @@ require("dotenv").config();
 const Link = require("../database/Link.js");
 const validUrl = require("../utils/urlChecker.js");
 const RavioliDate = require("../utils/dates.js");
-const { serveError } = require("./errors.js");
 const sanitize = require("sanitize-filename");
 const path = require("path");
 const { log, debug } = require("../utils/logger.js");
@@ -32,8 +31,10 @@ const handleLink = async (req, res, next) => {
     const { uid } = req.params;
     const link = await Link.findByUid(uid);
 
-    if (!link) return serveError(res, 404, "Link not found");
-
+    if (!link) {
+        res.status = 404;
+        return next(new Error("Link not found"));
+    }
     await link.checkExpiration();
     await link.checkViewsLeft();
 
@@ -42,7 +43,8 @@ const handleLink = async (req, res, next) => {
     const deleted = link.isDeleted();
     const expired = link.isExpired();
     if (!uidIsValid(uid) || !link || link.isDeleted() || link.isExpired()) {
-        return serveError(res, 404, "Link not found");
+        res.status = 404;
+        return next(new Error("Link not found"));
     }
 
     log("Loading link: " + JSON.stringify(link));
@@ -88,6 +90,7 @@ const handleLink = async (req, res, next) => {
             }
             break;
         default:
+            res.status = 400;
             return next(new Error("Unsupported link type."));
     }
 
@@ -99,8 +102,10 @@ const handleFile = async (req, res, next) => {
     const { uid } = req.params;
     const link = await Link.findByUid(uid);
 
-    if (!link) return serveError(res, 404, "Link not found");
-
+    if (!link) {
+        res.status = 404;
+        return next(new Error("Link not found"));
+    }
     await link.checkExpiration();
     await link.checkViewsLeft();
     if (
@@ -109,7 +114,8 @@ const handleFile = async (req, res, next) => {
         (await link.isExpired()) ||
         link.type != "file"
     ) {
-        return serveError(res, 404, "Link not found");
+        res.status = 404;
+        return next(new Error("Link not found"));
     }
 
     if (!fileExists(link)) {
@@ -154,8 +160,11 @@ const postLink = async (req, res, next) => {
     // Conditional code
     let newLink;
     if (type == "link") {
-        if (!validUrl(content))
+        if (!validUrl(content)) {
+            res.status = 400;
             return next(new Error("URL contains unsupported characters."));
+        }
+            
         newLink = new Link(
             content,
             type,
@@ -174,13 +183,21 @@ const postLink = async (req, res, next) => {
             textType
         );
     } else if (type == "file") {
-        if (!req.file) return next(new Error("File not found in form data."));
+        if (!req.file) {
+            res.status = 400;
+            return next(new Error("Form data must contain file."));
+        }
 
         // Check for bad filename
         const sanitizedFilename = sanitize(req.file.originalname);
-        if (sanitizedFilename.length > 255)
+        if (sanitizedFilename.length > 255) {
+            res.status = 400;
             return next(new Error("Filename too long"));
-        if (sanitizedFilename == "") return next(new Error("Invalid filename"));
+        }
+        if (sanitizedFilename == "") {
+            res.status = 400;
+            return next(new Error("Filename contains invalid characters"));
+        }
 
         // Perform virus scan
         const scanner = new Clamscan();
@@ -193,7 +210,9 @@ const postLink = async (req, res, next) => {
             const message = `Virus detected in file: ${viruses.join(", ")}`;
             log(message);
             debug(message);
-            return serveError(res, 409, message);
+            res.status = 409;
+            res.message = message;
+            return next(new Error(message));
         }
 
         // Create the link
@@ -208,7 +227,8 @@ const postLink = async (req, res, next) => {
             req.file["mimetype"]
         );
     } else {
-        return next(Error("Unsupported type"));
+        res.status = 400;
+        return next(Error("Unsupported link type"));
     }
     await newLink.save();
     return res.render("index", {
