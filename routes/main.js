@@ -1,6 +1,6 @@
 // Configure a rate limiter for use in certain routes
 const rateLimiter = require("../utils/rateLimiter.js");
-const limiter = rateLimiter({ window: 10 * 1000, limit: 5 });
+const limiter = rateLimiter({ window: 10 * 1000, limit: 1 });
 
 // Configure upload middleware
 const multer = require("multer");

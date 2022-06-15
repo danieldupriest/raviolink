@@ -13,6 +13,8 @@ async function init() {
         "CREATE TABLE IF NOT EXISTS accesses (id INTEGER PRIMARY KEY AUTOINCREMENT, ip TEXT, access_time INTEGER);"
     );
 }
+init();
+
 class Access {
     constructor(ip, accessTime, id = 0) {
         this.ip = ip;
@@ -59,16 +61,20 @@ const rateLimiter = (options = { window: WINDOW, limit: LIMIT }) => {
         debug("Logged access from ip:" + ip);
         const allowed = await Access.allowed(ip, window, limit);
         if (!allowed) {
-            debug("Too many requests from IP: " + ip);
-            res.status(429);
-            return serveError(res, 429, "Too many requests");
+            res.statusCode = 429;
+            return next(
+                new Error(
+                    "Too many requests from IP. Please 10 seconds before submitting again.",
+                    {
+                        cause: `Too many requests from IP ${ip}`,
+                    }
+                )
+            );
         }
         const access = new Access(ip, new Date());
         await access.save();
         next();
     };
 };
-
-init();
 
 module.exports = rateLimiter;

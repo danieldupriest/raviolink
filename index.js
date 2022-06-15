@@ -1,5 +1,6 @@
 require("dotenv").config();
 
+// Create app
 const express = require("express");
 const app = express();
 
@@ -48,9 +49,12 @@ app.use(base, mainRoutes);
 /**
  *  ERROR HANDLING
  */
-const { customErrorResponder, serverErrorResponder } = require("./controllers/errors.js");
-app.use(customErrorResponder);
-app.use(serverErrorResponder); // Serve 500 error and log uncaught problems
+const {
+    missingErrorResponder,
+    customErrorResponder,
+} = require("./controllers/errors.js");
+app.use(missingErrorResponder); // Serve 404 for missing pages
+app.use(customErrorResponder); // Serve custom errors and log uncaught problems
 
 /**
  * APP STARTUP

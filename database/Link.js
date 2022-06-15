@@ -195,21 +195,28 @@ class Link {
     }
 
     isDeleted() {
-        return this.deleted;
+        if (this.deleted) {
+            debug(`Link with UID ${this.uid} is deleted.`);
+            return true;
+        }
+        return false;
     }
 
     isExpired() {
-        return this.expiresOn && RavioliDate() > this.expiresOn;
+        if (this.expiresOn && RavioliDate() > this.expiresOn) {
+            debug(`Link with UID ${this.uid} is expired.`);
+            return true;
+        }
+        return false;
     }
 
     async checkExpiration() {
-        if (!this.expiresOn)
-            // Expiration date is not set
-            return;
+        if (!this.expiresOn) return;
         if (this.isExpired()) {
-            debug("Link is expired: " + this.uid);
             if (!this.isDeleted()) {
-                debug("Link has not yet been deleted. Deleting: " + this.uid);
+                debug(
+                    `Link with UID ${this.uid} has not yet been deleted. Deleting...`
+                );
                 await this.delete();
             }
         }

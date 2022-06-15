@@ -1,36 +1,32 @@
 require("dotenv").config();
-const { log, debug } = require("../utils/logger.js");
+const { log, debug, error } = require("../utils/logger.js");
 
-const customErrorResponder = (err, req, res, next) => {
-    const { statusCode } = res;
-    if (statusCode) {
-        res.status(statusCode);
-        return res.render("error", {
-            status: statusCode,
-            error: `Error: ${err}`,
-            ...res.locals.pageData
-        });
-    } else if (!err) {
-        res.status(404);
-        return res.render("error", {
-            status: 404,
-            error: "Error: page not found",
-            ...res.locals.pageData
-        });
-    }
-    next(err);
+const missingErrorResponder = (req, res, next) => {
+    const error = new Error("Resource not found");
+    res.status(404);
+    next(error);
 };
 
-const serverErrorResponder = (err, req, res, next) => {
-    const message = `Server error: ${err}`;
-    debug(message);
-    log(message);
-    res.status(500);
+const customErrorResponder = (err, req, res, next) => {
+    const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+    res.status(statusCode);
+    if ([400, 404, 429].includes(statusCode)) {
+        debug(err.message);
+        if (err.cause) debug(" " + err.cause);
+        log(err.message);
+        if (err.cause) log(" " + err.cause);
+    } else {
+        error({ err });
+        log({ err });
+    }
     return res.render("error", {
-        status: 500,
-        error: "A server error occurred",
-        ...res.locals.pageData
+        status: statusCode,
+        error: err.message,
+        ...res.locals.pageData,
     });
 };
 
-module.exports = { customErrorResponder, serverErrorResponder };
+module.exports = {
+    missingErrorResponder,
+    customErrorResponder,
+};

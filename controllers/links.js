@@ -31,8 +31,7 @@ const handleLink = async (req, res, next) => {
     const link = await Link.findByUid(uid);
 
     if (!link) {
-        res.status = 404;
-        return next(new Error("Link not found"));
+        return next();
     }
     await link.checkExpiration();
     await link.checkViewsLeft();
@@ -42,8 +41,7 @@ const handleLink = async (req, res, next) => {
     const deleted = link.isDeleted();
     const expired = link.isExpired();
     if (!uidIsValid(uid) || !link || link.isDeleted() || link.isExpired()) {
-        res.status = 404;
-        return next(new Error("Link not found"));
+        return next();
     }
 
     log("Loading link: " + JSON.stringify(link));
@@ -65,9 +63,9 @@ const handleLink = async (req, res, next) => {
             // Check that file exists
             if (!fileExists(link)) {
                 return next(
-                    new Error(
-                        `File ${link.content} for UID ${link.uid} not found.`
-                    )
+                    new Error("Server error", {
+                        cause: `File ${link.content} for UID ${link.uid} not found.`,
+                    })
                 );
             }
 
@@ -89,7 +87,7 @@ const handleLink = async (req, res, next) => {
             }
             break;
         default:
-            res.status = 400;
+            res.statusCode = 400;
             return next(new Error("Unsupported link type."));
     }
 
@@ -105,8 +103,12 @@ const handleFile = async (req, res, next) => {
     const link = await Link.findByUid(uid);
 
     if (!link) {
-        res.status = 404;
-        return next(new Error("Link not found"));
+        res.statusCode = 404;
+        return next(
+            new Error("Resource not found", {
+                cause: `Link with UID ${uid} not found.`,
+            })
+        );
     }
     await link.checkExpiration();
     await link.checkViewsLeft();
@@ -116,13 +118,14 @@ const handleFile = async (req, res, next) => {
         (await link.isExpired()) ||
         link.type != "file"
     ) {
-        res.status = 404;
-        return next(new Error("Link not found"));
+        return next();
     }
 
     if (!fileExists(link)) {
         return next(
-            new Error(`File ${link.content} for UID ${link.uid} not found.`)
+            new Error("Server error", {
+                cause: `File ${link.content} for UID ${link.uid} not found.`,
+            })
         );
     }
     const fullPath = path.resolve(
@@ -137,7 +140,8 @@ const handleFile = async (req, res, next) => {
     // Send thumbnail if requested
     if (size) {
         if (!link.isImage()) {
-            return serveError(res, 400, "File cannot be resized");
+            res.statusCode = 400;
+            return next(new Error("File cannot be resized"));
         }
         res.contentType("image/jpeg");
         sharp(fullPath)
@@ -182,10 +186,10 @@ const postLink = async (req, res, next) => {
     let newLink;
     if (type == "link") {
         if (!validUrl(content)) {
-            res.status = 400;
+            res.statusCode = 400;
             return next(new Error("URL contains unsupported characters."));
         }
-            
+
         newLink = new Link(
             content,
             type,
@@ -205,18 +209,18 @@ const postLink = async (req, res, next) => {
         );
     } else if (type == "file") {
         if (!req.file) {
-            res.status = 400;
+            res.statusCode = 400;
             return next(new Error("Form data must contain file."));
         }
 
         // Check for bad filename
         const sanitizedFilename = sanitize(req.file.originalname);
         if (sanitizedFilename.length > 255) {
-            res.status = 400;
+            res.statusCode = 400;
             return next(new Error("Filename too long"));
         }
         if (sanitizedFilename == "") {
-            res.status = 400;
+            res.statusCode = 400;
             return next(new Error("Filename contains invalid characters"));
         }
 
@@ -231,7 +235,7 @@ const postLink = async (req, res, next) => {
             const message = `Virus detected in file: ${viruses.join(", ")}`;
             log(message);
             debug(message);
-            res.status = 409;
+            res.statusCode = 409;
             res.message = message;
             return next(new Error(message));
         }
@@ -248,7 +252,7 @@ const postLink = async (req, res, next) => {
             req.file["mimetype"]
         );
     } else {
-        res.status = 400;
+        res.statusCode = 400;
         return next(Error("Unsupported link type"));
     }
     await newLink.save();
