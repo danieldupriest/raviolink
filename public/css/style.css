@@ -508,7 +508,7 @@ dd {
 .table-content {
 }
 .table-ip {
-    word-wrap: normal;
+    white-space: nowrap;
 }
 #footer {
     color: #fff;
