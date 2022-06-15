@@ -19,7 +19,7 @@
                 {{#showLink}}
                 <div id="link-container" class="shadow">
                     <div id="link-label">Link</div>
-                    <div id="link-text">{{server}}/{{link.uid}}</div>
+                    <div id="link-text">{{server}}/{{uid}}</div>
                     <a id="link-anchor" href="#" onclick=copyContent("hidden-link")>Copy</a>
                 </div>
                 {{/showLink}}
@@ -45,46 +45,43 @@
                     {{/isUrl}}
                     {{#isText}}<code id="content-text" class="hljs">{{#rows}}<div>{{.}}</div>{{/rows}}</code>{{/isText}}
                     {{#isFile}}
-                        <a id="content-file" href="http://{{server}}/{{link.uid}}/file">
+                        <a id="content-file" href="http://{{server}}/{{uid}}/file">
                             {{#isImage}}
-                                <img id="content-image" src="./{{link.uid}}/file" alt="Image {{link.content}}"/>
+                                <img id="content-image" src="./{{uid}}/file" alt="Image {{content}}"/>
                             {{/isImage}}
                             {{^isImage}}
                                 <img id="content-file-icon" src="./images/file.png" alt="File icon"/>
-                                <div id="content-file-name">{{link.content}}</div>
+                                <div id="content-file-name">{{content}}</div>
                             {{/isImage}}
                         </a>
                     {{/isFile}}
                     <textarea id="hidden-content">{{content}}</textarea>
-                    <textarea id="hidden-link">http://{{server}}/{{link.uid}}</textarea>
+                    <textarea id="hidden-link">http://{{server}}/{{uid}}</textarea>
                 </div>
                 <dl>
                     <div class="definition">
                         <dt>Created on</dt>
                         <dd>{{createdOn}}
                     </div>
-                    {{#link.expiresOn}}
+                    {{#expiresOn}}
                         <div class="definition">
                             <dt>Link expires</dt>
                             <dd>{{expiresOn}}</dd>
                         </div>
-                    {{/link.expiresOn}}
+                    {{/expiresOn}}
                     <div class="definition">
                         <dt>Delete on view</dt>
                         <dd>{{deleteOnView}}</dd>
                     </div>
-                    {{#isText}}
-                        <div class="definition">
-                            <dt>Display as raw</dt>
-                            <dd>{{raw}}</dd>
-                        </div>
-                    {{/isText}}
-                    {{#isFile}}
-                        <div class="definition">
-                            <dt>Direct download</dt>
-                            <dd>{{link.raw}}</dd>
-                        </div>
-                    {{/isFile}}
+                    <div class="definition">
+                        {{#isText}}<dt>Display as raw</dt>{{/isText}}
+                        {{#isFile}}<dt>Direct download</dt>{{/isFile}}
+                        <dd>{{raw}}</dd>
+                    </div>
+                    <div class="definition">
+                        <dt>No. of views</dt>
+                        <dd>{{views}}</dd>
+                    </div>
                     <div class="definition">
                         <dt>QR code</dt>
                         <dd><canvas id="qr-code" class="shadow"></canvas></dd>

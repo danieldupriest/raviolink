@@ -6,7 +6,7 @@ const db = new Database();
 async function init() {
     await db
         .run(
-            "CREATE TABLE IF NOT EXISTS links (id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT, content TEXT, type TEXT, created_on INTEGER, expires_on INTEGER, delete_on_view INTEGER, raw INTEGER, mime_type TEXT, deleted INTEGER, views_left INTEGER, text_type TEXT);"
+            "CREATE TABLE IF NOT EXISTS links (id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT, content TEXT, type TEXT, created_on INTEGER, expires_on INTEGER, delete_on_view INTEGER, raw INTEGER, mime_type TEXT, deleted INTEGER, views_left INTEGER, text_type TEXT, views INTEGER);"
         )
         .then((result) => {
             debug("Checked/created table links");

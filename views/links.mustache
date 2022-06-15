@@ -18,7 +18,7 @@
             <h2>Links</h2>
             <p>Below are shown all links which have not been deleted, are expired, or set to delete on view.</p>
             <table class="styled-table">
-                <tr><th>UID</th><th>Type</th><th class="table-content">Content</th><th>Date Created</th></tr>
+                <tr><th>UID</th><th>Type</th><th class="table-content">Content</th><th>Views</th><th>Date Created</th></tr>
                 {{#links}}
                     <tr><td class="uid"><a href="http://{{server}}/{{uid}}">{{uid}}</a></td>
                         <td class="type">{{type}}</td>
@@ -32,6 +32,7 @@
                             {{#isText}}{{shortContent}}{{/isText}}
                             {{#isUrl}}<a href="{{content}}">{{shortContent}}</a>{{/isUrl}}
                         </td>
+                        <td class="table-views">{{views}}</td>
                         <td class="date">{{createdOn.toShortDate}}</td>
                     </tr>
                 {{/links}}

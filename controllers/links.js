@@ -50,11 +50,11 @@ const handleLink = async (req, res, next) => {
     //Handle redirects and raw links
     switch (link.type) {
         case "link":
-            await link.decrementViewsLeft();
+            await link.access();
             return res.redirect(301, link.content);
             break;
         case "text":
-            await link.decrementViewsLeft();
+            await link.access();
             if (link.raw) {
                 res.setHeader("content-type", "text/plain");
                 return res.send(link.content);
@@ -79,7 +79,7 @@ const handleLink = async (req, res, next) => {
                     link.uid,
                     link.content
                 );
-                await link.decrementViewsLeft();
+                await link.access();
                 return res.sendFile(fullPath, {}, (err) => {
                     if (err) {
                         return next(err);
@@ -125,7 +125,7 @@ const handleFile = async (req, res, next) => {
         link.content
     );
     debug(`Sending file: ${fullPath}`);
-    await link.decrementViewsLeft();
+    await link.access();
     return res.sendFile(fullPath, {}, (err) => {
         if (err) {
             next(err);

@@ -27,7 +27,8 @@ class Link {
         createdOn = null,
         uid = "",
         deleted = false,
-        viewsLeft = null
+        viewsLeft = null,
+        views = 0
     ) {
         this.content = content;
         this.type = type;
@@ -48,6 +49,7 @@ class Link {
             if (this.isImage()) this.viewsLeft = 2;
             else this.viewsLeft = 1;
         }
+        this.views = views;
     }
 
     isImage() {
@@ -127,9 +129,11 @@ class Link {
         if (this.viewsLeft <= 0) await this.delete();
     }
 
-    async decrementViewsLeft() {
-        if (!this.deleteOnView) return;
-        this.viewsLeft = this.viewsLeft - 1;
+    async access() {
+        this.views = this.views + 1;
+        if (this.deleteOnView) {
+            this.viewsLeft = this.viewsLeft - 1;
+        }
         await this.update();
     }
 
@@ -155,7 +159,8 @@ class Link {
                 RavioliDate(parseInt(dbLink["created_on"])),
                 dbLink["uid"],
                 dbLink["deleted"] == 1 ? true : false,
-                parseInt(dbLink["views_left"])
+                parseInt(dbLink["views_left"]),
+                parseInt(dbLink["views"])
             );
             result.push(link);
         }
@@ -180,7 +185,8 @@ class Link {
                 RavioliDate(parseInt(dbLink["created_on"])),
                 dbLink["uid"],
                 dbLink["deleted"] == 1 ? true : false,
-                parseInt(dbLink["views_left"])
+                parseInt(dbLink["views_left"]),
+                parseInt(dbLink["views"])
             );
             return result;
         } else {
@@ -237,7 +243,7 @@ class Link {
         }
 
         await db.run(
-            `INSERT INTO links (uid, content, type, created_on, expires_on, delete_on_view, raw, mime_type, deleted, views_left, text_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO links (uid, content, type, created_on, expires_on, delete_on_view, raw, mime_type, deleted, views_left, text_type, views) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 this.uid,
                 this.content,
@@ -250,6 +256,7 @@ class Link {
                 this.deleted ? 1 : 0,
                 this.viewsLeft,
                 this.textType,
+                this.views,
             ]
         );
         const results = await db.get("SELECT last_insert_rowid();");
@@ -258,7 +265,7 @@ class Link {
 
     async update() {
         await db.run(
-            `UPDATE links SET content = ?, type = ?, created_on = ?, expires_on = ?, delete_on_view = ?, raw = ?, mime_type = ?, deleted = ?, views_left = ?, text_type = ? WHERE uid = ?`,
+            `UPDATE links SET content = ?, type = ?, created_on = ?, expires_on = ?, delete_on_view = ?, raw = ?, mime_type = ?, deleted = ?, views_left = ?, text_type = ?, views = ? WHERE uid = ?`,
             [
                 this.content,
                 this.type,
@@ -270,6 +277,7 @@ class Link {
                 this.deleted ? 1 : 0,
                 this.viewsLeft,
                 this.textType,
+                this.views,
                 this.uid,
             ]
         );
