@@ -12,8 +12,10 @@ Raviolink is an open source web application for generating short URLS for longer
 -   Optional delete on first view/download
 -   Optional direct download of content
 -   Copy text/code to clipboard
+-   Uploader IP tracking
 -   IP-based Rate-limiting of successive posts to prevent abuse
 -   Scanning files for viruses with ClamAV
+-   Cached image resizing
 
 ## Planned Features
 
