@@ -7,8 +7,7 @@ const path = require("path");
 const { log, debug } = require("../utils/logger.js");
 const fs = require("fs");
 const Clamscan = require("clamscan");
-
-const MAX_DATE_MS = 8640000000000000;
+const sharp = require("sharp");
 
 function uidIsValid(uid) {
     const match = uid.match(/[A-Za-z0-9]{7}/);
@@ -100,6 +99,9 @@ const handleLink = async (req, res, next) => {
 
 const handleFile = async (req, res, next) => {
     const { uid } = req.params;
+    let { size } = req.query;
+    size = size ? parseInt(size) : null;
+
     const link = await Link.findByUid(uid);
 
     if (!link) {
@@ -130,13 +132,32 @@ const handleFile = async (req, res, next) => {
         link.uid,
         link.content
     );
-    debug(`Sending file: ${fullPath}`);
     await link.access();
-    return res.sendFile(fullPath, {}, (err) => {
-        if (err) {
-            next(err);
+
+    // Send thumbnail if requested
+    if (size) {
+        if (!link.isImage()) {
+            return serveError(res, 400, "File cannot be resized");
         }
-    });
+        res.contentType("image/jpeg");
+        sharp(fullPath)
+            .resize(size, size)
+            .jpeg()
+            .toBuffer()
+            .then((data) => {
+                return res.write(data);
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    } else {
+        // Otherwise send full file
+        return res.sendFile(fullPath, {}, (err) => {
+            if (err) {
+                next(err);
+            }
+        });
+    }
 };
 
 const frontPage = (req, res) => {
