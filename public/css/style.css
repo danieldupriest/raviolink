@@ -187,6 +187,9 @@ select {
 #four:checked ~ .panels #four-panel{
   display:block
 }
+#four-panel {
+    overflow-x: scroll;
+}
 #one:checked ~ .tabs #one-tab,
 #two:checked ~ .tabs #two-tab,
 #three:checked ~ .tabs #three-tab,
