@@ -149,7 +149,8 @@ const handleFile = async (req, res, next) => {
             .jpeg()
             .toBuffer()
             .then((data) => {
-                return res.write(data);
+                res.write(data);
+                return res.end();
             })
             .catch((err) => {
                 console.error(err);
