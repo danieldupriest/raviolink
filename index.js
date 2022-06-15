@@ -22,9 +22,6 @@ app.use(helmet());
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Serve static content
-app.use(process.env.BASE_URL, express.static("./public"));
-
 /**
  * RUN CUSTOM MIDDLEWARE
  */
@@ -45,6 +42,9 @@ app.use(setCSPHeaders); // Set custom Content Security Policy header
 const mainRoutes = require("./routes/main.js");
 const base = process.env.BASE_URL ? process.env.BASE_URL : "/";
 app.use(base, mainRoutes);
+
+// Serve static content
+app.use(process.env.BASE_URL, express.static("./public"));
 
 /**
  *  ERROR HANDLING
