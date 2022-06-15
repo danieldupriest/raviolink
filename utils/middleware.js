@@ -39,17 +39,21 @@ function setCSPHeaders(req, res, next) {
 // Simple memory cache for thumbnails.
 function cache(duration) {
     return (req, res, next) => {
-        debug("Inside cache");
         let key = "__express__" + req.originalUrl || req.url;
         let cachedBody = mcache.get(key);
         if (cachedBody) {
-            debug(`Using cache for ${req.originalUrl || req.url}`);
+            debug(`Using cache for url: ${req.originalUrl || req.url}`);
             return res.send(cachedBody);
         } else {
             res.sendResponse = res.send;
             res.send = (body) => {
                 mcache.put(key, body, duration * 1000);
                 res.sendResponse(body);
+            };
+            res.writeResponse = res.write;
+            res.write = (body) => {
+                mcache.put(key, body, duration * 1000);
+                res.writeResponse(body);
             };
             next();
         }
