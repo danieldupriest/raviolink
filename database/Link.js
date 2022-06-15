@@ -20,6 +20,7 @@ class Link {
         deleteOnView,
         raw,
         textType,
+        ip,
         tempFilename = "",
         mimeType = "",
         id = 0,
@@ -42,6 +43,7 @@ class Link {
         this.mimeType = mimeType;
         this.deleted = deleted;
         this.textType = textType;
+        this.ip = ip;
         if (viewsLeft != null) {
             this.viewsLeft = viewsLeft;
         } else {
@@ -152,6 +154,7 @@ class Link {
                 dbLink["delete_on_view"] == 1 ? true : false,
                 dbLink["raw"] == 1 ? true : false,
                 dbLink["text_type"],
+                dbLink["ip"],
                 "",
                 dbLink["mime_type"],
                 dbLink["id"],
@@ -178,6 +181,7 @@ class Link {
                 dbLink["delete_on_view"] == 1 ? true : false,
                 dbLink["raw"] == 1 ? true : false,
                 dbLink["text_type"],
+                dbLink["ip"],
                 "",
                 dbLink["mime_type"],
                 dbLink["id"],
@@ -249,7 +253,7 @@ class Link {
         }
 
         await db.run(
-            `INSERT INTO links (uid, content, type, created_on, expires_on, delete_on_view, raw, mime_type, deleted, views_left, text_type, views) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO links (uid, content, type, created_on, expires_on, delete_on_view, raw, mime_type, deleted, views_left, text_type, views, ip) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 this.uid,
                 this.content,
@@ -263,6 +267,7 @@ class Link {
                 this.viewsLeft,
                 this.textType,
                 this.views,
+                this.ip,
             ]
         );
         const results = await db.get("SELECT last_insert_rowid();");
@@ -271,7 +276,7 @@ class Link {
 
     async update() {
         await db.run(
-            `UPDATE links SET content = ?, type = ?, created_on = ?, expires_on = ?, delete_on_view = ?, raw = ?, mime_type = ?, deleted = ?, views_left = ?, text_type = ?, views = ? WHERE uid = ?`,
+            `UPDATE links SET content = ?, type = ?, created_on = ?, expires_on = ?, delete_on_view = ?, raw = ?, mime_type = ?, deleted = ?, views_left = ?, text_type = ?, views = ?, ip = ? WHERE uid = ?`,
             [
                 this.content,
                 this.type,
@@ -285,6 +290,7 @@ class Link {
                 this.textType,
                 this.views,
                 this.uid,
+                this.ip,
             ]
         );
         return this;

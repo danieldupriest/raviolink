@@ -182,6 +182,9 @@ const postLink = async (req, res, next) => {
         expireDate = RavioliDate(now.getTime() + msToAdd);
     }
 
+    // Get submitter IP
+    let ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress || 0;
+
     // Conditional code
     let newLink;
     if (type == "link") {
@@ -196,7 +199,8 @@ const postLink = async (req, res, next) => {
             expireDate,
             deleteOnView == "true" ? true : false,
             raw == "true" ? true : false,
-            textType
+            textType,
+            ip
         );
     } else if (type == "text") {
         newLink = new Link(
@@ -205,7 +209,8 @@ const postLink = async (req, res, next) => {
             expireDate,
             deleteOnView == "true" ? true : false,
             raw == "true" ? true : false,
-            textType
+            textType,
+            ip
         );
     } else if (type == "file") {
         if (!req.file) {
@@ -248,6 +253,7 @@ const postLink = async (req, res, next) => {
             deleteOnView == "true" ? true : false,
             raw == "true" ? true : false,
             textType,
+            ip,
             req.file["path"],
             req.file["mimetype"]
         );
