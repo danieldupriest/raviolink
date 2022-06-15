@@ -25,7 +25,7 @@
                         <td class="table-content">
                             {{#isFile}}
                                 <a href="http://{{server}}/{{uid}}/file">
-                                {{#isImage}}<img src="http://{{server}}/{{uid}}/file" alt="{{content}}" />{{/isImage}}
+                                {{#isImage}}<img src="http://{{server}}/{{uid}}/file?size={{thumbSize}}" alt="{{content}}" />{{/isImage}}
                                 {{^isImage}}{{content}}{{/isImage}}
                                 </a>
                             {{/isFile}}
