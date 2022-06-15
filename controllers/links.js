@@ -8,6 +8,7 @@ const { log, debug } = require("../utils/logger.js");
 const fs = require("fs");
 const Clamscan = require("clamscan");
 const sharp = require("sharp");
+const cache = require("../utils/cache.js");
 
 function uidIsValid(uid) {
     const match = uid.match(/[A-Za-z0-9]{7}/);
@@ -137,31 +138,45 @@ const handleFile = async (req, res, next) => {
     );
     await link.access();
 
-    // Send thumbnail if requested
-    if (size) {
-        if (!link.isImage()) {
-            res.statusCode = 400;
-            return next(new Error("File cannot be resized"));
-        }
-        res.contentType("image/jpeg");
-        sharp(fullPath)
-            .resize(size, size)
-            .jpeg()
-            .toBuffer()
-            .then((data) => {
-                res.write(data);
-                return res.end();
-            })
-            .catch((err) => {
-                console.error(err);
-            });
+    // Setup caching
+    const key = req.get("X-Forwarded-Protocol") || req.originalUrl;
+    const cached = cache.read(key);
+    if (cached) {
+        // Use cache if possible
+        res.contentType(cached.type);
+        res.write(cached.data);
+        return res.end();
     } else {
-        // Otherwise send full file
-        return res.sendFile(fullPath, {}, (err) => {
-            if (err) {
-                next(err);
+        // Otherwise generate data, serve and cache it
+        let buffer;
+        if (size) {
+            // Resize if requested
+            if (!link.isImage()) {
+                res.statusCode = 400;
+                return next(new Error("File cannot be resized"));
             }
-        });
+            buffer = {
+                data: await sharp(fullPath)
+                    .resize(size, size)
+                    .jpeg()
+                    .toBuffer(),
+                type: "image/jpeg",
+            };
+        } else {
+            // Or send full file
+            buffer = {
+                data: fs.readFileSync(fullPath),
+                type: link.mimeType,
+            };
+        }
+
+        // Serve data
+        res.contentType(buffer.type);
+        res.write(buffer.data);
+        res.end();
+
+        // Cache it for later use
+        return cache.write(key, buffer);
     }
 };
 
