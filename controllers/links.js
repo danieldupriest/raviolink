@@ -122,6 +122,7 @@ const handleFile = async (req, res, next) => {
         return next();
     }
 
+    // Check that file exists
     if (!fileExists(link)) {
         return next(
             new Error("Server error", {
@@ -129,6 +130,8 @@ const handleFile = async (req, res, next) => {
             })
         );
     }
+
+    // Generate file path
     const fullPath = path.resolve(
         __dirname,
         "..",
@@ -136,47 +139,36 @@ const handleFile = async (req, res, next) => {
         link.uid,
         link.content
     );
+
+    // Count this access
     await link.access();
 
-    // Setup caching
-    const key = req.get("X-Forwarded-Protocol") || req.originalUrl;
-    const cached = cache.read(key);
-    if (cached) {
-        // Use cache if possible
-        res.contentType(cached.type);
-        res.write(cached.data);
-        return res.end();
-    } else {
-        // Otherwise generate data, serve and cache it
-        let buffer;
-        if (size) {
-            // Resize if requested
-            if (!link.isImage()) {
-                res.statusCode = 400;
-                return next(new Error("File cannot be resized"));
-            }
-            buffer = {
-                data: await sharp(fullPath)
-                    .resize(size, size)
-                    .jpeg()
-                    .toBuffer(),
-                type: "image/jpeg",
-            };
-        } else {
-            // Or send full file
-            buffer = {
-                data: fs.readFileSync(fullPath),
-                type: link.mimeType,
-            };
+    if (size) {
+        // Make sure link is an image
+        if (!link.isImage()) {
+            res.statusCode = 400;
+            return next(new Error("File cannot be resized"));
+        }
+
+        // Setup caching
+        const key = req.get("X-Forwarded-Protocol") || req.originalUrl;
+        let buffer = cache.read(key);
+        if (!buffer) {
+            // Generate resized data
+            buffer = await sharp(fullPath).resize(size, size).jpeg().toBuffer();
+            // Cache it
+            cache.write(key, buffer);
         }
 
         // Serve data
-        res.contentType(buffer.type);
-        res.write(buffer.data);
-        res.end();
-
-        // Cache it for later use
-        return cache.write(key, buffer);
+        res.contentType("image/jpeg");
+        res.write(buffer);
+        return res.end();
+    } else {
+        // Serve full file
+        return res.sendFile(fullPath, {}, (err) => {
+            if (err) return next(err);
+        });
     }
 };
 
