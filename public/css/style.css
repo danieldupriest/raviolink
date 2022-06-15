@@ -502,9 +502,6 @@ dd {
 .styled-table .date {
     white-space: nowrap;
 }
-.styled-table img {
-    height: 100px;
-}
 .styled-table .uid {
     word-wrap: normal;
 }

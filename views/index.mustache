@@ -47,7 +47,7 @@
                     {{#isFile}}
                         <a id="content-file" href="http://{{server}}/{{uid}}/file">
                             {{#isImage}}
-                                <img id="content-image" src="./{{uid}}/file" alt="Image {{content}}"/>
+                                <img id="content-image" src="./{{uid}}/file?size={{previewSize}}" alt="Image {{content}}"/>
                             {{/isImage}}
                             {{^isImage}}
                                 <img id="content-file-icon" src="./images/file.png" alt="File icon"/>

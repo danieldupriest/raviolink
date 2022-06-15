@@ -20,6 +20,8 @@ function setupTemplateData(req, res, next) {
             (process.env.PORT == 80 ? "" : ":" + process.env.PORT) +
             process.env.BASE_URL,
         maxUploadSize: process.env.MAX_UPLOAD_SIZE,
+        previewSize: process.env.PREVIEW_SIZE || 700,
+        thumbSize: process.env.THUMB_SIZE || 100,
     };
     next();
 }
