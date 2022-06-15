@@ -3,9 +3,8 @@ const Database = require("./Database.js");
 const genUid = require("../utils/genUid.js");
 const RavioliDate = require("../utils/dates.js");
 const fs = require("fs");
-const { threadId } = require("worker_threads");
 const { formatBytes } = require("../utils/tools.js");
-const { log, debug, error } = require("../utils/logger.js");
+const { debug, error } = require("../utils/logger.js");
 
 const URL_LENGTH = 7;
 const MAX_GEN_TRIES = 10;
