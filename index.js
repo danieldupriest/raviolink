@@ -1,5 +1,4 @@
 require("dotenv").config();
-const { logStep } = require("./utils/middleware.js");
 
 // Create app
 const express = require("express");
@@ -11,22 +10,31 @@ app.set("views", "./views");
 app.set("view engine", "mustache");
 app.engine("mustache", mustacheExpress());
 
-app.use(logStep("Before helmet"));
-
 /**
  * RUN CORE MIDDLEWARE
  */
 
 // Load and run helmet for web security
 const helmet = require("helmet");
-app.use(helmet());
-
-app.use(logStep("Before json"));
+app.use(helmet.contentSecurityPolicy());
+app.use(helmet.crossOriginEmbedderPolicy());
+app.use(helmet.crossOriginOpenerPolicy());
+//app.use(helmet.crossOriginResourcePolicy()); This seems to hang the server on Google cloud
+app.use(helmet.dnsPrefetchControl());
+app.use(helmet.expectCt());
+app.use(helmet.frameguard());
+app.use(helmet.hidePoweredBy());
+app.use(helmet.hsts());
+app.use(helmet.ieNoOpen());
+app.use(helmet.noSniff());
+app.use(helmet.originAgentCluster());
+app.use(helmet.permittedCrossDomainPolicies());
+app.use(helmet.referrerPolicy());
+app.use(helmet.xssFilter());
 
 // Parse request body
 const bodyParser = require("body-parser");
 app.use(express.json());
-app.use(logStep("Before bodyparser"));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 /**
@@ -38,22 +46,17 @@ const {
     setupTemplateData,
     setCSPHeaders,
 } = require("./utils/middleware.js");
-app.use(logStep("Before logRequest"));
 app.use(logRequest); // Log all requests to file and console
-app.use(logStep("Before TemplateData"));
 app.use(setupTemplateData); // Set up data for reuse in page templates
-app.use(logStep("Before CSPHeaders"));
 app.use(setCSPHeaders); // Set custom Content Security Policy header
 
 /**
  * APP ROUTES
  */
-app.use(logStep("Before routes"));
 const mainRoutes = require("./routes/main.js");
 const base = process.env.BASE_URL ? process.env.BASE_URL : "/";
 app.use(base, mainRoutes);
 
-app.use(logStep("Before static"));
 // Serve static content
 app.use(process.env.BASE_URL, express.static("./public"));
 

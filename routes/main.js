@@ -1,5 +1,3 @@
-const { logStep } = require("../utils/middleware.js");
-
 // Configure a rate limiter for use in certain routes
 const rateLimiter = require("../utils/rateLimiter.js");
 const limiter = rateLimiter({ window: 10 * 1000, limit: 2 });
@@ -24,12 +22,12 @@ const {
     deleteLinks,
 } = require("../controllers/links.js");
 
-router.post("/delete", logStep("Before deleteLinks"), limiter, deleteLinks); // Admin route to delete links
-router.get("/ip/:ip", logStep("Before linklistbyip"), linkListByIp); // Show all links from specified IP
-router.get("/links", logStep("Before linklist"), linkList); // Shows overview list of all links
-router.get("/:uid/file", logStep("Before handleFile"), handleFile); // Serves directly linked files
-router.get("/:uid", logStep("Before handleLink"), handleLink); // Retrieves specified link
-router.get("/", logStep("Before frontPage"), frontPage); // Shows default home page
-router.post("/", logStep("Before postLink"), limiter, upload, postLink); // Handle creation of link
+router.post("/delete", limiter, deleteLinks); // Admin route to delete links
+router.get("/ip/:ip", linkListByIp); // Show all links from specified IP
+router.get("/links", linkList); // Shows overview list of all links
+router.get("/:uid/file", handleFile); // Serves directly linked files
+router.get("/:uid", handleLink); // Retrieves specified link
+router.get("/", frontPage); // Shows default home page
+router.post("/", limiter, upload, postLink); // Handle creation of link
 
 module.exports = router;
