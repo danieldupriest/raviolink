@@ -27,9 +27,9 @@ const {
 router.post("/delete", logStep("Before deleteLinks"), limiter, deleteLinks); // Admin route to delete links
 router.get("/ip/:ip", logStep("Before linklistbyip"), linkListByIp); // Show all links from specified IP
 router.get("/links", logStep("Before linklist"), linkList); // Shows overview list of all links
-router.get("/:uid/file", logStep("Before handleFile"),handleFile); // Serves directly linked files
+router.get("/:uid/file", logStep("Before handleFile"), handleFile); // Serves directly linked files
 router.get("/:uid", logStep("Before handleLink"), handleLink); // Retrieves specified link
-router.get("/", logStep("Before frontPage")frontPage); // Shows default home page
+router.get("/", logStep("Before frontPage"), frontPage); // Shows default home page
 router.post("/", logStep("Before postLink"), limiter, upload, postLink); // Handle creation of link
 
 module.exports = router;
