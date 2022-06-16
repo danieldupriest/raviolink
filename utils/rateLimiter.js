@@ -57,8 +57,14 @@ const rateLimiter = (options = { window: WINDOW, limit: LIMIT }) => {
     let window = options.window;
     let limit = options.limit;
     return async (req, res, next) => {
-        let ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-        debug("Logged access from ip:" + ip);
+        let ip = (
+            req.headers["x-forwarded-for"] ||
+            req.socket.remoteAddress ||
+            "0"
+        )
+            .split(":")
+            .pop();
+        debug("Logged access from ip: " + ip);
         const allowed = await Access.allowed(ip, window, limit);
         if (!allowed) {
             res.statusCode = 429;

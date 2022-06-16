@@ -191,7 +191,9 @@ const postLink = async (req, res, next) => {
     }
 
     // Get submitter IP
-    let ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress || 0;
+    let ip = (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "0")
+        .split(":")
+        .pop();
 
     // Conditional code
     let newLink;
