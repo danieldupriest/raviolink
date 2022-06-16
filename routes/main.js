@@ -18,11 +18,13 @@ const {
     postLink,
     handleFile,
     linkList,
+    linkListByIp,
 } = require("../controllers/links.js");
-router.get(process.env.BASE_URL + "/links", linkList); // Shows overview list of all links
-router.get(process.env.BASE_URL + "/:uid/file", handleFile); // Serves directly linked files
-router.get(process.env.BASE_URL + "/:uid", handleLink); // Retrieves specified link
-router.get(process.env.BASE_URL + "/", frontPage); // Shows default home page
-router.post(process.env.BASE_URL + "/", [limiter, upload, postLink]); // Handle creation of link
+router.get("/ip/:ip", linkListByIp); // Show all links from specified IP
+router.get("/links", linkList); // Shows overview list of all links
+router.get("/:uid/file", handleFile); // Serves directly linked files
+router.get("/:uid", handleLink); // Retrieves specified link
+router.get("/", frontPage); // Shows default home page
+router.post("/", [limiter, upload, postLink]); // Handle creation of link
 
 module.exports = router;

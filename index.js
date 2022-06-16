@@ -49,6 +49,7 @@ app.use(process.env.BASE_URL, express.static("./public"));
 /**
  *  ERROR HANDLING
  */
+
 const {
     missingErrorResponder,
     customErrorResponder,
@@ -59,6 +60,7 @@ app.use(customErrorResponder); // Serve custom errors and log uncaught problems
 /**
  * APP STARTUP
  */
+
 const { log, debug } = require("./utils/logger.js");
 const port = process.env.PORT || 8080;
 app.listen(port, () => {

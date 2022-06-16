@@ -3,7 +3,6 @@ const Database = require("./Database.js");
 const genUid = require("../utils/genUid.js");
 const RavioliDate = require("../utils/dates.js");
 const fs = require("fs");
-const { formatBytes } = require("../utils/tools.js");
 const { debug, error } = require("../utils/logger.js");
 
 const URL_LENGTH = 7;
@@ -113,13 +112,18 @@ class Link {
         if (this.type == "file") {
             if (this.uid != "") {
                 const filePath = "./files/" + this.uid + "/" + this.content;
-                const stats = fs.statSync(filePath);
-                return formatBytes(stats.size);
+                try {
+                    const stats = fs.statSync(filePath);
+                    return stats.size;
+                } catch (err) {
+                    debug(err);
+                    return 0;
+                }
             } else {
-                return "";
+                return 0;
             }
         } else {
-            return formatBytes(this.content.length);
+            return this.content.length;
         }
     }
 
@@ -182,6 +186,19 @@ class Link {
         } else {
             return null;
         }
+    }
+
+    static async findAllByIp(ip) {
+        const dbLinks = await db.all(
+            `SELECT * FROM links WHERE ip = ? AND deleted = 0`,
+            [ip]
+        );
+        let result = [];
+        for (const dbLink of dbLinks) {
+            const link = Link.fromDb(dbLink);
+            result.push(link);
+        }
+        return result;
     }
 
     isDeleted() {

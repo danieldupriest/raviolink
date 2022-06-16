@@ -9,6 +9,7 @@ const fs = require("fs");
 const Clamscan = require("clamscan");
 const sharp = require("sharp");
 const cache = require("../utils/cache.js");
+const { formatBytes } = require("../utils/tools.js");
 
 function uidIsValid(uid) {
     const match = uid.match(/[A-Za-z0-9]{7}/);
@@ -281,17 +282,61 @@ const postLink = async (req, res, next) => {
 
 const linkList = async (req, res, next) => {
     let links = await Link.findAll();
+
+    // Filter expired and delete-on-view links
     for (const link of links) {
         await link.checkExpiration();
     }
     links = links.filter((link) => {
         return !link.isDeleted() && !link.isExpired() && !link.deleteOnView;
     });
+
+    // Calculate some statistics
+    let totalSize = 0;
+    for (const link of links) {
+        totalSize += link.size();
+    }
+
     return res.render("links", {
         links: links,
         fullWidth: true,
+        totalSizeOnDisk: formatBytes(totalSize),
         ...res.locals.pageData,
     });
 };
 
-module.exports = { handleLink, frontPage, postLink, handleFile, linkList };
+const linkListByIp = async (req, res, next) => {
+    const { ip } = req.params;
+    let links = await Link.findAllByIp(ip);
+
+    // Filter expired and delete-on-view links
+    for (const link of links) {
+        await link.checkExpiration();
+    }
+    links = links.filter((link) => {
+        return !link.isDeleted() && !link.isExpired() && !link.deleteOnView;
+    });
+
+    // Calculate some statistics
+    let totalSize = 0;
+    for (const link of links) {
+        totalSize += link.size();
+    }
+
+    return res.render("links", {
+        links: links,
+        fullWidth: true,
+        ip: ip,
+        totalSizeOnDisk: formatBytes(totalSize),
+        ...res.locals.pageData,
+    });
+};
+
+module.exports = {
+    handleLink,
+    frontPage,
+    postLink,
+    handleFile,
+    linkList,
+    linkListByIp,
+};

@@ -15,8 +15,14 @@
         {{> panelTwo}}
         {{> panelThree}}
         <div class="panel" id="four-panel">
-            <h2>Links</h2>
-            <p>Below are shown all links which have not been deleted, are expired, or set to delete on view.</p>
+            <h2>Links{{#ip}} from IP {{ip}}{{/ip}}</h2>
+            <p>Below are shown all links {{#ip}}submitted from this IP {{/ip}}which have not been deleted, are expired, or set to delete on view.</p>
+            <dl>
+                <div class="definition">
+                    <dt>Total size on disk</dt>
+                    <dd>{{totalSizeOnDisk}}</dd>
+                </div>
+            </dl>
             <table class="styled-table">
                 <tr>
                     <th>UID</th>
@@ -41,7 +47,7 @@
                         </td>
                         <td class="table-views">{{views}}</td>
                         <td class="date">{{createdOn.toShortDate}}</td>
-                        <td class="table-ip">{{ip}}</td>
+                        <td class="table-ip"><a href="http://{{server}}/ip/{{ip}}">{{ip}}</a></td>
                     </tr>
                 {{/links}}
             </table>
