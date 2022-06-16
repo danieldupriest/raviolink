@@ -16,6 +16,21 @@ app.engine("mustache", mustacheExpress());
 
 // Load and run helmet for web security
 const helmet = require("helmet");
+app.use(helmet.contentSecurityPolicy());
+app.use(helmet.crossOriginEmbedderPolicy());
+app.use(helmet.crossOriginOpenerPolicy());
+app.use(helmet.crossOriginResourcePolicy());
+app.use(helmet.dnsPrefetchControl());
+app.use(helmet.expectCt());
+app.use(helmet.frameguard());
+app.use(helmet.hidePoweredBy());
+app.use(helmet.hsts());
+app.use(helmet.ieNoOpen());
+app.use(helmet.noSniff());
+app.use(helmet.originAgentCluster());
+app.use(helmet.permittedCrossDomainPolicies());
+app.use(helmet.referrerPolicy());
+app.use(helmet.xssFilter());
 //app.use(helmet());
 
 // Parse request body
