@@ -1,5 +1,13 @@
 const { log, debug } = require("./logger.js");
 
+// Middleware to troubleshoot bugs
+function logStep(text) {
+    return (req, res, next) => {
+        debug(text);
+        next();
+    };
+}
+
 // Middleware to log requests
 function logRequest(req, res, next) {
     const message = `Handling request to: ${req.method} ${req.url}`;
@@ -35,4 +43,4 @@ function setCSPHeaders(req, res, next) {
     next();
 }
 
-module.exports = { logRequest, setupTemplateData, setCSPHeaders };
+module.exports = { logRequest, setupTemplateData, setCSPHeaders, logStep };
