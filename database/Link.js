@@ -53,6 +53,29 @@ class Link {
         this.views = views;
     }
 
+    static fromDb(dbLink) {
+        const link = new Link(
+            dbLink["content"],
+            dbLink["type"],
+            dbLink["expires_on"]
+                ? RavioliDate(parseInt(dbLink["expires_on"]))
+                : null,
+            dbLink["delete_on_view"] == 1 ? true : false,
+            dbLink["raw"] == 1 ? true : false,
+            dbLink["text_type"],
+            dbLink["ip"],
+            "",
+            dbLink["mime_type"],
+            dbLink["id"],
+            RavioliDate(parseInt(dbLink["created_on"])),
+            dbLink["uid"],
+            dbLink["deleted"] == 1 ? true : false,
+            parseInt(dbLink["views_left"]),
+            parseInt(dbLink["views"])
+        );
+        return link;
+    }
+
     isImage() {
         const mime = this.mimeType;
         return (
@@ -145,25 +168,7 @@ class Link {
         );
         let result = [];
         for (const dbLink of dbLinks) {
-            let link = new Link(
-                dbLink["content"],
-                dbLink["type"],
-                dbLink["expires_on"]
-                    ? RavioliDate(parseInt(dbLink["expires_on"]))
-                    : null,
-                dbLink["delete_on_view"] == 1 ? true : false,
-                dbLink["raw"] == 1 ? true : false,
-                dbLink["text_type"],
-                dbLink["ip"],
-                "",
-                dbLink["mime_type"],
-                dbLink["id"],
-                RavioliDate(parseInt(dbLink["created_on"])),
-                dbLink["uid"],
-                dbLink["deleted"] == 1 ? true : false,
-                parseInt(dbLink["views_left"]),
-                parseInt(dbLink["views"])
-            );
+            const link = Link.fromDb(dbLink);
             result.push(link);
         }
         return result;
@@ -172,26 +177,8 @@ class Link {
     static async findByUid(uid) {
         const dbLink = await db.get(`SELECT * FROM links WHERE uid = ?`, [uid]);
         if (dbLink) {
-            let result = new Link(
-                dbLink["content"],
-                dbLink["type"],
-                dbLink["expires_on"]
-                    ? RavioliDate(parseInt(dbLink["expires_on"]))
-                    : null,
-                dbLink["delete_on_view"] == 1 ? true : false,
-                dbLink["raw"] == 1 ? true : false,
-                dbLink["text_type"],
-                dbLink["ip"],
-                "",
-                dbLink["mime_type"],
-                dbLink["id"],
-                RavioliDate(parseInt(dbLink["created_on"])),
-                dbLink["uid"],
-                dbLink["deleted"] == 1 ? true : false,
-                parseInt(dbLink["views_left"]),
-                parseInt(dbLink["views"])
-            );
-            return result;
+            let link = Link.fromDb(dbLink);
+            return link;
         } else {
             return null;
         }
