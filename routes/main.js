@@ -1,4 +1,4 @@
-const { logStep } = require("./utils/middleware.js");
+const { logStep } = require("../utils/middleware.js");
 
 // Configure a rate limiter for use in certain routes
 const rateLimiter = require("../utils/rateLimiter.js");
