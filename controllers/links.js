@@ -174,6 +174,7 @@ const handleFile = async (req, res, next) => {
 };
 
 const frontPage = (req, res) => {
+    return res.send("Test");
     return res.render("index", { link: null, ...res.locals.pageData });
 };
 
