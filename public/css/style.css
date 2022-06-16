@@ -27,14 +27,12 @@ body{
     background-color: var(--accent);
     background-image: url("../images/checker.png");
     background-repeat: repeat;
-    /*font-family: sans-serif;*/
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     font-family: 'Lato', sans-serif;
     font-size: 114%;
     line-height: 1.5;
-    overflow-x: hidden;
-}
-body > * {
-    max-width: var(--wide);
 }
 body.full-width > * {
     max-width: 100%;
@@ -98,7 +96,6 @@ header{
   min-height: 200px;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
-  overflow-x: hidden;
   padding: 2rem;
 }
 .panel{
@@ -187,9 +184,6 @@ select {
 #four:checked ~ .panels #four-panel{
   display:block
 }
-#four-panel {
-    overflow-x: auto;
-}
 #one:checked ~ .tabs #one-tab,
 #two:checked ~ .tabs #two-tab,
 #three:checked ~ .tabs #three-tab,
@@ -202,11 +196,7 @@ select {
 
 #header-content {
     display: inline-block;
-    /*max-width: 23ch;
-    text-overflow: ellipsis;
-    overflow-x: hidden;*/
     vertical-align: bottom;
-    /*white-space: nowrap;*/
 }
 
 .shadow {
@@ -301,7 +291,6 @@ select {
     background: #f9f9f9;
     clip-path: inset( -100vw 0 -100vw -100vw);
     padding: .25rem;
-    /*overflow-x: hidden;*/
     min-height: 3ex;
     position: relative;
 }
@@ -528,7 +517,11 @@ dd {
 .row {
     align-items: flex-start;
     display: flex;
+    justify-content: center;
     gap: var(--padding-small);
+}
+.scrolling-container {
+    overflow: auto;
 }
 form .row > *:first-child {
     flex-grow: 1;
