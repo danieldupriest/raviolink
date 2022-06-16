@@ -16,7 +16,7 @@ app.engine("mustache", mustacheExpress());
 
 // Load and run helmet for web security
 const helmet = require("helmet");
-app.use(helmet());
+//app.use(helmet());
 
 // Parse request body
 const bodyParser = require("body-parser");
