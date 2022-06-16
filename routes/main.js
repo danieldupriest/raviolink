@@ -1,6 +1,6 @@
 // Configure a rate limiter for use in certain routes
 const rateLimiter = require("../utils/rateLimiter.js");
-const limiter = rateLimiter({ window: 10 * 1000, limit: 1 });
+const limiter = rateLimiter({ window: 10 * 1000, limit: 2 });
 
 // Configure upload middleware
 const multer = require("multer");
@@ -19,7 +19,9 @@ const {
     handleFile,
     linkList,
     linkListByIp,
+    deleteLinks,
 } = require("../controllers/links.js");
+router.post("/delete", [limiter, deleteLinks]); // Admin route to delete links
 router.get("/ip/:ip", linkListByIp); // Show all links from specified IP
 router.get("/links", linkList); // Shows overview list of all links
 router.get("/:uid/file", handleFile); // Serves directly linked files

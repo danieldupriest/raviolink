@@ -23,34 +23,53 @@
                     <dd>{{totalSizeOnDisk}}</dd>
                 </div>
             </dl>
-            <table class="styled-table">
-                <tr>
-                    <th>UID</th>
-                    <th>Type</th>
-                    <th class="table-content">Content</th>
-                    <th>Views</th>
-                    <th>Date Created</th>
-                    <th>IP</th>
-                </tr>
-                {{#links}}
-                    <tr><td class="uid"><a href="http://{{server}}/{{uid}}">{{uid}}</a></td>
-                        <td class="type">{{type}}</td>
-                        <td class="table-content">
-                            {{#isFile}}
-                                <a href="http://{{server}}/{{uid}}/file">
-                                {{#isImage}}<img src="http://{{server}}/{{uid}}/file?size={{thumbSize}}" alt="{{content}}" />{{/isImage}}
-                                {{^isImage}}{{content}}{{/isImage}}
-                                </a>
-                            {{/isFile}}
-                            {{#isText}}{{shortContent}}{{/isText}}
-                            {{#isUrl}}<a href="{{content}}">{{shortContent}}</a>{{/isUrl}}
-                        </td>
-                        <td class="table-views">{{views}}</td>
-                        <td class="date">{{createdOn.toShortDate}}</td>
-                        <td class="table-ip"><a href="http://{{server}}/ip/{{ip}}">{{ip}}</a></td>
+            <form id="delete-form" return false;" method="POST" action="http://{{server}}/delete">
+                <table class="styled-table">
+                    <tr>
+                        <th><input type="checkbox" id="select-all-input" class="form-control"></th>
+                        <th>UID</th>
+                        <th>Type</th>
+                        <th class="table-content">Content</th>
+                        <th>Views</th>
+                        <th>Date Created</th>
+                        <th>IP</th>
                     </tr>
-                {{/links}}
-            </table>
+                    {{#links}}
+                        <tr>
+                            <td class="table-select"><input type="checkbox" class="form-control delete-select" name="{{uid}}"></td>
+                            <td class="uid"><a href="http://{{server}}/{{uid}}">{{uid}}</a></td>
+                            <td class="type">{{type}}</td>
+                            <td class="table-content">
+                                {{#isFile}}
+                                    <a href="http://{{server}}/{{uid}}/file">
+                                    {{#isImage}}<img src="http://{{server}}/{{uid}}/file?size={{thumbSize}}" alt="{{content}}" />{{/isImage}}
+                                    {{^isImage}}{{content}}{{/isImage}}
+                                    </a>
+                                {{/isFile}}
+                                {{#isText}}{{shortContent}}{{/isText}}
+                                {{#isUrl}}<a href="{{content}}">{{shortContent}}</a>{{/isUrl}}
+                            </td>
+                            <td class="table-views">{{views}}</td>
+                            <td class="date">{{createdOn.toShortDate}}</td>
+                            <td class="table-ip"><a href="http://{{server}}/ip/{{ip}}">{{ip}}</a></td>
+                        </tr>
+                    {{/links}}
+                    {{^links}}
+                        <tr>
+                            <td colspan=7>No links found</td>
+                        </tr>
+                    {{/links}}
+                </table>
+                
+                <div class="form-group row">
+                    <label class="field-label" for="admin-password-input">Admin password</label>
+                    <input id="admin-password-toggle" type="checkbox" class="tip-checkbox"/>
+                    <label class="tip-label" for="admin-password-toggle">?</label>
+                    <label class="tip-text" for="admin-password-toggle">Enter the administrator password to delete the selected links.</label>
+                    <input type="password" class="form-control" id="admin-password-input" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Delete selected links</button>
+            </form>
         </div>
     </div>
 </div>

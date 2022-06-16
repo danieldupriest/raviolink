@@ -136,19 +136,17 @@ class Link {
     }
 
     async delete() {
-        this.deleted = true;
-
-        // Delete file if file
+        // Delete file if file exists
         if (this.type == "file") {
             const baseDir = "./files/" + this.uid;
-            debug("Attempting to unlink: " + baseDir);
-            try {
-                fs.rmSync(baseDir, { recursive: true, force: true });
-            } catch (err) {
-                throw err;
+            if (fs.existsSync(baseDir)) {
+                debug("Attempting to unlink: " + baseDir);
+                fs.rmSync(baseDir, { recursive: true, force: true }, (err) => {
+                    if (err) error(err);
+                });
             }
         }
-
+        this.deleted = true;
         await this.update();
     }
 
@@ -279,24 +277,31 @@ class Link {
     }
 
     async update() {
-        await db.run(
-            `UPDATE links SET content = ?, type = ?, created_on = ?, expires_on = ?, delete_on_view = ?, raw = ?, mime_type = ?, deleted = ?, views_left = ?, text_type = ?, views = ?, ip = ? WHERE uid = ?`,
-            [
-                this.content,
-                this.type,
-                this.createdOn.getTime(),
-                this.expiresOn ? this.expiresOn.getTime() : null,
-                this.deleteOnView ? 1 : 0,
-                this.raw ? 1 : 0,
-                this.mimeType,
-                this.deleted ? 1 : 0,
-                this.viewsLeft,
-                this.textType,
-                this.views,
-                this.uid,
-                this.ip,
-            ]
-        );
+        try {
+            debug(
+                `Going to update link with new data: ${JSON.stringify(this)}`
+            );
+            await db.run(
+                `UPDATE links SET content = ?, type = ?, created_on = ?, expires_on = ?, delete_on_view = ?, raw = ?, mime_type = ?, deleted = ?, views_left = ?, text_type = ?, views = ?, ip = ? WHERE uid = ?`,
+                [
+                    this.content,
+                    this.type,
+                    this.createdOn.getTime(),
+                    this.expiresOn ? this.expiresOn.getTime() : null,
+                    this.deleteOnView ? 1 : 0,
+                    this.raw ? 1 : 0,
+                    this.mimeType,
+                    this.deleted ? 1 : 0,
+                    this.viewsLeft,
+                    this.textType,
+                    this.views,
+                    this.ip,
+                    this.uid,
+                ]
+            );
+        } catch (err) {
+            error(err);
+        }
         return this;
     }
 

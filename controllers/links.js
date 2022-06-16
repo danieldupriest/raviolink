@@ -300,9 +300,38 @@ const linkList = async (req, res, next) => {
     return res.render("links", {
         links: links,
         fullWidth: true,
+        showLinks: true,
         totalSizeOnDisk: formatBytes(totalSize),
         ...res.locals.pageData,
     });
+};
+
+const deleteLinks = async (req, res, next) => {
+    const { toDelete, password, currentPage } = req.body;
+    let deleted = false;
+    if (password != process.env.ADMIN_PASSWORD) {
+        res.statusCode = 401;
+        return next(
+            new Error(`Unauthorized`, {
+                cause: `${password} is not the correct password.`,
+            })
+        );
+    }
+    for (const uid of toDelete) {
+        const link = await Link.findByUid(uid);
+        if (!link) {
+            res.statusCode = 400;
+            return next(new Error(`Resource not found`));
+        }
+        await link.delete();
+        deleted = true;
+    }
+    if (deleted) {
+        res.status(202);
+        return res.send("success");
+    }
+    res.statusCode = 404;
+    return next(new Error(`No links to delete`));
 };
 
 const linkListByIp = async (req, res, next) => {
@@ -327,6 +356,7 @@ const linkListByIp = async (req, res, next) => {
         links: links,
         fullWidth: true,
         ip: ip,
+        showLinks: true,
         totalSizeOnDisk: formatBytes(totalSize),
         ...res.locals.pageData,
     });
@@ -339,4 +369,5 @@ module.exports = {
     handleFile,
     linkList,
     linkListByIp,
+    deleteLinks,
 };

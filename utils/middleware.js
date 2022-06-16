@@ -2,7 +2,7 @@ const { log, debug } = require("./logger.js");
 
 // Middleware to log requests
 function logRequest(req, res, next) {
-    const message = `Handling request to: ${req.url}`;
+    const message = `Handling request to: ${req.method} ${req.url}`;
     log(message);
     debug(message);
     if (Object.keys(req.params).length > 0)

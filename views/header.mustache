@@ -14,6 +14,7 @@
         {{/link}}
         <script src="http://{{server}}/js/qrcode.js"></script>
         <script>
+            var deleteForm;
             function copyContent(id) {
                 const input = document.getElementById(id);
                 input.style.display = "block";
@@ -52,6 +53,16 @@
                         highlightCode();
                     {{/isText}}
                 {{/link}}
+                {{#showLinks}}
+                    deleteForm = document.getElementById("delete-form");
+                    deleteForm.addEventListener("submit", submitDelete);
+                    const selectAllInput = document.getElementById("select-all-input");
+                    selectAllInput.addEventListener("click", () => {
+                        const checks = document.querySelectorAll(".delete-select");
+                        for (const elem of checks)
+                            elem.checked = selectAllInput.checked;
+                    })
+                {{/showLinks}}
             }
             function showSpinner() {
                 spinnerFrames=['▁','▃','▄','▅','▆','▇','█','▇','▆','▅','▄','▃'];
@@ -69,6 +80,40 @@
                     alert("Files must be less than {{maxUploadSize}} bytes.");
                     inputElement.value = "";
                 }
+            }
+            function submitDelete(event) {
+                event.preventDefault();
+                const checks = document.querySelectorAll(".delete-select:checked")
+                const toDelete = [];
+                for (const check of checks) {
+                    toDelete.push(check.getAttribute("name"));
+                }
+                const password = document.getElementById("admin-password-input").value;
+                const data = {
+                    toDelete,
+                    password,
+                };
+                const currentPage = window.location.href;
+                fetch("http://{{server}}/delete", {
+                    method: "POST",
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }).then((res) => {
+                    switch (res.status) {
+                        case 400:
+                            alert("Resource not found");
+                            break;
+                        case 404:
+                            alert("No links to delete");
+                            break;
+                        case 202:
+                            location.reload();
+                    }
+                }).catch((err) => {
+                    alert("An error occurred while trying to delete.");
+                });
             }
         </script>
     </head>
