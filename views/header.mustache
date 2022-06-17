@@ -125,7 +125,7 @@
                             alert("No links to delete");
                             break;
                         case 202:
-                            location.reload();
+                            location.assign(location.pathname);
                     }
                 }).catch((err) => {
                     alert("An error occurred while trying to delete.");
