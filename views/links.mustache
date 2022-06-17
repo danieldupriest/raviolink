@@ -27,19 +27,19 @@
                 <div class="scrolling-container">
                     <table class="styled-table">
                         <tr>
-                            <th><input type="checkbox" id="select-all-input" class="form-control"></th>
-                            <th>UID</th>
-                            <th>Type</th>
+                            <th class="table-select"><input type="checkbox" id="select-all-input" class="form-control"></th>
+                            <th class="table-uid">UID</th>
+                            <th class="table-type">Type</th>
                             <th class="table-content">Content</th>
-                            <th>Views</th>
-                            <th>Date Created</th>
-                            <th>IP</th>
+                            <th class="table-views">Views</th>
+                            <th class="table-date">Date Created</th>
+                            <th class="table-ip">IP</th>
                         </tr>
                         {{#links}}
                             <tr>
                                 <td class="table-select"><input type="checkbox" class="form-control delete-select" name="{{uid}}"></td>
-                                <td class="uid"><a href="http://{{server}}/{{uid}}">{{uid}}</a></td>
-                                <td class="type">{{type}}</td>
+                                <td class="table-uid"><a href="http://{{server}}/{{uid}}">{{uid}}</a></td>
+                                <td class="table-type">{{type}}</td>
                                 <td class="table-content">
                                     {{#isFile}}
                                         <a href="http://{{server}}/{{uid}}/file">
@@ -51,7 +51,7 @@
                                     {{#isUrl}}<a href="{{content}}">{{shortContent}}</a>{{/isUrl}}
                                 </td>
                                 <td class="table-views">{{views}}</td>
-                                <td class="date">{{createdOn.toShortDate}}</td>
+                                <td class="table-date">{{createdOn.toShortDate}}</td>
                                 <td class="table-ip"><a href="http://{{server}}/ip/{{ip}}">{{ip}}</a></td>
                             </tr>
                         {{/links}}
