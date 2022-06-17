@@ -4,15 +4,25 @@
         <title>{{appTitle}}</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <!--<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' http://{{server}}; style-src 'self' https://fonts.googleapis.com;">-->
         <link rel="stylesheet" type="text/css" href="/css/style.css">
         {{#link}}
             <meta property="og:url" content="http://{{server}}/{{uid}}"/>
-            <meta property="og:type" content="{{type}}"/>
-            <meta property="og:title" content="A link to {{type}}"/>
+            <meta property="og:type" content="website"/>
             <meta property="og:description" content="A free web app to share urls, text, and files with short, convenient links."/>
-            {{#isImage}}<meta property="og:image" content="http://{{server}}/{{uid}}/file?size=1080"/>{{/isImage}}
-            {{^isImage}}<meta property="og:image" content="http://{{server}}/images/checker.png"/>{{/isImage}}
+            {{#isFile}}
+                {{#isImage}}
+                    <meta property="og:image" content="http://{{server}}/{{uid}}/file?size=1080"/>
+                    <meta property="og:title" content="A link to {{formattedSize}} image {{content}}"/>
+                {{/isImage}}
+                {{^isImage}}
+                    <meta property="og:image" content="http://{{server}}/images/checker.png"/>
+                    <meta property="og:title" content="A link to {{formattedSize}} file {{content}}"/>
+                {{/isImage}}
+            {{/isFile}}
+            {{#isText}}
+                <meta property="og:image" content="http://{{server}}/images/checker.png"/>
+                <meta property="og:title" content="A link to {{formattedSize}} of text/code"/>
+            {{/isText}}
             {{#isText}}
                 <link rel="stylesheet" href="http://{{server}}/css/highlight/googlecode.min.css">
                 <script src="http://{{server}}/js/highlight.min.js"></script>

@@ -94,7 +94,11 @@ const handleLink = async (req, res, next) => {
     }
 
     // Handle display of normal, non-raw links
-    res.render("index", { link: link, ...res.locals.pageData });
+    res.render("index", {
+        link: link,
+        formattedSize: formatBytes(link.size()),
+        ...res.locals.pageData,
+    });
 };
 
 const handleFile = async (req, res, next) => {
