@@ -25,7 +25,7 @@
             </dl>
             <form id="delete-form" return false;" method="POST" action="http://{{server}}/delete">
                 <div class="scrolling-container">
-                    <table class="styled-table">
+                    <table id="link-table" class="styled-table">
                         <tr>
                             <th class="table-select"><input type="checkbox" id="select-all-input" class="form-control"></th>
                             <th class="table-uid">UID</th>
@@ -69,7 +69,19 @@
                     <label class="tip-text" for="admin-password-toggle">Enter the administrator password to delete the selected links.</label>
                     <input type="password" class="form-control" id="admin-password-input" name="password" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Delete selected links</button>
+                <div class="button-container">
+                    <a class="btn btn-primary delete-button" href="#delete-modal">Delete selected links</a>
+                </div>
+                <div id="delete-modal" class="modal">
+                    <div class="modal-content">
+                        <h3>Confirm delete</h3>
+                        <p>Are you sure you wish to delete the selected links?</p>
+                        <div class="button-container">
+                            <a href="#link-table" class="btn">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Delete</button>
+                        </div>
+                    </div>
+                </div>
             </form>
         </div>
     </div>
