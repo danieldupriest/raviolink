@@ -527,8 +527,7 @@ td.table-content {
     width: 7ch;
 }
 .table-ip {
-    width: 13ch;
-    white-space: nowrap;
+    width: 13%;
 }
 td.table-ip {
     font-family: monospace;
