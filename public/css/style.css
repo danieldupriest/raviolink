@@ -42,6 +42,10 @@ h1, h2, h3, h4, h5 {
     margin: var(--padding-small) 0 0 0;
     padding: 0;
 }
+.panel > h2:first-child,
+form > .form-group:first-child {
+    margin-top: 0;
+}
 .hidden {
     display: none;
 }
@@ -92,14 +96,16 @@ header{
 }
 .panels{
   background: var(--offwhite);
-  box-shadow: 0 2rem 2rem #00000080;
+  box-shadow: 0 var(--padding-large) var(--padding-large) #00000080;
   min-height: 200px;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
-  padding: 2rem;
+  padding: var(--padding-large);
 }
 .panel{
   display: none;
+  flex-direction: column;
+  align-items: flex-start;
   animation: fadein .8s;
 }
 .panel p {
@@ -149,7 +155,7 @@ select {
     padding: .5em 1em;
     border-radius: 5px;
     cursor: pointer;
-    margin-top: var(--padding-large);
+    margin-top: var(--padding-small);
 }
 .btn:hover {
     background: var(--highlight);
@@ -182,7 +188,7 @@ select {
 #two:checked ~ .panels #two-panel,
 #three:checked ~ .panels #three-panel,
 #four:checked ~ .panels #four-panel{
-  display:block
+  display: flex;
 }
 #one:checked ~ .tabs #one-tab,
 #two:checked ~ .tabs #two-tab,
@@ -374,7 +380,7 @@ select {
 
 dl {
     display: table;
-    margin-top: var(--padding-large);
+    margin: var(--padding-small) 0 0 0;
 }
 dl * {
     vertical-align: top;
@@ -471,7 +477,7 @@ dd {
 
 /* LINKS */
 .styled-table {
-    margin-top: var(--padding-small);
+    margin: var(--padding-small) 0 0 0;
 }
 .styled-table th {
     background: #aaa;

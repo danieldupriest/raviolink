@@ -279,6 +279,7 @@ const postLink = async (req, res, next) => {
     await newLink.save();
     return res.render("index", {
         link: newLink,
+        formattedSize: formatBytes(newLink.size()),
         showLink: true,
         ...res.locals.pageData,
     });

@@ -50,15 +50,15 @@ app.use(logRequest); // Log all requests to file and console
 app.use(setupTemplateData); // Set up data for reuse in page templates
 app.use(setCSPHeaders); // Set custom Content Security Policy header
 
+// Serve static content
+app.use(process.env.BASE_URL, express.static("./public"));
+
 /**
  * APP ROUTES
  */
 const mainRoutes = require("./routes/main.js");
 const base = process.env.BASE_URL ? process.env.BASE_URL : "/";
 app.use(base, mainRoutes);
-
-// Serve static content
-app.use(process.env.BASE_URL, express.static("./public"));
 
 /**
  *  ERROR HANDLING
