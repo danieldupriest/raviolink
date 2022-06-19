@@ -35,8 +35,12 @@ function setupTemplateData(req, res, next) {
     next();
 }
 
-// Middleware to configure Content Security Policy header
-function setCSPHeaders(req, res, next) {
+// Middleware to configure custom security headers
+function setCustomHeaders(req, res, next) {
+    // Set Feature Policy header
+    res.header("Feature-Policy", "camera 'none'; microphone 'none';");
+
+    // Set Content Security Policy header
     res.header(
         "Content-Security-Policy",
         "default-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com"
@@ -44,4 +48,4 @@ function setCSPHeaders(req, res, next) {
     next();
 }
 
-module.exports = { logRequest, setupTemplateData, setCSPHeaders, logStep };
+module.exports = { logRequest, setupTemplateData, setCustomHeaders, logStep };

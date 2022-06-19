@@ -44,11 +44,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const {
     logRequest,
     setupTemplateData,
-    setCSPHeaders,
+    setCustomHeaders,
 } = require("./utils/middleware.js");
 app.use(logRequest); // Log all requests to file and console
 app.use(setupTemplateData); // Set up data for reuse in page templates
-app.use(setCSPHeaders); // Set custom Content Security Policy header
+app.use(setCustomHeaders); // Set custom security headers
 
 // Serve static content
 app.use(process.env.BASE_URL, express.static("./public"));
