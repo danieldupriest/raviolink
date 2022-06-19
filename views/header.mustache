@@ -131,6 +131,32 @@
                     alert("An error occurred while trying to delete.");
                 });
             }
+            function checkInput(type) {
+                switch (type) {
+                    case "url":
+                        if (!document.getElementById("url-input").value) {
+                            alert("You must input a URL.");
+                            return false;
+                        }
+                        break;
+                    case "text":
+                        if (!document.getElementById("text-input").value) {
+                            alert("You must input text/code.");
+                            return false;
+                        }
+                        break;
+                    case "file":
+                        if (!document.getElementById("file-input").value) {
+                            alert("You must select a file to upload.");
+                            return false;
+                        }
+                        break;
+                    default:
+                        console.error("Unsupported type check");
+                        return false;
+                }
+                return true;
+            }
         </script>
     </head>
     <body class="{{#link}}link {{#isText}} full-width{{/isText}}{{/link}}{{#fullWidth}} full-width{{/fullWidth}}">
