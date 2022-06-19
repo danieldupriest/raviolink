@@ -37,8 +37,8 @@ function setupTemplateData(req, res, next) {
 
 // Middleware to configure custom security headers
 function setCustomHeaders(req, res, next) {
-    // Set Feature Policy header
-    res.header("Feature-Policy", "camera 'none'; microphone 'none';");
+    // Set Permissions Policy header
+    res.header("Permissions-Policy", "camera 'none'; microphone 'none';");
 
     // Set Content Security Policy header
     res.header(
