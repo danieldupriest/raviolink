@@ -304,6 +304,7 @@ const linkList = async (req, res, next) => {
 
     return res.render("links", {
         links: links,
+        results: links.length > 0,
         fullWidth: true,
         showLinks: true,
         totalSizeOnDisk: formatBytes(totalSize),
