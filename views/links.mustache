@@ -27,7 +27,7 @@
                         <dd>{{totalSizeOnDisk}}</dd>
                     </div>
                 </dl>
-                <form id="delete-form" return false;" method="POST" action="http://{{server}}/delete">
+                <form id="delete-form" return false;" method="POST" action="{{server}}/delete">
                     <div class="scrolling-container">
                         <table id="link-table" class="styled-table">
                             <tr>
@@ -42,12 +42,12 @@
                             {{#links}}
                                 <tr>
                                     <td class="table-select"><input type="checkbox" class="form-control delete-select" name="{{uid}}"></td>
-                                    <td class="table-uid"><a href="http://{{server}}/{{uid}}">{{uid}}</a></td>
+                                    <td class="table-uid"><a href="{{server}}/{{uid}}">{{uid}}</a></td>
                                     <td class="table-type">{{type}}</td>
                                     <td class="table-content">
                                         {{#isFile}}
-                                            <a href="http://{{server}}/{{uid}}/file">
-                                            {{#isImage}}<img src="http://{{server}}/{{uid}}/file?size={{thumbSize}}" alt="{{content}}" />{{/isImage}}
+                                            <a href="{{server}}/{{uid}}/file">
+                                            {{#isImage}}<img src="{{server}}/{{uid}}/file?size={{thumbSize}}" alt="{{content}}" />{{/isImage}}
                                             {{^isImage}}{{content}}{{/isImage}}
                                             </a>
                                         {{/isFile}}
@@ -56,7 +56,7 @@
                                     </td>
                                     <td class="table-views">{{views}}</td>
                                     <td class="table-date">{{createdOn.toShortDate}}</td>
-                                    <td class="table-ip"><a href="http://{{server}}/ip/{{ip}}">{{ip}}</a></td>
+                                    <td class="table-ip"><a href="{{server}}/ip/{{ip}}">{{ip}}</a></td>
                                 </tr>
                             {{/links}}
                         </table>
