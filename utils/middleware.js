@@ -23,14 +23,15 @@ function logRequest(req, res, next) {
 // Middleware to set up template data common to many pages
 function setupTemplateData(req, res, next) {
     res.locals.pageData = {
-        server:
-            process.env.SERVER +
-            (process.env.PORT == 80 ? "" : ":" + process.env.PORT) +
-            process.env.BASE_URL,
         maxUploadSize: process.env.MAX_UPLOAD_SIZE,
         previewSize: process.env.PREVIEW_SIZE || 700,
         thumbSize: process.env.THUMB_SIZE || 100,
     };
+    if (process.env.NODE_ENV == "development") {
+        res.locals.pageData.server = `http://localhost:${process.env.PORT}${process.env.BASE_URL}`;
+    } else {
+        res.locals.pageData.server = `https://${process.env.SERVER}${process.env.BASE_URL}`;
+    }
     next();
 }
 

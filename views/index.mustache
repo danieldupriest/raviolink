@@ -45,9 +45,9 @@
                     {{/isUrl}}
                     {{#isText}}<code id="content-text" class="hljs">{{#rows}}<div>{{.}}</div>{{/rows}}</code>{{/isText}}
                     {{#isFile}}
-                        <a id="content-file" href="http://{{server}}/{{uid}}/file">
+                        <a id="content-file" href="{{server}}/{{uid}}/file">
                             {{#isImage}}
-                                <img id="content-image" src="http://{{server}}/{{uid}}/file?size={{previewSize}}" alt="Image {{content}}"/>
+                                <img id="content-image" src="{{server}}/{{uid}}/file?size={{previewSize}}" alt="Image {{content}}"/>
                             {{/isImage}}
                             {{^isImage}}
                                 <img id="content-file-icon" src="./images/file.png" alt="File icon"/>
@@ -56,7 +56,7 @@
                         </a>
                     {{/isFile}}
                     <textarea id="hidden-content">{{content}}</textarea>
-                    <textarea id="hidden-link">http://{{server}}/{{uid}}</textarea>
+                    <textarea id="hidden-link">{{server}}/{{uid}}</textarea>
                 </div>
                 <dl>
                     <div class="definition">

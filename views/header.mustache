@@ -6,29 +6,29 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" href="/css/style.css">
         {{#link}}
-            <meta property="og:url" content="http://{{server}}/{{uid}}"/>
+            <meta property="og:url" content="{{server}}/{{uid}}"/>
             <meta property="og:type" content="website"/>
             <meta property="og:description" content="A free web app to share urls, text, and files with short, convenient links."/>
             {{#isFile}}
                 {{#isImage}}
-                    <meta property="og:image" content="http://{{server}}/{{uid}}/file?size=1080"/>
+                    <meta property="og:image" content="{{server}}/{{uid}}/file?size=1080"/>
                     <meta property="og:title" content="A link to {{formattedSize}} image {{content}}"/>
                 {{/isImage}}
                 {{^isImage}}
-                    <meta property="og:image" content="http://{{server}}/images/checker.png"/>
+                    <meta property="og:image" content="{{server}}/images/checker.png"/>
                     <meta property="og:title" content="A link to {{formattedSize}} file {{content}}"/>
                 {{/isImage}}
             {{/isFile}}
             {{#isText}}
-                <meta property="og:image" content="http://{{server}}/images/checker.png"/>
+                <meta property="og:image" content="{{server}}/images/checker.png"/>
                 <meta property="og:title" content="A link to {{formattedSize}} of text/code"/>
             {{/isText}}
             {{#isText}}
-                <link rel="stylesheet" href="http://{{server}}/css/highlight/googlecode.min.css">
-                <script src="http://{{server}}/js/highlight.min.js"></script>
+                <link rel="stylesheet" href="{{server}}/css/highlight/googlecode.min.css">
+                <script src="{{server}}/js/highlight.min.js"></script>
             {{/isText}}
         {{/link}}
-        <script src="http://{{server}}/js/qrcode.js"></script>
+        <script src="{{server}}/js/qrcode.js"></script>
         <script>
             var deleteForm;
             function copyContent(id) {
@@ -42,7 +42,7 @@
             }
             function drawCanvas() {
                 const canvas = document.getElementById("qr-code");
-                QRCode.toCanvas(canvas, 'http://{{server}}/{{link.uid}}', (error) => {
+                QRCode.toCanvas(canvas, '{{server}}/{{link.uid}}', (error) => {
                     if(error) console.error(error);
                 });
             }
@@ -111,7 +111,7 @@
                     password,
                 };
                 const currentPage = window.location.href;
-                fetch("http://{{server}}/delete", {
+                fetch("{{server}}/delete", {
                     method: "POST",
                     body: JSON.stringify(data),
                     headers: {
@@ -162,7 +162,7 @@
     </head>
     <body class="{{#link}}link {{#isText}} full-width{{/isText}}{{/link}}{{#fullWidth}} full-width{{/fullWidth}}">
         <header>
-            <a id="title" href="http://{{server}}">
+            <a id="title" href="{{server}}">
                 <img src="/images/logo.png"/>
                 <h1>Raviolink</h1>
             </a>
