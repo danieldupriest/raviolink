@@ -276,6 +276,10 @@ select {
     margin-top: var(--padding-small);
 }
 
+#content code div {
+    word-wrap: anywhere;
+}
+
 #content-title {
     font-family: 'Lato', sans-serif;
     margin: var(--padding-large) 0 0 0;

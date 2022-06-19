@@ -359,6 +359,7 @@ const linkListByIp = async (req, res, next) => {
 
     return res.render("links", {
         links: links,
+        results: links.length > 0,
         fullWidth: true,
         ip: ip,
         showLinks: true,

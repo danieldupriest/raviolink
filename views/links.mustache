@@ -17,72 +17,72 @@
         <div class="panel" id="four-panel">
             <h2>Links{{#ip}} from IP {{ip}}{{/ip}}</h2>
             <p>Below are shown all links {{#ip}}submitted from this IP {{/ip}}which have not been deleted, are expired, or set to delete on view.</p>
-            <dl>
-                <div class="definition">
-                    <dt>Total size on disk</dt>
-                    <dd>{{totalSizeOnDisk}}</dd>
-                </div>
-            </dl>
-            <form id="delete-form" return false;" method="POST" action="http://{{server}}/delete">
-                <div class="scrolling-container">
-                    <table id="link-table" class="styled-table">
-                        <tr>
-                            <th class="table-select"><input type="checkbox" id="select-all-input" class="form-control"></th>
-                            <th class="table-uid">UID</th>
-                            <th class="table-type">Type</th>
-                            <th class="table-content">Content</th>
-                            <th class="table-views">Views</th>
-                            <th class="table-date">Date Created</th>
-                            <th class="table-ip">IP</th>
-                        </tr>
-                        {{#links}}
+            {{^results}}
+                <h3 class="search-results">No links found</h3>
+            {{/results}}
+            {{#results}}
+                <dl>
+                    <div class="definition">
+                        <dt>Total size on disk</dt>
+                        <dd>{{totalSizeOnDisk}}</dd>
+                    </div>
+                </dl>
+                <form id="delete-form" return false;" method="POST" action="http://{{server}}/delete">
+                    <div class="scrolling-container">
+                        <table id="link-table" class="styled-table">
                             <tr>
-                                <td class="table-select"><input type="checkbox" class="form-control delete-select" name="{{uid}}"></td>
-                                <td class="table-uid"><a href="http://{{server}}/{{uid}}">{{uid}}</a></td>
-                                <td class="table-type">{{type}}</td>
-                                <td class="table-content">
-                                    {{#isFile}}
-                                        <a href="http://{{server}}/{{uid}}/file">
-                                        {{#isImage}}<img src="http://{{server}}/{{uid}}/file?size={{thumbSize}}" alt="{{content}}" />{{/isImage}}
-                                        {{^isImage}}{{content}}{{/isImage}}
-                                        </a>
-                                    {{/isFile}}
-                                    {{#isText}}{{shortContent}}{{/isText}}
-                                    {{#isUrl}}<a href="{{content}}">{{shortContent}}</a>{{/isUrl}}
-                                </td>
-                                <td class="table-views">{{views}}</td>
-                                <td class="table-date">{{createdOn.toShortDate}}</td>
-                                <td class="table-ip"><a href="http://{{server}}/ip/{{ip}}">{{ip}}</a></td>
+                                <th class="table-select"><input type="checkbox" id="select-all-input" class="form-control"></th>
+                                <th class="table-uid">UID</th>
+                                <th class="table-type">Type</th>
+                                <th class="table-content">Content</th>
+                                <th class="table-views">Views</th>
+                                <th class="table-date">Date Created</th>
+                                <th class="table-ip">IP</th>
                             </tr>
-                        {{/links}}
-                        {{^links}}
-                            <tr>
-                                <td colspan=7>No links found</td>
-                            </tr>
-                        {{/links}}
-                    </table>
-                </div>
-                <div class="form-group row">
-                    <label class="field-label" for="admin-password-input">Admin password</label>
-                    <input id="admin-password-toggle" type="checkbox" class="tip-checkbox"/>
-                    <label class="tip-label" for="admin-password-toggle">?</label>
-                    <label class="tip-text" for="admin-password-toggle">Enter the administrator password to delete the selected links.</label>
-                    <input type="password" class="form-control" id="admin-password-input" name="password" required>
-                </div>
-                <div class="button-container">
-                    <a class="btn btn-primary delete-button" href="#delete-modal">Delete selected links</a>
-                </div>
-                <div id="delete-modal" class="modal">
-                    <div class="modal-content">
-                        <h3>Confirm delete</h3>
-                        <p>Are you sure you wish to delete the selected links?</p>
-                        <div class="button-container">
-                            <a href="#link-table" class="btn">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Delete</button>
+                            {{#links}}
+                                <tr>
+                                    <td class="table-select"><input type="checkbox" class="form-control delete-select" name="{{uid}}"></td>
+                                    <td class="table-uid"><a href="http://{{server}}/{{uid}}">{{uid}}</a></td>
+                                    <td class="table-type">{{type}}</td>
+                                    <td class="table-content">
+                                        {{#isFile}}
+                                            <a href="http://{{server}}/{{uid}}/file">
+                                            {{#isImage}}<img src="http://{{server}}/{{uid}}/file?size={{thumbSize}}" alt="{{content}}" />{{/isImage}}
+                                            {{^isImage}}{{content}}{{/isImage}}
+                                            </a>
+                                        {{/isFile}}
+                                        {{#isText}}{{shortContent}}{{/isText}}
+                                        {{#isUrl}}<a href="{{content}}">{{shortContent}}</a>{{/isUrl}}
+                                    </td>
+                                    <td class="table-views">{{views}}</td>
+                                    <td class="table-date">{{createdOn.toShortDate}}</td>
+                                    <td class="table-ip"><a href="http://{{server}}/ip/{{ip}}">{{ip}}</a></td>
+                                </tr>
+                            {{/links}}
+                        </table>
+                    </div>
+                    <div class="form-group row">
+                        <label class="field-label" for="admin-password-input">Admin password</label>
+                        <input id="admin-password-toggle" type="checkbox" class="tip-checkbox"/>
+                        <label class="tip-label" for="admin-password-toggle">?</label>
+                        <label class="tip-text" for="admin-password-toggle">Enter the administrator password to delete the selected links.</label>
+                        <input type="password" class="form-control" id="admin-password-input" name="password" required>
+                    </div>
+                    <div class="button-container">
+                        <a class="btn btn-primary delete-button" href="#delete-modal">Delete selected links</a>
+                    </div>
+                    <div id="delete-modal" class="modal">
+                        <div class="modal-content">
+                            <h3>Confirm delete</h3>
+                            <p>Are you sure you wish to delete the selected links?</p>
+                            <div class="button-container">
+                                <a href="#link-table" class="btn">Cancel</a>
+                                <button type="submit" class="btn btn-primary">Delete</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </form>
+                </form>
+            {{/results}}
         </div>
     </div>
 </div>
