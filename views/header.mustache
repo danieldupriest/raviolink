@@ -81,12 +81,13 @@
                 {{/showLinks}}
             }
             function showSpinner() {
+                location.hash = "spinner-modal";
                 spinnerFrames=['▁','▃','▄','▅','▆','▇','█','▇','▆','▅','▄','▃'];
                 currFrame=0;
                 const spinner = document.getElementById("spinner");
                 spinner.style.display = "block";
                 function nextFrame(){
-                    spinner.innerHTML = `<div class="row"><div>${spinnerFrames[currFrame]}</div><div>Uploading and scanning for viruses. This may take a while.</div></div>`;
+                    spinner.innerHTML = `<div class="row"><div>${spinnerFrames[currFrame]}</div><div>Please wait. This may take up to 30 seconds.</div></div>`;
                     currFrame=(currFrame==spinnerFrames.length-1)? 0:currFrame+1;
                 }
                 setInterval(nextFrame, 100);

@@ -265,6 +265,9 @@ select {
     cursor: pointer;
 }
 
+#file-input {
+    max-width: 25ch;
+}
 #file-input:hover {
     cursor: pointer;
 }
