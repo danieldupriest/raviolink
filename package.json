@@ -4,9 +4,9 @@
   "description": "Open source text sharing and URL shortening app",
   "main": "index.js",
   "scripts": {
-    "serve": "node index.js",
-    "dev": "nodemon index.js",
-    "init": "node database/initialize.js",
+    "serve": "node index.mjs",
+    "dev": "nodemon index.mjs",
+    "init": "node database/initialize.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

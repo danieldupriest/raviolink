@@ -1,17 +1,18 @@
-require("dotenv").config();
-const Database = require("./Database.js");
-const genUid = require("../utils/genUid.js");
-const RavioliDate = require("../utils/dates.js");
-const fs = require("fs");
-const { debug, error } = require("../utils/logger.js");
+import dotenv from "dotenv"
+dotenv.config()
+import Database from "./Database.mjs"
+import genUid from "../utils/genUid.mjs"
+import RavioliDate from "../utils/dates.mjs"
+import fs from "fs"
+import { debug, error } from "../utils/logger.mjs"
 
-const URL_LENGTH = 7;
-const MAX_GEN_TRIES = 10;
+const URL_LENGTH = 7
+const MAX_GEN_TRIES = 10
 
-const db = new Database();
+const db = new Database()
 
 // Dataclass to store links
-class Link {
+export default class Link {
     constructor(
         content,
         type,
@@ -29,27 +30,27 @@ class Link {
         viewsLeft = null,
         views = 0
     ) {
-        this.content = content;
-        this.type = type;
-        this.expiresOn = expiresOn;
-        this.deleteOnView = deleteOnView;
-        this.raw = raw;
-        this.id = id;
-        if (!createdOn) this.createdOn = RavioliDate();
-        else this.createdOn = createdOn;
-        this.uid = uid;
-        this.tempFilename = tempFilename;
-        this.mimeType = mimeType;
-        this.deleted = deleted;
-        this.textType = textType;
-        this.ip = ip;
+        this.content = content
+        this.type = type
+        this.expiresOn = expiresOn
+        this.deleteOnView = deleteOnView
+        this.raw = raw
+        this.id = id
+        if (!createdOn) this.createdOn = RavioliDate()
+        else this.createdOn = createdOn
+        this.uid = uid
+        this.tempFilename = tempFilename
+        this.mimeType = mimeType
+        this.deleted = deleted
+        this.textType = textType
+        this.ip = ip
         if (viewsLeft != null) {
-            this.viewsLeft = viewsLeft;
+            this.viewsLeft = viewsLeft
         } else {
-            if (this.isImage()) this.viewsLeft = 2;
-            else this.viewsLeft = 1;
+            if (this.isImage()) this.viewsLeft = 2
+            else this.viewsLeft = 1
         }
-        this.views = views;
+        this.views = views
     }
 
     static fromDb(dbLink) {
@@ -71,12 +72,12 @@ class Link {
             dbLink["deleted"] == 1 ? true : false,
             parseInt(dbLink["views_left"]),
             parseInt(dbLink["views"])
-        );
-        return link;
+        )
+        return link
     }
 
     isImage() {
-        const mime = this.mimeType;
+        const mime = this.mimeType
         return (
             mime == "image/jpeg" ||
             mime == "image/apng" ||
@@ -85,104 +86,104 @@ class Link {
             mime == "image/gif" ||
             mime == "image/svg+xml" ||
             mime == "image/webp"
-        );
+        )
     }
 
     isFile() {
-        return this.type == "file";
+        return this.type == "file"
     }
 
     isText() {
-        return this.type == "text";
+        return this.type == "text"
     }
 
     isCode() {
-        return this.textType != "plain";
+        return this.textType != "plain"
     }
 
     isUrl() {
-        return this.type == "link";
+        return this.type == "link"
     }
 
     rows() {
-        return this.content.split("\n");
+        return this.content.split("\n")
     }
 
     size() {
         if (this.type == "file") {
             if (this.uid != "") {
-                const filePath = "./files/" + this.uid + "/" + this.content;
+                const filePath = "./files/" + this.uid + "/" + this.content
                 try {
-                    const stats = fs.statSync(filePath);
-                    return stats.size;
+                    const stats = fs.statSync(filePath)
+                    return stats.size
                 } catch (err) {
-                    debug(err);
-                    return 0;
+                    debug(err)
+                    return 0
                 }
             } else {
-                return 0;
+                return 0
             }
         } else {
-            return this.content.length;
+            return this.content.length
         }
     }
 
     shortContent() {
-        const shortContent = this.content.substr(0, 48);
+        const shortContent = this.content.substr(0, 48)
         if (shortContent.length != this.content.length) {
-            return shortContent + "...";
+            return shortContent + "..."
         }
-        return this.content;
+        return this.content
     }
 
     async delete() {
         // Delete file if file exists
         if (this.type == "file") {
-            const baseDir = "./files/" + this.uid;
+            const baseDir = "./files/" + this.uid
             if (fs.existsSync(baseDir)) {
-                debug("Attempting to unlink: " + baseDir);
+                debug("Attempting to unlink: " + baseDir)
                 fs.rmSync(baseDir, { recursive: true, force: true }, (err) => {
-                    if (err) error(err);
-                });
+                    if (err) error(err)
+                })
             }
         }
-        this.deleted = true;
-        await this.update();
+        this.deleted = true
+        await this.update()
     }
 
     async checkViewsLeft() {
-        if (!this.deleteOnView) return;
-        if (this.viewsLeft <= 0) await this.delete();
+        if (!this.deleteOnView) return
+        if (this.viewsLeft <= 0) await this.delete()
     }
 
     async access() {
-        this.views = this.views + 1;
+        this.views = this.views + 1
         if (this.deleteOnView) {
-            this.viewsLeft = this.viewsLeft - 1;
+            this.viewsLeft = this.viewsLeft - 1
         }
-        await this.update();
+        await this.update()
     }
 
     static async findAll() {
         const dbLinks = await db.all(
             `SELECT * FROM links WHERE deleted = 0`,
             []
-        );
-        let result = [];
+        )
+        let result = []
         for (const dbLink of dbLinks) {
-            const link = Link.fromDb(dbLink);
-            result.push(link);
+            const link = Link.fromDb(dbLink)
+            result.push(link)
         }
-        return result;
+        return result
     }
 
     static async findByUid(uid) {
-        const dbLink = await db.get(`SELECT * FROM links WHERE uid = ?`, [uid]);
+        const dbLink = await db.get(`SELECT * FROM links WHERE uid = ?`, [uid])
         if (dbLink) {
-            let link = Link.fromDb(dbLink);
-            return link;
+            let link = Link.fromDb(dbLink)
+            return link
         } else {
-            return null;
+            return null
         }
     }
 
@@ -190,67 +191,67 @@ class Link {
         const dbLinks = await db.all(
             `SELECT * FROM links WHERE ip = ? AND deleted = 0`,
             [ip]
-        );
-        let result = [];
+        )
+        let result = []
         for (const dbLink of dbLinks) {
-            const link = Link.fromDb(dbLink);
-            result.push(link);
+            const link = Link.fromDb(dbLink)
+            result.push(link)
         }
-        return result;
+        return result
     }
 
     isDeleted() {
         if (this.deleted) {
-            debug(`Link with UID ${this.uid} is deleted.`);
-            return true;
+            debug(`Link with UID ${this.uid} is deleted.`)
+            return true
         }
-        return false;
+        return false
     }
 
     isExpired() {
         if (this.expiresOn && RavioliDate() > this.expiresOn) {
-            debug(`Link with UID ${this.uid} is expired.`);
-            return true;
+            debug(`Link with UID ${this.uid} is expired.`)
+            return true
         }
-        return false;
+        return false
     }
 
     async checkExpiration() {
-        if (!this.expiresOn) return;
+        if (!this.expiresOn) return
         if (this.isExpired()) {
             if (!this.isDeleted()) {
                 debug(
                     `Link with UID ${this.uid} has not yet been deleted. Deleting...`
-                );
-                await this.delete();
+                )
+                await this.delete()
             }
         }
     }
 
     async save() {
         if (this.uid == 0) {
-            const uid = await this.generateUnusedUid();
-            this.uid = uid;
+            const uid = await this.generateUnusedUid()
+            this.uid = uid
         }
 
-        debug(`Saving link with UID ${this.uid}`);
+        debug(`Saving link with UID ${this.uid}`)
 
         if (this.type == "file") {
-            const baseDir = "./files/" + this.uid;
+            const baseDir = "./files/" + this.uid
             if (!fs.existsSync(baseDir)) {
-                debug("Making base dir: " + baseDir);
-                fs.mkdirSync(baseDir);
-                const newFilePath = baseDir + "/" + this.content;
+                debug("Making base dir: " + baseDir)
+                fs.mkdirSync(baseDir)
+                const newFilePath = baseDir + "/" + this.content
                 debug(
                     "Renaming '" +
                         this.tempFilename +
                         "' to '" +
                         newFilePath +
                         "'"
-                );
+                )
                 fs.renameSync(this.tempFilename, newFilePath, (err) => {
-                    if (err) throw err;
-                });
+                    if (err) throw err
+                })
             }
         }
 
@@ -271,16 +272,14 @@ class Link {
                 this.views,
                 this.ip,
             ]
-        );
-        const results = await db.get("SELECT last_insert_rowid();");
-        this.id = results["last_insert_rowid()"];
+        )
+        const results = await db.get("SELECT last_insert_rowid();")
+        this.id = results["last_insert_rowid()"]
     }
 
     async update() {
         try {
-            debug(
-                `Going to update link with new data: ${JSON.stringify(this)}`
-            );
+            debug(`Going to update link with new data: ${JSON.stringify(this)}`)
             await db.run(
                 `UPDATE links SET content = ?, type = ?, created_on = ?, expires_on = ?, delete_on_view = ?, raw = ?, mime_type = ?, deleted = ?, views_left = ?, text_type = ?, views = ?, ip = ? WHERE uid = ?`,
                 [
@@ -298,26 +297,25 @@ class Link {
                     this.ip,
                     this.uid,
                 ]
-            );
+            )
         } catch (err) {
-            error(err);
+            error(err)
         }
-        return this;
+        return this
     }
 
     async generateUnusedUid() {
-        let uid;
-        let attempts = 1;
+        let uid
+        let attempts = 1
         while (true) {
-            uid = genUid(URL_LENGTH);
+            uid = genUid(URL_LENGTH)
             if (!(await Link.findByUid(uid))) {
-                break;
+                break
             }
             if (attempts > MAX_GEN_TRIES)
-                throw new Error("Exceeded max attempts to generate unique UID");
-            attempts += 1;
+                throw new Error("Exceeded max attempts to generate unique UID")
+            attempts += 1
         }
-        return uid;
+        return uid
     }
 }
-module.exports = Link;

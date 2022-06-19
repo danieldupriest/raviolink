@@ -71,13 +71,15 @@
                 {{/link}}
                 {{#showLinks}}
                     deleteForm = document.getElementById("delete-form");
-                    deleteForm.addEventListener("submit", submitDelete);
-                    const selectAllInput = document.getElementById("select-all-input");
-                    selectAllInput.addEventListener("click", () => {
-                        const checks = document.querySelectorAll(".delete-select");
-                        for (const elem of checks)
-                            elem.checked = selectAllInput.checked;
-                    })
+                    if(deleteForm){
+                        deleteForm.addEventListener("submit", submitDelete);
+                        const selectAllInput = document.getElementById("select-all-input");
+                        selectAllInput.addEventListener("click", () => {
+                            const checks = document.querySelectorAll(".delete-select");
+                            for (const elem of checks)
+                                elem.checked = selectAllInput.checked;
+                        })
+                    }
                 {{/showLinks}}
             }
             function showSpinner() {
@@ -111,7 +113,7 @@
                     password,
                 };
                 const currentPage = window.location.href;
-                fetch("{{server}}/delete", {
+                fetch("{{{server}}}/delete", {
                     method: "POST",
                     body: JSON.stringify(data),
                     headers: {
