@@ -1,7 +1,6 @@
 import config from "dotenv"
 config.config()
 import Link from "../database/Link.mjs"
-import validUrl from "../utils/urlChecker.mjs"
 import RavioliDate from "../utils/dates.mjs"
 import sanitize from "sanitize-filename"
 import path from "path"
@@ -11,7 +10,7 @@ import fs from "fs"
 import Clamscan from "clamscan"
 import sharp from "sharp"
 import cache from "../utils/cache.mjs"
-import { formatBytes } from "../utils/tools.mjs"
+import { formatBytes, urlIsValid } from "../utils/tools.mjs"
 
 function uidIsValid(uid) {
     const match = uid.match(/[A-Za-z0-9]{7}/)
@@ -209,9 +208,11 @@ const postLink = async (req, res, next) => {
     // Conditional code
     let newLink
     if (type == "link") {
-        if (!validUrl(content)) {
+        if (!urlIsValid(content)) {
             res.statusCode = 400
-            return next(new Error("URL contains unsupported characters."))
+            return next(
+                new Error("URL Invalid. It may contain unsupported characters.")
+            )
         }
 
         newLink = new Link(

@@ -13,3 +13,16 @@ export function formatBytes(bytes, decimals = 2) {
 
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i]
 }
+
+const validUrlRegex = new RegExp(
+    `^(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\/\\\+&amp;%\$#_~:=]*)?$`
+)
+
+// Check if URL is valid
+export function urlIsValid(input) {
+    const result = input.match(validUrlRegex)
+    if (result) {
+        return true
+    }
+    return false
+}

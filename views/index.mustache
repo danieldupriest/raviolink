@@ -73,11 +73,12 @@
                         <dt>Delete on view</dt>
                         <dd>{{deleteOnView}}</dd>
                     </div>
+                    {{^isUrl}}
                     <div class="definition">
-                        {{#isText}}<dt>Display as raw</dt>{{/isText}}
-                        {{#isFile}}<dt>Direct download</dt>{{/isFile}}
+                        <dt>Display as raw</dt>
                         <dd>{{raw}}</dd>
                     </div>
+                    {{/isUrl}}
                     <div class="definition">
                         <dt>No. of views</dt>
                         <dd>{{views}}</dd>
