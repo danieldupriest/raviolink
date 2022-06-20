@@ -7,7 +7,7 @@
     "serve": "node index.mjs",
     "dev": "nodemon index.mjs",
     "init": "node database/initialize.mjs",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -37,6 +37,11 @@
     "sqlite3": "^5.0.8"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.18.2",
+    "babel-jest": "^28.1.1",
+    "jest": "^28.1.1",
+    "jest-config": "^28.1.1",
+    "jest-express": "^1.12.0",
     "nodemon": "^2.0.15"
   }
 }
