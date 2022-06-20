@@ -33,16 +33,15 @@ describe("Testing link posting", () => {
             expires: "never",
         }
         const response = await supertest(app).post("/").send(data).expect(201)
-        expect(response.text.includes("google.com")).toBe(true)
+        expect(response.text).toMatch(/google.com/)
     })
 })
 
-/*test("Render non-existent page abc.html", async () => {
+test("Render 404 error for non-existent page abc.html", async () => {
     await supertest(app)
         .get("/abc.html")
         .expect(404)
-        .then((res) => {
-            expect(res.body.contains("Resource not found")).toBe(true)
+        .then((response) => {
+            expect(response.text).toMatch(/Resource not found/)
         })
 })
-*/

@@ -19,11 +19,10 @@ function uidIsValid(uid) {
 }
 
 function fileExists(link) {
-    const filename = fileURLToPath(import.meta.url)
-    const dirname = path.dirname(filename)
+    //const filename = fileURLToPath(import.meta.url)
+    //const dirname = path.dirname(filename)
     const fullPath = path.resolve(
-        dirname,
-        "..",
+        process.cwd(),
         "files",
         link.uid,
         link.content
@@ -77,8 +76,7 @@ const handleLink = async (req, res, next) => {
             // Handle direct downloads
             if (link.raw) {
                 const fullPath = path.resolve(
-                    __dirname,
-                    "..",
+                    process.cwd(),
                     "files",
                     link.uid,
                     link.content
@@ -140,11 +138,10 @@ const handleFile = async (req, res, next) => {
     }
 
     // Generate file path
-    const filename = fileURLToPath(import.meta.url)
-    const dirname = path.dirname(filename)
+    //const filename = fileURLToPath(import.meta.url)
+    //const dirname = path.dirname(filename)
     const fullPath = path.resolve(
-        dirname,
-        "..",
+        process.cwd(),
         "files",
         link.uid,
         link.content
