@@ -21,18 +21,16 @@ export function logRequest(req, res, next) {
 }
 
 // Middleware to set up template data common to many pages
-export const pageData = {
-    maxUploadSize: process.env.MAX_UPLOAD_SIZE,
-    previewSize: process.env.PREVIEW_SIZE || 700,
-    server:
-        process.env.NODE_ENV == "development"
-            ? `http://localhost:${process.env.PORT}${process.env.BASE_URL}`
-            : `https://${process.env.SERVER}${process.env.BASE_URL}`,
-    thumbSize: process.env.THUMB_SIZE || 100,
-}
-
 export function setupTemplateData(req, res, next) {
-    res.locals.pageData = pageData
+    res.locals.pageData = {
+        maxUploadSize: process.env.MAX_UPLOAD_SIZE,
+        previewSize: process.env.PREVIEW_SIZE || 700,
+        server:
+            process.env.NODE_ENV == "development"
+                ? `http://localhost:${process.env.PORT}${process.env.BASE_URL}`
+                : `https://${process.env.SERVER}${process.env.BASE_URL}`,
+        thumbSize: process.env.THUMB_SIZE || 100,
+    }
     next()
 }
 

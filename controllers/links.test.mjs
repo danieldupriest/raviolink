@@ -25,6 +25,18 @@ describe("Testing normal pages", () => {
     })
 })
 
+describe("Testing link posting", () => {
+    test("Submit URL link", async () => {
+        const data = {
+            content: "http://google.com",
+            type: "link",
+            expires: "never",
+        }
+        const response = await supertest(app).post("/").send(data).expect(201)
+        expect(response.text.includes("google.com")).toBe(true)
+    })
+})
+
 /*test("Render non-existent page abc.html", async () => {
     await supertest(app)
         .get("/abc.html")

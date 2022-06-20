@@ -284,6 +284,7 @@ const postLink = async (req, res, next) => {
         return next(Error("Unsupported link type"))
     }
     await newLink.save()
+    res.status(201)
     return res.render("index", {
         link: newLink,
         formattedSize: formatBytes(newLink.size()),
