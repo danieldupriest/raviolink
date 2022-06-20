@@ -4,10 +4,12 @@ import { log, debug } from "../utils/logger.mjs"
 import sqlite3 from "sqlite3"
 sqlite3.verbose()
 
-const dbFile = process.env.DATABASE_FILE || "./database/sqlite.db"
-
 export default class Database {
     constructor(memory = false) {
+        const dbFile = process.env.TESTING
+            ? "./testing.db"
+            : process.env.DATABASE_FILE || "./database/sqlite.db"
+
         this.db = new sqlite3.Database(memory ? ":memory:" : dbFile, (err) => {
             if (err) throw err
             debug(
@@ -41,5 +43,9 @@ export default class Database {
                 resolve(rows)
             })
         })
+    }
+
+    close() {
+        this.db.close()
     }
 }

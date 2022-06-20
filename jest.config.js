@@ -8,10 +8,10 @@ module.exports = {
     testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|js?|mjs?|tsx?|ts?)$",
 
     // Convert using babel
-    transform: {
+    transform: {} /*
         "^.+\\.jsx?$": "babel-jest",
         "^.+\\.mjs$": "babel-jest",
-    },
+    },*/,
     // All imported modules in your tests should be mocked automatically
     // automock: false,
 

@@ -9,7 +9,7 @@ function logStep(text) {
 }
 
 // Middleware to log requests
-function logRequest(req, res, next) {
+export function logRequest(req, res, next) {
     const message = `Handling request to: ${req.method} ${req.url}`
     log(message)
     debug(message)
@@ -21,22 +21,23 @@ function logRequest(req, res, next) {
 }
 
 // Middleware to set up template data common to many pages
-function setupTemplateData(req, res, next) {
-    res.locals.pageData = {
-        maxUploadSize: process.env.MAX_UPLOAD_SIZE,
-        previewSize: process.env.PREVIEW_SIZE || 700,
-        thumbSize: process.env.THUMB_SIZE || 100,
-    }
-    if (process.env.NODE_ENV == "development") {
-        res.locals.pageData.server = `http://localhost:${process.env.PORT}${process.env.BASE_URL}`
-    } else {
-        res.locals.pageData.server = `https://${process.env.SERVER}${process.env.BASE_URL}`
-    }
+export const pageData = {
+    maxUploadSize: process.env.MAX_UPLOAD_SIZE,
+    previewSize: process.env.PREVIEW_SIZE || 700,
+    server:
+        process.env.NODE_ENV == "development"
+            ? `http://localhost:${process.env.PORT}${process.env.BASE_URL}`
+            : `https://${process.env.SERVER}${process.env.BASE_URL}`,
+    thumbSize: process.env.THUMB_SIZE || 100,
+}
+
+export function setupTemplateData(req, res, next) {
+    res.locals.pageData = pageData
     next()
 }
 
 // Middleware to configure custom security headers
-function setCustomHeaders(req, res, next) {
+export function setCustomHeaders(req, res, next) {
     // Set Permissions Policy header
     res.header("Permissions-Policy", "camera=(), microphone=()")
 
@@ -47,5 +48,3 @@ function setCustomHeaders(req, res, next) {
     )
     next()
 }
-
-export { logRequest, setupTemplateData, setCustomHeaders, logStep }
