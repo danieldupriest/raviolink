@@ -4,7 +4,7 @@
         <title>{{appTitle}}</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" type="text/css" href="/css/style.css">
+        <link rel="stylesheet" type="text/css" href="{{server}}/css/style.css">
         {{#link}}
             <meta property="og:url" content="{{server}}/{{uid}}"/>
             <meta property="og:type" content="website"/>
@@ -165,7 +165,7 @@
     <body class="{{#link}}link {{#isText}} full-width{{/isText}}{{/link}}{{#fullWidth}} full-width{{/fullWidth}}">
         <header>
             <a id="title" href="{{server}}">
-                <img src="/images/logo.png"/>
+                <img src="{{server}}/images/logo.png"/>
                 <h1>Raviolink</h1>
             </a>
             <p id="subtitle">Share shortened URLs, text and files.</p>
