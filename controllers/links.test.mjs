@@ -4,7 +4,7 @@ import Database from "../database/Database.mjs"
 let db, server, agent
 
 beforeAll((done) => {
-    db = Database.instance("default", { temporary: true, memory: true })
+    db = Database.instance("default", true)
     const app = createApp()
     server = app.listen(8000, (err) => {
         if (err) done(err)

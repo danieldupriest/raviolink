@@ -16,8 +16,7 @@ function Database() {
      * This looks for a connected database of the supplied name, and if it doesn't
      * exist, it creates it and returns an object with db functions.
      * @param {String} name - This is the name of the database to connect to, such as 'testing'
-     * @param {Object} options - The options 'temporary' will delete the db from disk on close, and
-     * 'memory' will create an in-memory database which will be transient.
+     * @param {Boolean} memory - This creates a database in-memory
      * @returns {Object} An object containing all the db run, get, and all functions.
      */
     function instance(name = "default", memory = false) {
