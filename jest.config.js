@@ -7,6 +7,8 @@ module.exports = {
     // Files to run during tests
     testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|js?|mjs?|tsx?|ts?)$",
 
+    verbose: true,
+
     // Convert using babel
     transform: {
         "^.+\\.jsx?$": "babel-jest",
