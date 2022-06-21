@@ -13,11 +13,11 @@ async function init() {
         log(message)
         debug(message)
     })
-    process.on("SIGTERM", () => {
-        server.close()
-    })
     process.on("SIGINT", () => {
-        server.close()
+        const message = "Shutting down from SIGINT (Ctrl-C)"
+        log(message)
+        debug(message)
+        process.exit(0)
     })
 }
 
