@@ -9,8 +9,12 @@ async function init() {
         log(message)
         debug(message)
     })
-    process.on("SIGTERM", () => { server.close() }))
-    process.on("SIGINT", () => { server.close() })
+    process.on("SIGTERM", () => {
+        server.close()
+    })
+    process.on("SIGINT", () => {
+        server.close()
+    })
 }
 
 init()
