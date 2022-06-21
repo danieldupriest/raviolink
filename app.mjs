@@ -1,5 +1,6 @@
 import config from "dotenv"
 config.config()
+import express from "express"
 import mustacheExpress from "mustache-express"
 import helmet from "helmet"
 import bodyParser from "body-parser"
@@ -13,12 +14,14 @@ import {
     missingErrorResponder,
     customErrorResponder,
 } from "./controllers/errors.mjs"
-import { log, debug } from "./utils/logger.mjs"
-import express from "express"
 
+/**
+ * Generates an app object ready to begin listening
+ * @returns {function} A function which generates an http server
+ **/
 export default function createApp() {
-    // Create app
     const app = express()
+    console.log(typeof app)
 
     // Configure mustache template engine
     app.set("views", "./views")
