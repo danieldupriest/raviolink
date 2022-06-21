@@ -1,8 +1,8 @@
 import dotenv from "dotenv"
 dotenv.config()
 import Database from "./Database.mjs"
-import genUid from "../utils/genUid.mjs"
-import RavioliDate from "../utils/dates.mjs"
+import { genUid } from "../utils/tools.mjs"
+import Date from "../utils/date.mjs"
 import fs from "fs"
 import { debug, error } from "../utils/logger.mjs"
 
@@ -38,7 +38,7 @@ export default class Link {
         this.deleteOnView = deleteOnView
         this.raw = raw
         this.id = id
-        if (!createdOn) this.createdOn = RavioliDate()
+        if (!createdOn) this.createdOn = Date()
         else this.createdOn = createdOn
         this.uid = uid
         this.tempFilename = tempFilename
@@ -80,9 +80,7 @@ export default class Link {
         const link = new Link(
             dbLink["content"],
             dbLink["type"],
-            dbLink["expires_on"]
-                ? RavioliDate(parseInt(dbLink["expires_on"]))
-                : null,
+            dbLink["expires_on"] ? Date(parseInt(dbLink["expires_on"])) : null,
             dbLink["delete_on_view"] == 1 ? true : false,
             dbLink["raw"] == 1 ? true : false,
             dbLink["text_type"],
@@ -90,7 +88,7 @@ export default class Link {
             "",
             dbLink["mime_type"],
             dbLink["id"],
-            RavioliDate(parseInt(dbLink["created_on"])),
+            Date(parseInt(dbLink["created_on"])),
             dbLink["uid"],
             dbLink["deleted"] == 1 ? true : false,
             parseInt(dbLink["views_left"]),
@@ -289,7 +287,7 @@ export default class Link {
      * @returns true if the link has expired
      */
     isExpired() {
-        if (this.expiresOn && RavioliDate() > this.expiresOn) {
+        if (this.expiresOn && Date() > this.expiresOn) {
             debug(`Link with UID ${this.uid} is expired.`)
             return true
         }

@@ -1,7 +1,7 @@
 import config from "dotenv"
 config.config()
 import Link from "../database/Link.mjs"
-import RavioliDate from "../utils/dates.mjs"
+import Date from "../utils/date.mjs"
 import sanitize from "sanitize-filename"
 import path from "path"
 import { log, debug } from "../utils/logger.mjs"
@@ -210,8 +210,8 @@ export const postLink = async (req, res, next) => {
     let expireDate = null
     if (expires != "never") {
         const msToAdd = parseInt(expires)
-        const now = RavioliDate()
-        expireDate = RavioliDate(now.getTime() + msToAdd)
+        const now = Date()
+        expireDate = Date(now.getTime() + msToAdd)
     }
 
     // Get submitter IP

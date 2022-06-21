@@ -38,14 +38,23 @@ const days = {
     6: "Saturday",
 }
 
-export default function createDate(input = null) {
+/**
+ * Returns a date object with some customized methods
+ * @param {Number} ms - ms since Unix epoch
+ * @returns {Object} A custom date object
+ */
+export default function createDate(ms = null) {
     let d
-    if (input) {
-        d = new Date(input)
+    if (ms) {
+        d = new Date(ms)
     } else {
         d = new Date()
     }
 
+    /**
+     * Generates a full-length date string
+     * @returns {String} A date string in the format "Tuesday, January 1, 2020 at 12:30 pm"
+     */
     d.toFullDate = () => {
         const day = days[d.getDay()]
         const date = d.getDate()
@@ -60,6 +69,10 @@ export default function createDate(input = null) {
         return `${day}, ${month} ${date}, ${year} at ${hours}:${minutes} ${amPm}`
     }
 
+    /**
+     * Generates a shortened date string
+     * @returns {String} A date string in the format "Jan. 1, 2020"
+     */
     d.toShortDate = () => {
         const date = d.getDate()
         const month = shortMonths[d.getMonth()]
@@ -68,6 +81,10 @@ export default function createDate(input = null) {
         return `${month}. ${date}, ${year}`
     }
 
+    /**
+     * Generates an ISO date string
+     * @returns {String} A date string in the foramt "2020-01-01 12:30:00"
+     */
     d.toISODate = () => {
         const date = d.getDate().toString().padStart(2, 0)
         const month = (d.getMonth() + 1).toString().padStart(2, 0)
@@ -79,10 +96,18 @@ export default function createDate(input = null) {
         return `${year}-${month}-${date} ${hours}:${minutes}:${seconds}`
     }
 
+    /**
+     * Generates a full length date string when converting to JSON
+     * @returns
+     */
     d.toJSON = () => {
         return d.toFullDate()
     }
 
+    /**
+     * Generates a full length date string when converting to string
+     * @returns
+     */
     d.toString = () => {
         return d.toFullDate()
     }

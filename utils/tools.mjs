@@ -33,3 +33,19 @@ export function uidIsValid(uid) {
     if (!match) debug(`Searched for UID ${uid} but did not find.`)
     return match
 }
+
+/**
+ * Generates a random UID of the specified length. Uppercase, lowecare,
+ * and digits are used.
+ */
+export const genUid = (length) => {
+    const alphabet =
+        "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    let output = ""
+    for (let i = 0; i < length; i++) {
+        const randomInt = Math.floor(Math.random() * alphabet.length)
+        const randomChar = alphabet.charAt(randomInt)
+        output += randomChar
+    }
+    return output
+}

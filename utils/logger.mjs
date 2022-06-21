@@ -1,19 +1,29 @@
 import fs from "fs"
-import RavioliDate from "./dates.mjs"
+import Date from "./date.mjs"
 
 const logFile = fs.createWriteStream("./debug.log")
 
-const log = (input) => {
-    const d = new RavioliDate()
+/**
+ * Writes a message out to the debug.log file
+ * @param {String} input - Message to log
+ */
+export const log = (input) => {
+    const d = new Date()
     logFile.write(d.toISODate() + ": " + input + "\n")
 }
 
-const debug = (input) => {
+/**
+ * Writes a message to the console if in development mode
+ * @param {String} input - Message to write
+ */
+export const debug = (input) => {
     if (process.env.NODE_ENV == "development") console.debug(input)
 }
 
-const error = (input) => {
+/**
+ * Writes an error message to the console
+ * @param {String}} input - Message to write
+ */
+export const error = (input) => {
     console.error(input)
 }
-
-export { log, debug, error }
