@@ -1,6 +1,11 @@
 import { log, debug } from "./logger.mjs"
 
-// Middleware to troubleshoot bugs
+/**
+ * Logging middleware which may be inserted anywhere among the app's use
+ * statement pipeline, which will output debug statements during processing.
+ * @param {String} text - Message to write
+ * @returns
+ */
 function logStep(text) {
     return (req, res, next) => {
         debug(text)
@@ -8,7 +13,10 @@ function logStep(text) {
     }
 }
 
-// Middleware to log requests
+/**
+ * Middleware which will log all requests the server receives, including
+ * parameter and body information if in development mode.
+ */
 export function logRequest(req, res, next) {
     const message = `Handling request to: ${req.method} ${req.url}`
     log(message)
@@ -20,7 +28,11 @@ export function logRequest(req, res, next) {
     next()
 }
 
-// Middleware to set up template data common to many pages
+/**
+ * Middleware which sets up template data common to many page templates.
+ * This includes dynamic strings, such as the servername and ports. Data
+ * will be available in the res.locals.pageData object.
+ */
 export function setupTemplateData(req, res, next) {
     let serverString
     if (process.env.NODE_ENV == "development" || process.env.NODE_ENV == "test")
@@ -35,12 +47,11 @@ export function setupTemplateData(req, res, next) {
     next()
 }
 
-// Middleware to configure custom security headers
+/**
+ * Middleware to configure custom security headers
+ */
 export function setCustomHeaders(req, res, next) {
-    // Set Permissions Policy header
     res.header("Permissions-Policy", "camera=(), microphone=()")
-
-    // Set Content Security Policy header
     res.header(
         "Content-Security-Policy",
         "default-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com"
