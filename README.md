@@ -29,7 +29,7 @@ Raviolink is an open source web application for generating short URLS for longer
 2. Change into new directory `cd raviolink`
 3. Install ClamAV on the server. On Debian this can be done with `sudo apt-get install clamav`. Note that ClamAV will not run on Google's smallest VM with 512MB of memory. They recommend at least 2 GB of memory, though I am currently running it on a 1.7 GB machine with no problems.
 4. Ensure npm is installed and run `npm i` in the root directory of the project
-5. Copy `.env.sample` to `.env` and edit to configure. Note that linux will not allow node to run the app on a port number lower than 1024, so you must choose a higher number, like 8080.
+5. Copy `.env.sample` to `.env` and edit to configure the app. Note that linux will not allow node to run the app on a port number lower than 1024, so you must choose a higher number, like 8080.
 
 ## Development
 
