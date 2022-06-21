@@ -11,7 +11,9 @@ const MAX_GEN_TRIES = 10
 
 const db = Database.instance("default")
 
-// Dataclass to store links
+/**
+ * Data class to store user-submitted links
+ */
 export default class Link {
     constructor(
         content,
@@ -53,6 +55,9 @@ export default class Link {
         this.views = views
     }
 
+    /**
+     * Checks for links table in the database and creates it if not found.
+     */
     static async init() {
         await db
             .run(
@@ -66,6 +71,11 @@ export default class Link {
             })
     }
 
+    /**
+     * Helper function for converting database link rows into a Link object
+     * @param {*} dbLink - A dictionary of values from the db.get function
+     * @returns {Link} A newly created Link object
+     */
     static fromDb(dbLink) {
         const link = new Link(
             dbLink["content"],
@@ -89,6 +99,10 @@ export default class Link {
         return link
     }
 
+    /**
+     * Checks whether a file link is one of the supported image types
+     * @returns true if the mime type of the file is an image
+     */
     isImage() {
         const mime = this.mimeType
         return (
@@ -102,26 +116,39 @@ export default class Link {
         )
     }
 
+    /**
+     * Checks whether a link's type is file
+     */
     isFile() {
         return this.type == "file"
     }
 
+    /**
+     * Checks whether a link's type is text
+     */
     isText() {
         return this.type == "text"
     }
 
-    isCode() {
-        return this.textType != "plain"
-    }
-
+    /**
+     * Checks whether a link's type is link(url)
+     */
     isUrl() {
         return this.type == "link"
     }
 
+    /**
+     * Splits the content lines into an array for use by templates
+     * @returns {[String]} An array containing strings for each row of text/code
+     */
     rows() {
         return this.content.split("\n")
     }
 
+    /**
+     * Calculates the approximate size of a link's data stored on disk
+     * @returns {Number} The size in bytes
+     */
     size() {
         if (this.type == "file") {
             if (this.uid != "") {
@@ -141,6 +168,10 @@ export default class Link {
         }
     }
 
+    /**
+     * Crops long content down to 48 characters with an ellipsis
+     * @returns {String} A short version of the content
+     */
     shortContent() {
         const shortContent = this.content.substr(0, 48)
         if (shortContent.length != this.content.length) {
@@ -149,6 +180,10 @@ export default class Link {
         return this.content
     }
 
+    /**
+     * Deletes this link, removing the associated file if it is of type
+     * file. The database entry will remain as an inactive link.
+     */
     async delete() {
         // Delete file if file exists
         if (this.type == "file") {
@@ -164,11 +199,20 @@ export default class Link {
         await this.update()
     }
 
+    /**
+     * Delete this link if delete-on-view is enabled and it has
+     * run out of views
+     * @returns {Promise}
+     */
     async checkViewsLeft() {
         if (!this.deleteOnView) return
         if (this.viewsLeft <= 0) await this.delete()
     }
 
+    /**
+     * Increment the number of views a link has, while also decrementing
+     * its views left if delete-on-view is enabled.
+     */
     async access() {
         this.views = this.views + 1
         if (this.deleteOnView) {
@@ -177,6 +221,10 @@ export default class Link {
         await this.update()
     }
 
+    /**
+     * Retrieves an array of all undeleted rows in the links table
+     * @returns {Promise} All undeleted rows of the links table
+     */
     static async findAll() {
         const dbLinks = await db.all(
             `SELECT * FROM links WHERE deleted = 0`,
@@ -190,6 +238,11 @@ export default class Link {
         return result
     }
 
+    /**
+     * Retrieves a link with the specified UID
+     * @param {String} uid - The UID of the link to retrieve
+     * @returns {Promise} Either the link, or null if not found
+     */
     static async findByUid(uid) {
         const dbLink = await db.get(`SELECT * FROM links WHERE uid = ?`, [uid])
         if (dbLink) {
@@ -200,6 +253,12 @@ export default class Link {
         }
     }
 
+    /**
+     * Retrieves an array of all undeleted links in the links table
+     * submitted from the specified IP address.
+     * @param {String} ip - The address to retrieve links for
+     * @returns {Promise} An array of matching links
+     */
     static async findAllByIp(ip) {
         const dbLinks = await db.all(
             `SELECT * FROM links WHERE ip = ? AND deleted = 0`,
@@ -213,6 +272,10 @@ export default class Link {
         return result
     }
 
+    /**
+     * Checks whether a link is deleted or not
+     * @returns true if the link is deleted
+     */
     isDeleted() {
         if (this.deleted) {
             debug(`Link with UID ${this.uid} is deleted.`)
@@ -221,6 +284,10 @@ export default class Link {
         return false
     }
 
+    /**
+     * Checks whether a link is past its expiration date
+     * @returns true if the link has expired
+     */
     isExpired() {
         if (this.expiresOn && RavioliDate() > this.expiresOn) {
             debug(`Link with UID ${this.uid} is expired.`)
@@ -229,6 +296,10 @@ export default class Link {
         return false
     }
 
+    /**
+     * Checks if a link is past its expiration date, and deletes it
+     * if it is
+     */
     async checkExpiration() {
         if (!this.expiresOn) return
         if (this.isExpired()) {
@@ -241,6 +312,10 @@ export default class Link {
         }
     }
 
+    /**
+     * Saves a new link to the database, and for file type links, renames the
+     * temporary uploaded file and moves it to the ./files directory.
+     */
     async save() {
         if (this.uid == 0) {
             const uid = await this.generateUnusedUid()
@@ -249,6 +324,7 @@ export default class Link {
 
         debug(`Saving link with UID ${this.uid}`)
 
+        // If a file type, rename the uploaded temp file and save to /files directory
         if (this.type == "file") {
             const baseDir = "./files/" + this.uid
             if (!fs.existsSync(baseDir)) {
@@ -290,6 +366,9 @@ export default class Link {
         this.id = results["last_insert_rowid()"]
     }
 
+    /**
+     * Updates the data for a link already saved in the database.
+     */
     async update() {
         try {
             debug(`Going to update link with new data: ${JSON.stringify(this)}`)
@@ -317,6 +396,11 @@ export default class Link {
         return this
     }
 
+    /**
+     * Attempts to generate a random UID not yet used by a link
+     * in the database. It will make 10 attempts before failing.
+     * @returns {String} A new, unused UID
+     */
     async generateUnusedUid() {
         let uid
         let attempts = 1

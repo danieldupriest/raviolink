@@ -7,7 +7,7 @@ sqlite3.verbose()
 
 /**
  * Allows multiple shared connections to a sqlite database either on disk or in memory.
- * @returns
+ * @returns {Object} A container for the instance() function
  */
 function Database() {
     var instances = {} // Store database references and configuration
