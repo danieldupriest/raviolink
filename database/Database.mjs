@@ -20,10 +20,9 @@ function Database() {
      * 'memory' will create an in-memory database which will be transient.
      * @returns {Object} An object containing all the db run, get, and all functions.
      */
-    function instance(name = "default", options = {}) {
-        const { temporary, memory } = options
-        let dbFile
+    function instance(name = "default", memory = false) {
         if (!instances[name]) {
+            let dbFile
             if (memory) {
                 dbFile = ":memory:"
             } else {
@@ -38,11 +37,10 @@ function Database() {
                 }),
                 file: dbFile,
                 memory: memory,
-                temporary: true,
             }
         }
-        let db = instances[name].db
         debug(`Getting db instance: ${name}`)
+        const db = instances[name].db
         return {
             /**
              * Runs the provided SQL code without returning anything
@@ -90,15 +88,18 @@ function Database() {
              */
             close: () => {
                 debug(`Closing database: ${name}`)
-                const { file, db, temporary, memory } = instances[name]
                 return new Promise((resolve, reject) => {
                     db.close((err) => {
                         if (err) reject(err)
-                        delete instances[name]
-                        if (temporary && !memory) {
+                        if (
+                            process.env.NODE_ENV == "test" &&
+                            !instances[name].memory
+                        ) {
+                            const file = instances[name].file
                             debug(`Trying to unlink file: ${file}`)
                             fs.unlinkSync(file)
                         }
+                        delete instances[name]
                         resolve()
                     })
                 })

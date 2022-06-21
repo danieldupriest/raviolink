@@ -6,7 +6,7 @@ import { debug } from "../utils/logger.mjs"
 const WINDOW = 10 * 1000 //Access window in ms
 const LIMIT = 2 //Max number of accesses to allow within window
 
-const db = Database.instance("limiter", { temporary: true, memory: true }) //Create in-memory database for access log
+const db = Database.instance("limiter", true) //Create in-memory database for access log
 
 /**
  * Class for logging user accesses to restricted routes.
