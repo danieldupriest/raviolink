@@ -21,7 +21,6 @@ import {
  **/
 export default function createApp() {
     const app = express()
-    console.log(typeof app)
 
     // Configure mustache template engine
     app.set("views", "./views")
