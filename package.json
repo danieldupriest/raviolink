@@ -4,10 +4,9 @@
   "description": "Open source text sharing and URL shortening app",
   "main": "index.js",
   "scripts": {
-    "serve": "node index.mjs",
-    "dev": "nodemon index.mjs",
-    "init": "node database/initialize.mjs",
-    "test": "TESTING=true npx jest --forceExit"
+    "serve": "NODE_ENV=production node index.mjs",
+    "dev": "NODE_ENV=development nodemon index.mjs",
+    "test": "NODE_ENV=test npx jest"
   },
   "repository": {
     "type": "git",

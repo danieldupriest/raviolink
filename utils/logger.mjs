@@ -1,7 +1,6 @@
 import fs from "fs"
 import RavioliDate from "./dates.mjs"
 
-const environment = process.env.NODE_ENV || "development"
 const logFile = fs.createWriteStream("./debug.log")
 
 const log = (input) => {
@@ -10,7 +9,7 @@ const log = (input) => {
 }
 
 const debug = (input) => {
-    if (environment == "development") console.debug(input)
+    if (process.env.NODE_ENV == "development") console.debug(input)
 }
 
 const error = (input) => {

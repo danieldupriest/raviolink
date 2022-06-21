@@ -6,20 +6,25 @@ import { debug } from "../utils/logger.mjs"
 const WINDOW = 10 * 1000 //Access window in ms
 const LIMIT = 2 //Max number of accesses to allow within window
 
-const db = new Database(true) //Create in-memory database for access log
-
-async function init() {
-    await db.run(
-        "CREATE TABLE IF NOT EXISTS accesses (id INTEGER PRIMARY KEY AUTOINCREMENT, ip TEXT, access_time INTEGER);"
-    )
-}
-init()
+const db = Database.instance("limiter", { temporary: true, memory: true }) //Create in-memory database for access log
 
 class Access {
     constructor(ip, accessTime, id = 0) {
         this.ip = ip
         this.accessTime = accessTime
         this.id = id
+    }
+
+    static async init() {
+        db.run(
+            "CREATE TABLE IF NOT EXISTS accesses (id INTEGER PRIMARY KEY AUTOINCREMENT, ip TEXT, access_time INTEGER);"
+        )
+            .then((result) => {
+                debug("Checked/created table accesses")
+            })
+            .catch((err) => {
+                error(`Error creating table accesses: ${err}`)
+            })
     }
 
     static async allowed(ip, window, limit) {
@@ -82,3 +87,5 @@ export default (options = { window: WINDOW, limit: LIMIT }) => {
         next()
     }
 }
+
+Access.init()

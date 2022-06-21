@@ -1,12 +1,10 @@
 import supertest from "supertest"
-import createApp from "../index.mjs"
+import createApp from "../app.mjs"
 import Database from "../database/Database.mjs"
-import init from "../database/initialize.mjs"
-let server, db, agent
+let db, server, agent
 
-beforeEach((done) => {
-    db = new Database()
-    init(db)
+beforeAll((done) => {
+    db = Database.instance("default", { temporary: true })
     const app = createApp()
     server = app.listen(8000, (err) => {
         if (err) done(err)
@@ -15,9 +13,10 @@ beforeEach((done) => {
     })
 })
 
-afterEach((done) => {
-    server.close(() => {
-        db.close(done)
+afterAll((done) => {
+    server.close((err) => {
+        if (err) console.error(err)
+        db.close().then(done)
     })
 })
 

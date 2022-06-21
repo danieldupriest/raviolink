@@ -9,7 +9,7 @@ import { debug, error } from "../utils/logger.mjs"
 const URL_LENGTH = 7
 const MAX_GEN_TRIES = 10
 
-const db = new Database()
+const db = Database.instance("default")
 
 // Dataclass to store links
 export default class Link {
@@ -51,6 +51,19 @@ export default class Link {
             else this.viewsLeft = 1
         }
         this.views = views
+    }
+
+    static async init() {
+        await db
+            .run(
+                "CREATE TABLE IF NOT EXISTS links (id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT, content TEXT, type TEXT, created_on INTEGER, expires_on INTEGER, delete_on_view INTEGER, raw INTEGER, mime_type TEXT, deleted INTEGER, views_left INTEGER, text_type TEXT, views INTEGER, ip INTEGER);"
+            )
+            .then((result) => {
+                debug("Checked/created table links")
+            })
+            .catch((err) => {
+                error(`Error creating table links: ${err}`)
+            })
     }
 
     static fromDb(dbLink) {
@@ -319,3 +332,5 @@ export default class Link {
         return uid
     }
 }
+
+Link.init()

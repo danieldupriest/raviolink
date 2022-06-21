@@ -1,5 +1,6 @@
 import dotenv from "dotenv"
 dotenv.config()
+import { debug } from "./logger.mjs"
 
 // Generate a short unit representation for various file sizes
 export function formatBytes(bytes, decimals = 2) {

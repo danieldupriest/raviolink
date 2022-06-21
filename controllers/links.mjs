@@ -331,7 +331,6 @@ const deleteLinks = async (req, res, next) => {
     for (const uid of toDelete) {
         const link = await Link.findByUid(uid)
         if (!link) {
-            console.log("Link with uid: " + uid + " not found")
             res.statusCode = 400
             return next(new Error(`Resource not found`))
         }

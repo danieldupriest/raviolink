@@ -22,13 +22,14 @@ export function logRequest(req, res, next) {
 
 // Middleware to set up template data common to many pages
 export function setupTemplateData(req, res, next) {
+    let serverString
+    if (process.env.NODE_ENV == "development" || process.env.NODE_ENV == "test")
+        serverString = `http://localhost:${process.env.PORT}${process.env.BASE_URL}`
+    else serverString = `https://${process.env.SERVER}${process.env.BASE_URL}`
     res.locals.pageData = {
         maxUploadSize: process.env.MAX_UPLOAD_SIZE,
         previewSize: process.env.PREVIEW_SIZE || 700,
-        server:
-            process.env.NODE_ENV == "development"
-                ? `http://localhost:${process.env.PORT}${process.env.BASE_URL}`
-                : `https://${process.env.SERVER}${process.env.BASE_URL}`,
+        server: serverString,
         thumbSize: process.env.THUMB_SIZE || 100,
     }
     next()
