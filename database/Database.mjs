@@ -45,14 +45,17 @@ export default class Database {
         })
     }
 
-    close() {
-        this.db.close()
-        if (process.env.TESTING) {
-            try {
-                if (fs.existsSync("./testing.db")) fs.unlinkSync("./testing.db")
-            } catch (err) {
-                console.error(err)
+    close(callback) {
+        this.db.close(() => {
+            if (process.env.TESTING) {
+                try {
+                    if (fs.existsSync("./testing.db"))
+                        fs.unlinkSync("./testing.db")
+                } catch (err) {
+                    console.error(err)
+                }
             }
-        }
+            callback()
+        })
     }
 }

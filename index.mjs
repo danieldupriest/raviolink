@@ -74,20 +74,15 @@ export default function createApp() {
     app.use(missingErrorResponder) // Serve 404 for missing pages
     app.use(customErrorResponder) // Serve custom errors and log uncaught problems
 
-    /**
-     * APP STARTUP
-     */
-
-    const port = process.env.PORT || 8080
-    app.listen(port, () => {
-        const message = `Raviolink listening on port ${port}`
-        log(message)
-        debug(message)
-    })
-
     return app
 }
 
 if (!process.env.TESTING) {
-    createApp()
+    const app = createApp()
+    const port = process.env.PORT || 8080
+    const server = app.listen(port, () => {
+        const message = `Raviolink listening on port ${port}`
+        log(message)
+        debug(message)
+    })
 }

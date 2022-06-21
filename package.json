@@ -7,7 +7,7 @@
     "serve": "node index.mjs",
     "dev": "nodemon index.mjs",
     "init": "node database/initialize.mjs",
-    "test": "TESTING=true npx jest"
+    "test": "TESTING=true npx jest --forceExit"
   },
   "repository": {
     "type": "git",
