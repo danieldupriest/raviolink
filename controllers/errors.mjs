@@ -2,13 +2,21 @@ import config from "dotenv"
 config.config()
 import { log, debug, error } from "../utils/logger.mjs"
 
-const missingErrorResponder = (req, res, next) => {
+/**
+ * Sets up a 404 error for any unhandled requests that is passed to
+ * the customErrorResponder
+ */
+export const missingErrorResponder = (req, res, next) => {
     const error = new Error("Resource not found")
     res.status(404)
     next(error)
 }
 
-const customErrorResponder = (err, req, res, next) => {
+/**
+ * Logs and renders any errors passed on from previous middleware/routes.
+ * Unspecified errors show as a 500 server error.
+ */
+export const customErrorResponder = (err, req, res, next) => {
     const statusCode = res.statusCode === 200 ? 500 : res.statusCode
     res.status(statusCode)
     if ([400, 404, 429].includes(statusCode)) {
@@ -26,5 +34,3 @@ const customErrorResponder = (err, req, res, next) => {
         ...res.locals.pageData,
     })
 }
-
-export { missingErrorResponder, customErrorResponder }
