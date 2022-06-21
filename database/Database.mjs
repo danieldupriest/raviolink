@@ -5,10 +5,22 @@ import sqlite3 from "sqlite3"
 import fs from "fs"
 sqlite3.verbose()
 
+/**
+ * Allows multiple shared connections to a sqlite database either on disk or in memory.
+ * @returns
+ */
 function Database() {
-    var instances = {}
+    var instances = {} // Store database references and configuration
 
-    function instance(name, options = {}) {
+    /**
+     * This looks for a connected database of the supplied name, and if it doesn't
+     * exist, it creates it and returns an object with db functions.
+     * @param {String} name - This is the name of the database to connect to, such as 'testing'
+     * @param {Object} options - The options 'temporary' will delete the db from disk on close, and
+     * 'memory' will create an in-memory database which will be transient.
+     * @returns {Object} An object containing all the db run, get, and all functions.
+     */
+    function instance(name = "default", options = {}) {
         const { temporary, memory } = options
         let dbFile
         if (!instances[name]) {
@@ -32,6 +44,11 @@ function Database() {
         let db = instances[name].db
         debug(`Getting db instance: ${name}`)
         return {
+            /**
+             * Runs the provided SQL code without returning anything
+             * @param {String} sql - The SQL query to run
+             * @param {Array} params - An array of variables to populate the query
+             */
             run: (sql, params) => {
                 return new Promise((resolve, reject) => {
                     db.run(sql, params, (err) => {
@@ -40,6 +57,12 @@ function Database() {
                     })
                 })
             },
+            /**
+             * Runs the provided SQL code returning one result
+             * @param {String} sql - The SQL query to run
+             * @param {Array} params - An array of variables to populate the query
+             * @returns {Object} - A dictionary of the selected fields
+             */
             get: (sql, params) => {
                 return new Promise((resolve, reject) => {
                     db.get(sql, params, (err, result) => {
@@ -48,6 +71,12 @@ function Database() {
                     })
                 })
             },
+            /**
+             * Runs the provided SQL code returning an array of results
+             * @param {String} sql - The SQL query to run
+             * @param {Array} params - An array of variables to populate the query
+             * @returns {[Object]} - An array of dictionaries containing the selected fields
+             */
             all: (sql, params) => {
                 return new Promise((resolve, reject) => {
                     db.all(sql, params, (err, rows) => {
@@ -56,6 +85,9 @@ function Database() {
                     })
                 })
             },
+            /**
+             * Closes all connections to the database and deletes it from disk if temporary
+             */
             close: () => {
                 debug(`Closing database: ${name}`)
                 const { file, db, temporary, memory } = instances[name]
