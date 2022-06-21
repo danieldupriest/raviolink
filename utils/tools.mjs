@@ -27,3 +27,9 @@ export function urlIsValid(input) {
     }
     return false
 }
+
+export function uidIsValid(uid) {
+    const match = uid.match(/[A-Za-z0-9]{7}/)
+    if (!match) debug(`Searched for UID ${uid} but did not find.`)
+    return match
+}

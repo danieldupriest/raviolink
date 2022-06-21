@@ -4,23 +4,19 @@ import Link from "../database/Link.mjs"
 import RavioliDate from "../utils/dates.mjs"
 import sanitize from "sanitize-filename"
 import path from "path"
-import { fileURLToPath } from "url"
 import { log, debug } from "../utils/logger.mjs"
 import fs from "fs"
 import Clamscan from "clamscan"
 import sharp from "sharp"
 import cache from "../utils/cache.mjs"
-import { formatBytes, urlIsValid } from "../utils/tools.mjs"
+import { formatBytes, urlIsValid, uidIsValid } from "../utils/tools.mjs"
 
-function uidIsValid(uid) {
-    const match = uid.match(/[A-Za-z0-9]{7}/)
-    if (!match) debug(`Searched for UID ${uid} but did not find.`)
-    return match
-}
-
+/**
+ * Checks for the existence of a file link's file on disk
+ * @param {} link - The link to check
+ * @returns true if the file exists
+ */
 function fileExists(link) {
-    //const filename = fileURLToPath(import.meta.url)
-    //const dirname = path.dirname(filename)
     const fullPath = path.resolve(
         process.cwd(),
         "files",
@@ -30,7 +26,11 @@ function fileExists(link) {
     return fs.existsSync(fullPath)
 }
 
-const handleLink = async (req, res, next) => {
+/**
+ * Load the requested link, carry out expiration and access
+ * checks, and render it.
+ */
+export const handleLink = async (req, res, next) => {
     const { uid } = req.params
     const link = await Link.findByUid(uid)
 
@@ -102,7 +102,13 @@ const handleLink = async (req, res, next) => {
     })
 }
 
-const handleFile = async (req, res, next) => {
+/**
+ * Loads a file type link and serves the file data directly to the client,
+ * displaying with the appropriate content type. Images can be resized with
+ * the ?size=100 query parameter, and resized images will be cached for later
+ * accesses.
+ */
+export const handleFile = async (req, res, next) => {
     const { uid } = req.params
     let { size } = req.query
     size = size ? parseInt(size) : null
@@ -138,8 +144,6 @@ const handleFile = async (req, res, next) => {
     }
 
     // Generate file path
-    //const filename = fileURLToPath(import.meta.url)
-    //const dirname = path.dirname(filename)
     const fullPath = path.resolve(
         process.cwd(),
         "files",
@@ -147,10 +151,12 @@ const handleFile = async (req, res, next) => {
         link.content
     )
 
-    // Count this access
+    // Count this access against view limits
     await link.access()
 
     if (size) {
+        let parsedSize = parseInt(size)
+
         // Make sure link is an image
         if (!link.isImage()) {
             res.statusCode = 400
@@ -162,7 +168,10 @@ const handleFile = async (req, res, next) => {
         let buffer = cache.read(key)
         if (!buffer) {
             // Generate resized data
-            buffer = await sharp(fullPath).resize(size, size).jpeg().toBuffer()
+            buffer = await sharp(fullPath)
+                .resize(parsedSize, parsedSize)
+                .jpeg()
+                .toBuffer()
             // Cache it
             cache.write(key, buffer)
         }
@@ -179,11 +188,19 @@ const handleFile = async (req, res, next) => {
     }
 }
 
-const frontPage = (req, res) => {
+/**
+ * Render the main page of the app with forms for submitting links.
+ */
+export const frontPage = (req, res) => {
     return res.render("index", { link: null, ...res.locals.pageData })
 }
 
-const postLink = async (req, res, next) => {
+/**
+ * Handle creation of new links, saving them to the database, then rendering
+ * a detail page for that link. This render does not count toward links with
+ * delete-on-view enabled.
+ */
+export const postLink = async (req, res, next) => {
     // Filter input
     let { content, type, expires, deleteOnView, raw, textType } = req.body
     if (typeof raw == "undefined") raw = false
@@ -290,7 +307,12 @@ const postLink = async (req, res, next) => {
     })
 }
 
-const linkList = async (req, res, next) => {
+/**
+ * Load all links that have not been deleted, are expired, or have
+ * delete-on-view enabled, then displays them in a list to the client.
+ * The page allows an administrator to delete selected links.
+ * */
+export const linkList = async (req, res, next) => {
     let links = await Link.findAll()
 
     // Filter expired and delete-on-view links
@@ -317,8 +339,12 @@ const linkList = async (req, res, next) => {
     })
 }
 
-const deleteLinks = async (req, res, next) => {
-    const { toDelete, password, currentPage } = req.body
+/**
+ * Handles deletion of the specified links. This endpoint does not have
+ * a confirmation step.
+ */
+export const deleteLinks = async (req, res, next) => {
+    const { toDelete, password } = req.body
     let deleted = false
     if (password != process.env.ADMIN_PASSWORD) {
         res.statusCode = 401
@@ -345,7 +371,12 @@ const deleteLinks = async (req, res, next) => {
     return next(new Error(`No links to delete`))
 }
 
-const linkListByIp = async (req, res, next) => {
+/**
+ * Load all links from the specified IP that have not been deleted,
+ * are expired, or have delete-on-view enabled, then displays them in a list
+ * to the client. The page allows an administrator to delete selected links.
+ */
+export const linkListByIp = async (req, res, next) => {
     const { ip } = req.params
     let links = await Link.findAllByIp(ip)
 
@@ -372,14 +403,4 @@ const linkListByIp = async (req, res, next) => {
         totalSizeOnDisk: formatBytes(totalSize),
         ...res.locals.pageData,
     })
-}
-
-export {
-    handleLink,
-    frontPage,
-    postLink,
-    handleFile,
-    linkList,
-    linkListByIp,
-    deleteLinks,
 }
