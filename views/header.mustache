@@ -31,6 +31,11 @@
         <script src="{{server}}/js/qrcode.js"></script>
         <script>
             var deleteForm;
+            /**
+             * Copies the content from the element with the supplied ID into
+             * the clipboard.
+             * @param {String} The ID of the element to copy from
+             */
             function copyContent(id) {
                 const input = document.getElementById(id);
                 input.style.display = "block";
@@ -40,12 +45,18 @@
                 input.style.display = "none";
                 window.alert("Text copied.");
             }
+            /**
+             * Draws a QR code for the currently displayed link
+             */
             function drawCanvas() {
                 const canvas = document.getElementById("qr-code");
                 QRCode.toCanvas(canvas, '{{server}}/{{link.uid}}', (error) => {
                     if(error) console.error(error);
                 });
             }
+            /**
+             * Prepare a download link for the currently displayed text/code
+             */
             function setupDownloadLink() {
                 var link = document.getElementById("download");
                 const text = document.getElementById("hidden-content").value;
@@ -53,6 +64,9 @@
                 link.href = URL.createObjectURL(file);
                 link.download = `{{link.uid}}.txt`;
             }
+            /**
+             * If it is enabled, perform syntax highlighting for the currently displayed text/code
+             */
             function highlightCode() {
                 if ("{{link.textType}}" == "plain") return;
                 const input = document.getElementById("content-text");
@@ -61,6 +75,9 @@
                 const replacedNewlines = newHTML.replace(/\n/g, '</div><div>');
                 input.innerHTML = "<div>" + replacedNewlines + "</div>";
             }
+            /**
+             * Selectively initialize different portions of the page's code
+             */
             function init() {
                 {{#link}}
                     drawCanvas();
@@ -82,6 +99,9 @@
                     }
                 {{/showLinks}}
             }
+            /**
+             * Show a "please wait" popup and animate a spinner when performing an upload
+             */
             function showSpinner() {
                 location.hash = "spinner-modal";
                 spinnerFrames=['▁','▃','▄','▅','▆','▇','█','▇','▆','▅','▄','▃'];
@@ -94,12 +114,19 @@
                 }
                 setInterval(nextFrame, 100);
             }
+            /**
+             * Warns the user if the file size exceeds the upload size limit. This
+             * defaults to 10 MB.
+             */
             function checkFileSize(inputElement) {
                 if(inputElement.files[0].size > {{maxUploadSize}}) {
                     alert("Files must be less than {{maxUploadSize}} bytes.");
                     inputElement.value = "";
                 }
             }
+            /**
+             * Carry out the delete request and refresh the page once completed
+             */
             function submitDelete(event) {
                 event.preventDefault();
                 const checks = document.querySelectorAll(".delete-select:checked")
@@ -134,6 +161,11 @@
                     alert("An error occurred while trying to delete.");
                 });
             }
+            /**
+             * Checks required fields for input and alerts the user if any are missing.
+             * This is primarily for mobile browsers which may not have a visual cue
+             * when fields with the 'required' attribute set.
+             */
             function checkInput(type) {
                 switch (type) {
                     case "url":

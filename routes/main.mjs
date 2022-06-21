@@ -1,16 +1,17 @@
-// Configure a rate limiter for use in certain routes
 import rateLimiter from "../utils/rateLimiter.mjs"
+import multer from "multer"
+import express from "express"
+
+// Configure a rate limiter for use in certain restricted routes
 const limiter = rateLimiter({ window: 10 * 1000, limit: 2 })
 
-// Configure upload middleware
-import multer from "multer"
+// Configure upload middleware to save temporary uploaded files
 const upload = multer({
     limits: { fileSize: process.env.MAX_UPLOAD_SIZE },
-    dest: process.env.TEMP_FILE_PATH,
+    dest: "./files",
 }).single("content")
 
-// Routes
-import express from "express"
+// Main application routes
 const router = express.Router()
 import {
     handleLink,
