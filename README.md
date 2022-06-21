@@ -4,6 +4,7 @@ Raviolink is an open source web application for generating short URLS for longer
 
 ## Current Features
 
+-   Support for persistent and temporary on-disk sqlite databases, as well as in-memory
 -   Shorten long URLs
 -   Share plain text or source code with syntax highlighting
 -   Share images, which are displayed, or files, which can be downloaded
@@ -20,6 +21,7 @@ Raviolink is an open source web application for generating short URLS for longer
 ## Planned Features
 
 -   Bandwidth monitoring and management on a per-link basis.
+-   Conversion to TypeScript
 
 ## Setup
 
