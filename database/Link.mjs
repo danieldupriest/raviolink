@@ -313,6 +313,7 @@ export default class Link {
     /**
      * Saves a new link to the database, and for file type links, renames the
      * temporary uploaded file and moves it to the ./files directory.
+     * @returns {Link} The link object
      */
     async save() {
         if (this.uid == 0) {
@@ -362,10 +363,12 @@ export default class Link {
         )
         const results = await db.get("SELECT last_insert_rowid();")
         this.id = results["last_insert_rowid()"]
+        return this
     }
 
     /**
      * Updates the data for a link already saved in the database.
+     * @returns {Link} The link object
      */
     async update() {
         try {
