@@ -1,8 +1,8 @@
 import supertest from "supertest"
-import createApp from "../app"
-import Database from "../database/Database"
-import { log } from "../utils/logger"
-import Link from "../database/Link"
+import createApp from "../app.mjs"
+import Database from "../database/Database.mjs"
+import { log } from "../utils/logger.mjs"
+import Link from "../database/Link.mjs"
 import jest from "jest"
 
 let db, app

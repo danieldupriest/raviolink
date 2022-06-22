@@ -8,12 +8,12 @@ import {
     logRequest,
     setupTemplateData,
     setCustomHeaders,
-} from "./utils/middleware"
-import mainRoutes from "./routes/main"
+} from "./utils/middleware.mjs"
+import mainRoutes from "./routes/main.mjs"
 import {
     missingErrorResponder,
     customErrorResponder,
-} from "./controllers/errors"
+} from "./controllers/errors.mjs"
 
 /**
  * Generates an app object ready to begin listening

@@ -1,7 +1,7 @@
 import dotenv from "dotenv"
 dotenv.config()
-import Database from "../database/Database"
-import { debug } from "../utils/logger"
+import Database from "../database/Database.mjs"
+import { debug } from "../utils/logger.mjs"
 
 const WINDOW = 10 * 1000 //Access window in ms
 const LIMIT = 2 //Max number of accesses to allow within window

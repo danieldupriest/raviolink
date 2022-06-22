@@ -1,4 +1,4 @@
-import rateLimiter from "../utils/rateLimiter"
+import rateLimiter from "../utils/rateLimiter.mjs"
 import multer from "multer"
 import express from "express"
 

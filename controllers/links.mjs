@@ -1,15 +1,15 @@
 import config from "dotenv"
 config.config()
-import Link from "../database/Link"
-import Date from "../utils/date"
+import Link from "../database/Link.mjs"
+import Date from "../utils/date.mjs"
 import sanitize from "sanitize-filename"
 import path from "path"
-import { log, debug } from "../utils/logger"
+import { log, debug } from "../utils/logger.mjs"
 import fs from "fs"
 import Clamscan from "clamscan"
 import sharp from "sharp"
-import cache from "../utils/cache"
-import { formatBytes, urlIsValid, uidIsValid } from "../utils/tools"
+import cache from "../utils/cache.mjs"
+import { formatBytes, urlIsValid, uidIsValid } from "../utils/tools.mjs"
 
 /**
  * Checks for the existence of a file link's file on disk

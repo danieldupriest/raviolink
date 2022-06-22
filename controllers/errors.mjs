@@ -1,6 +1,6 @@
 import config from "dotenv"
 config.config()
-import { log, debug, error } from "../utils/logger"
+import { log, debug, error } from "../utils/logger.mjs"
 
 /**
  * Sets up a 404 error for any unhandled requests that is passed to

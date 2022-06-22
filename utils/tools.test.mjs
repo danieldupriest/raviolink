@@ -1,4 +1,4 @@
-import { formatBytes, urlIsValid } from "./tools"
+import { formatBytes, urlIsValid } from "./tools.mjs"
 
 describe("formatBytes", () => {
     test("bytes", () => {
