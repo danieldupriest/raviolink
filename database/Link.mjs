@@ -1,10 +1,10 @@
 import dotenv from "dotenv"
 dotenv.config()
-import Database from "./Database.mjs"
-import { genUid } from "../utils/tools.mjs"
-import Date from "../utils/date.mjs"
+import Database from "./Database"
+import { genUid } from "../utils/tools"
+import Date from "../utils/date"
 import fs from "fs"
-import { debug, error } from "../utils/logger.mjs"
+import { debug, error } from "../utils/logger"
 
 const URL_LENGTH = 7
 const MAX_GEN_TRIES = 10

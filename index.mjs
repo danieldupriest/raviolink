@@ -1,5 +1,5 @@
-import createApp from "./app.mjs"
-import { log, debug } from "./utils/logger.mjs"
+import createApp from "./app"
+import { log, debug } from "./utils/logger"
 
 /**
  * Creates a new app and starts a server listening.

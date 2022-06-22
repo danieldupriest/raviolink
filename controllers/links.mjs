@@ -1,15 +1,15 @@
 import config from "dotenv"
 config.config()
-import Link from "../database/Link.mjs"
-import Date from "../utils/date.mjs"
+import Link from "../database/Link"
+import Date from "../utils/date"
 import sanitize from "sanitize-filename"
 import path from "path"
-import { log, debug } from "../utils/logger.mjs"
+import { log, debug } from "../utils/logger"
 import fs from "fs"
 import Clamscan from "clamscan"
 import sharp from "sharp"
-import cache from "../utils/cache.mjs"
-import { formatBytes, urlIsValid, uidIsValid } from "../utils/tools.mjs"
+import cache from "../utils/cache"
+import { formatBytes, urlIsValid, uidIsValid } from "../utils/tools"
 
 /**
  * Checks for the existence of a file link's file on disk
@@ -201,10 +201,18 @@ export const frontPage = (req, res) => {
  * delete-on-view enabled.
  */
 export const postLink = async (req, res, next) => {
-    // Filter input
     let { content, type, expires, deleteOnView, raw, textType } = req.body
-    if (typeof raw == "undefined") raw = false
-    if (typeof textType == "undefined") textType = "plain"
+
+    // Catch any missing parameters
+    if (content == undefined || type == undefined || expires == undefined) {
+        res.statusCode = 400
+        return next(new Error("Request is missing parameters"))
+    }
+
+    // Convert parameters
+    deleteOnView = deleteOnView == "true" ? true : false
+    raw = raw == "true" ? true : false
+    textType = textType == undefined ? "plain" : textType
 
     // Calculate expiration date
     let expireDate = null
@@ -214,89 +222,82 @@ export const postLink = async (req, res, next) => {
         expireDate = Date(now.getTime() + msToAdd)
     }
 
-    // Get submitter IP
+    // Get submitter IP address
     let ip = (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "0")
         .split(":")
         .pop()
 
-    // Conditional code
-    let newLink
-    if (type == "link") {
-        if (!urlIsValid(content)) {
-            res.statusCode = 400
-            return next(
-                new Error("URL Invalid. It may contain unsupported characters.")
+    // Conditional code for each type
+    switch (type) {
+        case "link":
+            // Check for bad URL formatting/characters
+            if (!urlIsValid(content)) {
+                res.statusCode = 400
+                return next(
+                    new Error(
+                        "URL is invalid. It may contain unsupported characters."
+                    )
+                )
+            }
+            break
+        case "text":
+            if (content.length > 500000) {
+                res.statusCode = 413
+                return next(new Error("Text content is too large."))
+            }
+            break
+        case "file":
+            // Check that file is present in data
+            if (!req.file) {
+                res.statusCode = 400
+                return next(new Error("Form data must contain a file."))
+            }
+
+            // Check for bad filename
+            content = sanitize(req.file.originalname)
+            if (content.length > 255) {
+                res.statusCode = 400
+                return next(
+                    new Error(
+                        "Filename too long. Maximum length of 255 characters."
+                    )
+                )
+            }
+            if (content == "") {
+                res.statusCode = 400
+                return next(new Error("Filename contains invalid characters"))
+            }
+
+            // Perform virus scan
+            const scanner = new Clamscan()
+            await scanner.init()
+            const { _, isInfected, viruses } = await scanner.scanFile(
+                req.file.path
             )
-        }
-
-        newLink = new Link(
-            content,
-            type,
-            expireDate,
-            deleteOnView == "true" ? true : false,
-            raw == "true" ? true : false,
-            textType,
-            ip
-        )
-    } else if (type == "text") {
-        newLink = new Link(
-            content,
-            type,
-            expireDate,
-            deleteOnView == "true" ? true : false,
-            raw == "true" ? true : false,
-            textType,
-            ip
-        )
-    } else if (type == "file") {
-        if (!req.file) {
+            if (isInfected) {
+                fs.unlinkSync(req.file.path)
+                const message = `Virus detected in file: ${viruses.join(", ")}`
+                log(message)
+                debug(message)
+                res.statusCode = 409
+                return next(new Error(message))
+            }
+            break
+        default:
             res.statusCode = 400
-            return next(new Error("Form data must contain file."))
-        }
-
-        // Check for bad filename
-        const sanitizedFilename = sanitize(req.file.originalname)
-        if (sanitizedFilename.length > 255) {
-            res.statusCode = 400
-            return next(new Error("Filename too long"))
-        }
-        if (sanitizedFilename == "") {
-            res.statusCode = 400
-            return next(new Error("Filename contains invalid characters"))
-        }
-
-        // Perform virus scan
-        const scanner = new Clamscan()
-        await scanner.init()
-        const { _, isInfected, viruses } = await scanner.scanFile(
-            req.file["path"]
-        )
-        if (isInfected) {
-            fs.unlinkSync(req.file["path"])
-            const message = `Virus detected in file: ${viruses.join(", ")}`
-            log(message)
-            debug(message)
-            res.statusCode = 409
-            res.message = message
-            return next(new Error(message))
-        }
-
-        // Create the link
-        newLink = new Link(
-            sanitizedFilename,
-            type,
-            expireDate,
-            deleteOnView == "true" ? true : false,
-            raw == "true" ? true : false,
-            textType,
-            ip,
-            req.file["path"],
-            req.file["mimetype"]
-        )
-    } else {
-        res.statusCode = 400
-        return next(Error("Unsupported link type"))
+            return next(Error("Unsupported link type"))
     }
+    const newLink = new Link(
+        content,
+        type,
+        expireDate,
+        deleteOnView,
+        raw,
+        textType,
+        ip,
+        req?.file?.path,
+        req?.file?.mimetype
+    )
     await newLink.save()
     res.status(201)
     return res.render("index", {

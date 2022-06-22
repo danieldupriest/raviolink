@@ -1,60 +1,108 @@
 import supertest from "supertest"
-import createApp from "../app.mjs"
-import Database from "../database/Database.mjs"
-import Link from "../database/Link.mjs"
+import createApp from "../app"
+import Database from "../database/Database"
+import { log } from "../utils/logger"
+import Link from "../database/Link"
+import jest from "jest"
 
-let db, server, agent
+let db, app
 
 beforeAll((done) => {
     db = Database.instance("default", true)
-    const app = createApp()
-    server = app.listen(8000, (err) => {
-        if (err) done(err)
-        agent = supertest.agent(server)
-        done()
-    })
+    app = createApp()
+    done()
 })
 
 afterAll((done) => {
-    server.close((err) => {
-        if (err) console.error(err)
-        db.close().then(done)
-    })
+    db.close().then(done)
 })
 
-describe("Testing normal pages", () => {
-    test("Render index page /", async () => {
-        const result = await agent.get("/").expect(200)
-        expect(result.text.includes("URL")).toBe(true)
+describe("normal pages", () => {
+    test("render home page", async () => {
+        const { status, text } = await supertest(app).get("/")
+        expect(status).toBe(200)
+        expect(text.includes("URL")).toBe(true)
     })
-    test("URL link should forward the user (HTTP 301) to google.com", async () => {
-        const link = new Link(
-            "http://google.com",
-            "link",
-            null,
-            false,
-            false,
-            "plain",
-            "1.2.3.4"
-        )
-        await link.save()
-        const result = await agent.get(`/${link.uid}`).expect(301)
-        await db.run("DELETE FROM links WHERE uid = ?;", [link.uid])
-    })
-    test("Render missing resource abc.html", async () => {
-        const result = await agent.get("/abc.html").expect(404)
-        expect(result.text.includes("Resource not found")).toBe(true)
+    describe("given a request for missing content", () => {
+        it("should show a 404 error", async () => {
+            const { text, status } = await supertest(app).get("/abc.html")
+            expect(status).toBe(404)
+        })
     })
 })
-
-describe("Testing link posting", () => {
-    test("Submit URL link", async () => {
-        const data = {
-            content: "http://google.com",
-            type: "link",
-            expires: "never",
-        }
-        const response = await agent.post("/").send(data).expect(201)
-        expect(response.text).toMatch(/google.com/)
+describe("creating links", () => {
+    describe("url type", () => {
+        describe("given a correct request", () => {
+            it("should display detail page", async () => {
+                const data = {
+                    content: "http://google.com",
+                    type: "link",
+                    expires: "never",
+                }
+                const { status, text } = await supertest(app)
+                    .post("/")
+                    .send(data)
+                expect(status).toBe(201)
+                expect(text).toMatch(/google.com/)
+            })
+        })
+        describe("given a request with a missing parameter", () => {
+            it("should show a 400 error", async () => {
+                const data = {
+                    content: "http://google.com",
+                    type: "link",
+                }
+                const { status, text } = await supertest(app)
+                    .post("/")
+                    .send(data)
+                expect(status).toBe(400)
+                expect(text).toMatch(/parameters/)
+            })
+        })
+        describe("given a request with an unsupported URL", () => {
+            it("should show a 400 error", async () => {
+                const data = {
+                    content: `http://google.com/'`,
+                    type: "link",
+                    expires: "never",
+                }
+                const { status, text } = await supertest(app)
+                    .post("/")
+                    .send(data)
+                expect(status).toBe(400)
+                expect(text).toMatch(/unsupported/)
+            })
+        })
+    })
+    describe("text type", () => {
+        describe("given a correct request", () => {
+            it("should display detail page", async () => {
+                const data = {
+                    content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`,
+                    type: "text",
+                    expires: "never",
+                }
+                const { status, text } = await supertest(app)
+                    .post("/")
+                    .send(data)
+                expect(status).toBe(201)
+                expect(text).toMatch(/Lorem ipsum/)
+            })
+        })
+        describe("given a request with more than 500,000 characters in the content field", () => {
+            it("should show a 413 error", async () => {
+                const tooManyChars = new Array(600000).fill("a").join("")
+                const data = {
+                    content: tooManyChars,
+                    type: "text",
+                    expires: "never",
+                }
+                const { status, text } = await supertest(app)
+                    .post("/")
+                    .send(data)
+                expect(status).toBe(413)
+                expect(text).toMatch(/too large/)
+            })
+        })
     })
 })

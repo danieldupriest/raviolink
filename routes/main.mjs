@@ -1,4 +1,4 @@
-import rateLimiter from "../utils/rateLimiter.mjs"
+import rateLimiter from "../utils/rateLimiter"
 import multer from "multer"
 import express from "express"
 
@@ -23,12 +23,16 @@ import {
     deleteLinks,
 } from "../controllers/links.mjs"
 
-router.post("/delete", limiter, deleteLinks) // Admin route to delete links
+if (process.env.NODE_ENV != "test")
+    router.post("/delete", limiter, deleteLinks) // Admin route to delete links
+else router.post("/delete", deleteLinks) // Admin route to delete links
 router.get("/ip/:ip", linkListByIp) // Show all links from specified IP
 router.get("/links", linkList) // Shows overview list of all links
 router.get("/:uid/file", handleFile) // Serves directly linked files
 router.get("/:uid", handleLink) // Retrieves specified link
 router.get("/", frontPage) // Shows default home page
-router.post("/", limiter, upload, postLink) // Handle creation of link
+if (process.env.NODE_ENV != "test")
+    router.post("/", limiter, upload, postLink) // Handle creation of link
+else router.post("/", upload, postLink) // Handle creation of link
 
 export default router

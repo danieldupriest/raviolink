@@ -1,5 +1,5 @@
 import fs from "fs"
-import Date from "./date.mjs"
+import Date from "./date"
 
 const logFile = fs.createWriteStream("./debug.log")
 

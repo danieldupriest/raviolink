@@ -1,4 +1,4 @@
-import { log, debug } from "./logger.mjs"
+import { log, debug } from "./logger"
 
 /**
  * Logging middleware which may be inserted anywhere among the app's use

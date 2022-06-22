@@ -8,12 +8,12 @@ import {
     logRequest,
     setupTemplateData,
     setCustomHeaders,
-} from "./utils/middleware.mjs"
-import mainRoutes from "./routes/main.mjs"
+} from "./utils/middleware"
+import mainRoutes from "./routes/main"
 import {
     missingErrorResponder,
     customErrorResponder,
-} from "./controllers/errors.mjs"
+} from "./controllers/errors"
 
 /**
  * Generates an app object ready to begin listening
@@ -49,8 +49,8 @@ export default function createApp() {
     app.use(helmet.xssFilter())
 
     // Parse request body
-    app.use(express.json())
-    app.use(bodyParser.urlencoded({ extended: true }))
+    app.use(express.json({ limit: "1mb" }))
+    app.use(bodyParser.urlencoded({ extended: true, limit: "1mb" }))
 
     /**
      * RUN CUSTOM MIDDLEWARE
