@@ -197,6 +197,14 @@ export default class Link {
         await this.update()
     }
 
+    static async hardDeleteAll() {
+        const allLinks = await Link.findAll()
+        for (const link of allLinks) {
+            await link.delete()
+        }
+        await db.run("DELETE FROM links;")
+    }
+
     /**
      * Delete this link if delete-on-view is enabled and it has
      * run out of views

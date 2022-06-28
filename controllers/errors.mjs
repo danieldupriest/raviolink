@@ -1,4 +1,5 @@
 import config from "dotenv"
+import multer from "multer"
 config.config()
 import { log, debug, error } from "../utils/logger.mjs"
 
@@ -17,6 +18,9 @@ export const missingErrorResponder = (req, res, next) => {
  * Unspecified errors show as a 500 server error.
  */
 export const customErrorResponder = (err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+        res.statusCode = 413
+    }
     const statusCode = res.statusCode === 200 ? 500 : res.statusCode
     res.status(statusCode)
     if ([400, 404, 429, 413].includes(statusCode)) {

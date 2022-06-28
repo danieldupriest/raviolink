@@ -1,4 +1,7 @@
-import { formatBytes, urlIsValid } from "./tools.mjs"
+import { integer } from "sharp/lib/is"
+import { formatBytes, urlIsValid, fileExistsRecursive } from "./tools.mjs"
+import fs from "fs"
+import { log } from "./logger.mjs"
 
 describe("formatBytes", () => {
     test("bytes", () => {
@@ -68,6 +71,55 @@ describe("validUrl", () => {
                     `http://ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.com:0123456789/${char}`
                 )
             ).toBe(result)
+        })
+    })
+})
+
+describe("fileExistsRecursive", () => {
+    const tempDir = "./temporary"
+    beforeEach(() => {
+        if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir)
+    })
+    afterEach(() => {
+        if (fs.existsSync(tempDir)) fs.rmdirSync(tempDir, { recursive: true })
+    })
+    describe("given the search file existing within the root directory", () => {
+        it("should return true", () => {
+            const tempFile = fs.writeFileSync(
+                tempDir + "/tempFile.txt",
+                "Temporary content"
+            )
+            const result = fileExistsRecursive("tempFile.txt", tempDir)
+            expect(result).toBe(true)
+        })
+    })
+    describe("given the searched file not existing within the root directory", () => {
+        it("should return false", () => {
+            const result = fileExistsRecursive("doesntExist.txt", tempDir)
+            expect(result).toBe(false)
+        })
+    })
+    describe("given the search file existing within a nested directory", () => {
+        it("should return true", () => {
+            fs.mkdirSync(tempDir + "/subdir")
+            fs.writeFileSync(
+                tempDir + "/subdir/tempFile.txt",
+                "Temporary content"
+            )
+            const result = fileExistsRecursive("tempFile.txt", tempDir)
+            expect(result).toBe(true)
+        })
+    })
+    describe("given the search file not existing within any nested directories", () => {
+        it("should return false", () => {
+            fs.mkdirSync(tempDir + "/subdir")
+            fs.mkdirSync(tempDir + "/subdir/subdir")
+            fs.writeFileSync(
+                tempDir + "/subdir/subdir/wrongFile.txt",
+                "Temporary content"
+            )
+            const result = fileExistsRecursive("tempFile.txt", tempDir)
+            expect(result).toBe(false)
         })
     })
 })

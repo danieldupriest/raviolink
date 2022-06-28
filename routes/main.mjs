@@ -7,7 +7,7 @@ const limiter = rateLimiter({ window: 10 * 1000, limit: 2 })
 
 // Configure upload middleware to save temporary uploaded files
 const upload = multer({
-    limits: { fileSize: process.env.MAX_UPLOAD_SIZE },
+    limits: { fileSize: parseInt(process.env.MAX_UPLOAD_SIZE) },
     dest: "./files",
 }).single("content")
 

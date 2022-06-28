@@ -1,5 +1,7 @@
 import dotenv from "dotenv"
 dotenv.config()
+import { log } from "./logger.mjs"
+import fs from "fs"
 
 /**
  * Generate a shortened representation of a file size
@@ -60,4 +62,35 @@ export function genUid(length) {
         output += randomChar
     }
     return output
+}
+
+/**
+ * Recursively check subdirectories under the provided root directory to see if
+ * a file exists.
+ * @param {String} filePath - Filename to search for. Preceding path is dropped.
+ * @param {} rootPath - Starting directory to search from. e.g. './files/'
+ * @returns true if the file is found anywhere within the root path.
+ */
+export function fileExistsRecursive(filePath, rootPath) {
+    if (!fs.existsSync(rootPath))
+        throw new Error(`Specified root path does not exist`)
+    log("inside fileExistsRecursive:")
+    log(filePath)
+    log(rootPath)
+    const filename = filePath.split("/").pop()
+    const dirs = [rootPath]
+    while (dirs.length > 0) {
+        log(JSON.stringify(dirs, null, 2))
+        const currentDir = dirs.pop()
+        const files = fs.readdirSync(currentDir)
+        for (const file of files) {
+            const absolute = currentDir + "/" + file
+            if (fs.statSync(absolute).isDirectory()) {
+                dirs.push(absolute)
+            } else if (absolute.includes(filename)) {
+                return true
+            }
+        }
+    }
+    return false
 }

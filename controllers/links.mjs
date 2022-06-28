@@ -204,7 +204,11 @@ export const postLink = async (req, res, next) => {
     let { content, type, expires, deleteOnView, raw, textType } = req.body
 
     // Catch any missing parameters
-    if (content == undefined || type == undefined || expires == undefined) {
+    if (
+        (content == undefined && type != "file") ||
+        type == undefined ||
+        expires == undefined
+    ) {
         res.statusCode = 400
         return next(new Error("Request is missing parameters"))
     }
@@ -241,12 +245,14 @@ export const postLink = async (req, res, next) => {
             }
             break
         case "text":
+            log("text content.length: " + content.length)
             if (content.length > 500000) {
                 res.statusCode = 413
                 return next(new Error("Text content is too large."))
             }
             break
         case "file":
+            log("file type")
             // Check that file is present in data
             if (!req.file) {
                 res.statusCode = 400
@@ -268,7 +274,8 @@ export const postLink = async (req, res, next) => {
                 return next(new Error("Filename contains invalid characters"))
             }
 
-            // Perform virus scan
+            // Perform virus scan when not testing
+            if (process.env.NODE_ENV == "test") break
             const scanner = new Clamscan()
             await scanner.init()
             const { _, isInfected, viruses } = await scanner.scanFile(
@@ -298,7 +305,7 @@ export const postLink = async (req, res, next) => {
         req?.file?.path,
         req?.file?.mimetype
     )
-    await newLink.save()
+    const saved = await newLink.save()
     res.status(201)
     return res.render("index", {
         link: newLink,
