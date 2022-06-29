@@ -37,6 +37,10 @@ beforeAll((done) => {
     done()
 })
 
+afterEach(async () => {
+    await Link.hardDeleteAll()
+})
+
 afterAll((done) => {
     db.close().then(done)
 })
@@ -55,9 +59,6 @@ describe("normal pages", () => {
     })
 })
 describe("creating links", () => {
-    afterEach(async () => {
-        await Link.hardDeleteAll()
-    })
     describe("all types", () => {
         describe("given a request with a missing content parameter", () => {
             it("should show a 400 error", async () => {
@@ -96,6 +97,25 @@ describe("creating links", () => {
                     .send(data)
                 expect(status).toBe(400)
                 expect(text).toMatch(/parameters/)
+            })
+        })
+        describe("given a request to create a link from a local machine", () => {
+            it.only("should save a link with IP 127.0.0.1", async () => {
+                app.use((req, res, next) => {
+
+                })
+                const data = {
+                    content: "http://google.com",
+                    type: "link",
+                    expires: "never",
+                }
+                const { status, text } = await supertest(app)
+                    .post("/")
+                    .send(data)
+                const uid = getUidFromText(text)
+                const result = await supertest(app)
+                    .get("/adminview/" + uid)
+                expect(result.body.ip).toBe('127.0.0.1')
             })
         })
     })
@@ -142,6 +162,21 @@ describe("creating links", () => {
                     .send(data)
                 expect(status).toBe(201)
                 expect(text).toMatch(/Lorem ipsum/)
+            })
+        })
+        describe("given a request with highlighting type of CSS selected", () => {
+            it("should display the detail page with highlighting for css enabled", async () => {
+                const data = {
+                    content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`,
+                    type: "text",
+                    expires: "never",
+                    textType: "css",
+                }
+                const { status, text } = await supertest(app)
+                    .post("/")
+                    .send(data)
+                expect(status).toBe(201)
+                expect(text).toMatch(/language: "css"/)
             })
         })
         describe("given a request with more than 500,000 characters in the content field", () => {
@@ -211,12 +246,7 @@ describe("creating links", () => {
             for (const [key, value] of renamedStrings) {
                 describe(`given a request with filename ${key}`, () => {
                     it(`should sanitize the filename to ${value}`, async () => {
-                        try {
-                            fs.writeFileSync("./temp/" + key, "content")
-                        } catch (err) {
-                            log(err)
-                            expect(true).toBe(true)
-                        }
+                        fs.writeFileSync("./temp/" + key, "content")
                         const { status, text } = await supertest(app)
                             .post("/")
                             .attach("content", "./temp/" + key)
@@ -224,7 +254,6 @@ describe("creating links", () => {
                             .field("type", "file")
                             .field("expires", "never")
                         const result = fileExistsRecursive(value, "./files/")
-                        if (!result) log("Failed on: " + key)
                         expect(result).toBe(true)
                     })
                 })
@@ -264,21 +293,40 @@ describe("creating links", () => {
     })
 })
 describe("viewing links", () => {
-    describe("given a file link set to display as raw", () => {
-        it.only("should display as the file type, such as png", async() => {
-            let result = await supertest(app)
-                .post("/")
-                .attach("content", testImagePath)
-                .field("content", "logo.png")
-                .field("type", "file")
-                .field("expires", "never")
-                .field("raw", "true")
-            const uid = getUidFromText(result.text)
-            result = await supertest(app)
-                .get("/" + uid)
-            expect(result.status).toBe(200)
-            //console.dir(result)
-            expect(result.headers['content-type']).toBe('image/png')
+    describe("given a link set to display as raw", () => {
+        describe("given the link is of type file, and the mimetype is image/png", () => {
+            it("should display with content type of image/png", async() => {
+                let result = await supertest(app)
+                    .post("/")
+                    .attach("content", testImagePath)
+                    .field("content", "logo.png")
+                    .field("type", "file")
+                    .field("expires", "never")
+                    .field("raw", "true")
+                const uid = getUidFromText(result.text)
+                result = await supertest(app)
+                    .get("/" + uid)
+                expect(result.status).toBe(200)
+                expect(result.headers['content-type']).toBe('image/png')
+            })
+        })
+        describe("given the link is of type text", () => {
+            it("should display with content type of text/plain", async() => {
+                const data = {
+                    content: "This is plaintext",
+                    expires: "never",
+                    type: "text",
+                    raw: "true",
+                }
+                let result = await supertest(app)
+                    .post("/")
+                    .send(data)
+                const uid = getUidFromText(result.text)
+                result = await supertest(app)
+                    .get("/" + uid)
+                expect(result.status).toBe(200)
+                expect(result.headers['content-type']).toBe('text/plain; charset=utf-8')
+            })
         })
     })
     describe("given a link with expiration time set to 300ms", () => {

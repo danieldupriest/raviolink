@@ -21,11 +21,15 @@ import {
     linkList,
     linkListByIp,
     deleteLinks,
+    adminView,
 } from "../controllers/links.mjs"
 
-if (process.env.NODE_ENV != "test")
+if (process.env.NODE_ENV == "test") {
+    router.post("/delete", deleteLinks) // Admin route to delete links
+    router.get("/adminview/:uid", adminView) // Route for testing
+} else {
     router.post("/delete", limiter, deleteLinks) // Admin route to delete links
-else router.post("/delete", deleteLinks) // Admin route to delete links
+}
 router.get("/ip/:ip", linkListByIp) // Show all links from specified IP
 router.get("/links", linkList) // Shows overview list of all links
 router.get("/:uid/file", handleFile) // Serves directly linked files

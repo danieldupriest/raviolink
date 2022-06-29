@@ -413,3 +413,13 @@ export const linkListByIp = async (req, res, next) => {
         ...res.locals.pageData,
     })
 }
+
+/**
+ * Route for use in testing successful posting of data. It returns the full json
+ * data of the link regardless of expiration or deletion state.
+ */
+export const adminView = async (req, res, next) => {
+    const { uid } = req.params
+    const link = await Link.findByUid(uid)
+    return res.json(link)
+}
