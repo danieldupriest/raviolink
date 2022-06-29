@@ -45,7 +45,7 @@ afterAll(async () => {
     await db.close()
 })
 
-describe("normal pages", () => {
+describe("viewing normal pages", () => {
     describe("given a request for the home page", () => {
         it("should render the home page", async () => {
             const { status, text } = await supertest(app).get("/")
@@ -460,10 +460,6 @@ describe("viewing links", () => {
             const uid = getUidFromText(result.text)
             result = await supertest(app)
                 .get("/" + uid + "/file?size=1921")
-            //const image = await sharp(result.body)
-            //const metadata = await image.metadata()
-            //expect(metadata.width).toBe(100)
-            //expect(metadata.height).toBe(100)
             expect(result.status).toBe(400)
         })
     })
