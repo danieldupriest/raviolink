@@ -12,6 +12,7 @@ import Cache from "../utils/cache.mjs"
 import { formatBytes, urlIsValid, uidIsValid } from "../utils/tools.mjs"
 
 const cache = new Cache()
+const MAXIMUM_IMAGE_RESIZE = 1920
 
 /**
  * Load the requested link, carry out expiration and access
@@ -124,38 +125,42 @@ export const handleFile = async (req, res, next) => {
     // Count this access against view limits
     await link.access()
 
-    if (size) {
-        let parsedSize = parseInt(size)
-
-        // Make sure link is an image
-        if (!link.isImage()) {
-            res.statusCode = 400
-            return next(new Error("File cannot be resized"))
-        }
-
-        // Setup caching
-        const key = req.get("X-Forwarded-Protocol") || req.originalUrl
-        let buffer = cache.read(key)
-        if (!buffer) {
-            // Generate resized data
-            buffer = await sharp(fullPath)
-                .resize(parsedSize, parsedSize)
-                .jpeg()
-                .toBuffer()
-            // Cache it
-            cache.write(key, buffer)
-        }
-
-        // Serve data
-        res.contentType(link.mimeType)
-        res.write(buffer)
-        return res.end()
-    } else {
-        // Serve full file
+    // Serve full file if no resize is requested
+    if (!size) {
         return res.sendFile(fullPath, {}, (err) => {
             if (err) return next(err)
         })
     }
+
+    // Serve error if requested size exceeds limits
+    if (size > MAXIMUM_IMAGE_RESIZE) {
+        res.statusCode = 400
+        return next(new Error("Size parameter must be equal to or smaller than 1920"))
+    }
+
+    // Resize requested: make sure link is an image
+    if (!link.isImage()) {
+        res.statusCode = 400
+        return next(new Error("File cannot be resized"))
+    }
+
+    // Setup caching, and load buffer from cache if available
+    const key = req.get("X-Forwarded-Protocol") || req.originalUrl
+    let buffer = cache.read(key)
+    if (!buffer) {
+        // Generate resized data if not yet cached
+        buffer = await sharp(fullPath)
+            .resize(size, size)
+            .jpeg()
+            .toBuffer()
+        // Cache it
+        cache.write(key, buffer)
+    }
+
+    // Serve data
+    res.contentType(link.mimeType)
+    res.write(buffer)
+    return res.end()
 }
 
 /**

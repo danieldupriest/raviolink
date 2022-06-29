@@ -32,18 +32,17 @@ function getUidFromText(text) {
 
 let db, app
 
-beforeAll((done) => {
+beforeAll(() => {
     db = Database.instance("default", true)
     app = createApp()
-    done()
 })
 
 afterEach(async () => {
-    await Link.hardDeleteAll()
+    await Link.hardDeleteAll()    
 })
 
-afterAll((done) => {
-    db.close().then(done)
+afterAll(async () => {
+    await db.close()
 })
 
 describe("normal pages", () => {
@@ -438,6 +437,25 @@ describe("viewing links", () => {
             const metadata = await image.metadata()
             expect(metadata.width).toBe(100)
             expect(metadata.height).toBe(100)
+        })
+    })
+    describe("given a request to resize an image beyond the limit of 1920 px", () => {
+        it("should show a 400 error stating the limit", async () => {
+            let result = await supertest(app)
+                .post("/")
+                .attach("content", testImagePath)
+                .field("content", "logo.png")
+                .field("type", "file")
+                .field("expires", "never")
+                .field("deleteOnView", "true")
+            const uid = getUidFromText(result.text)
+            result = await supertest(app)
+                .get("/" + uid + "/file?size=1921")
+            //const image = await sharp(result.body)
+            //const metadata = await image.metadata()
+            //expect(metadata.width).toBe(100)
+            //expect(metadata.height).toBe(100)
+            expect(result.status).toBe(400)
         })
     })
 })

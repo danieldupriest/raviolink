@@ -45,7 +45,7 @@ describe("customErrorResponder", () => {
     describe("given an uncaught error during some middleware", () => {
         it("should display the http code 500 and generic error message", async () => {
             app.use((req, res, next) => {
-                next(new Error("User-facing error message"))
+                next(new Error("Internal error message with sensitive data"))
             })
             app.use(customErrorResponder)
             const { text, status } = await supertest(app)
