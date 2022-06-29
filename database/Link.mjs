@@ -98,15 +98,16 @@ export default class Link {
     }
 
     /**
-     * Checks whether a file link is one of the supported image types
+     * Checks whether a file link is one of the supported image types. Those without good
+     * browser support have been commented out.
      * @returns true if the mime type of the file is an image
      */
     isImage() {
         const mime = this.mimeType
         return (
             mime == "image/jpeg" ||
-            mime == "image/apng" ||
-            mime == "image/avif" ||
+            //mime == "image/apng" ||
+            //mime == "image/avif" ||
             mime == "image/png" ||
             mime == "image/gif" ||
             mime == "image/svg+xml" ||

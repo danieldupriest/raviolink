@@ -51,12 +51,6 @@ describe("normal pages", () => {
         expect(status).toBe(200)
         expect(text.includes("URL")).toBe(true)
     })
-    describe("given a request for missing content", () => {
-        it("should show a 404 error", async () => {
-            const { text, status } = await supertest(app).get("/abc.html")
-            expect(status).toBe(404)
-        })
-    })
 })
 describe("creating links", () => {
     describe("all types", () => {
@@ -100,10 +94,7 @@ describe("creating links", () => {
             })
         })
         describe("given a request to create a link from a local machine", () => {
-            it.only("should save a link with IP 127.0.0.1", async () => {
-                app.use((req, res, next) => {
-
-                })
+            it("should save a link with IP 127.0.0.1", async () => {
                 const data = {
                     content: "http://google.com",
                     type: "link",
