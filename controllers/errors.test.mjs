@@ -51,7 +51,7 @@ describe("customErrorResponder", () => {
             const { text, status } = await supertest(app)
                 .get("/")
             expect(status).toBe(500)
-            expect(text).toMatch(/error message/)
+            expect(text).toMatch(/server error occurred/)
         })
     })
 })

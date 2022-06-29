@@ -35,7 +35,7 @@ export const customErrorResponder = (err, req, res, next) => {
     }
     return res.render("error", {
         status: statusCode,
-        error: err.message,
+        error: statusCode == 500 ? `A server error occurred while processing this request` : err.message,
         ...res.locals.pageData,
     })
 }

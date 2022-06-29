@@ -6,8 +6,9 @@ import { fileExistsRecursive, sleep } from "../utils/tools.mjs"
 import { log } from "../utils/logger.mjs"
 import Link from "../database/Link.mjs"
 import fs from "fs"
+import sharp from "sharp"
 
-const testImagePath = "./public/images/logo.png"
+const testImagePath = "./testData/test.png"
 
 function getUidFromText(text) {
     if (text.includes("content-image")) {
@@ -220,7 +221,7 @@ describe("creating links", () => {
                 if (!fs.existsSync("./temp")) fs.mkdirSync("./temp")
             })
             afterEach(() => {
-                fs.rmdirSync("./temp", { recursive: true })
+                fs.rmSync("./temp", { recursive: true })
             })
             const renamedStrings = [
                 ["a\\", "a"],
@@ -419,6 +420,24 @@ describe("viewing links", () => {
                     .get("/" + uid + "/file")
                 expect(result.status).toBe(404)
             })
+        })
+    })
+    describe("given a request to resize an image to 100 px", () => {
+        it("should render the resized image at 100 X 100 px", async () => {
+            let result = await supertest(app)
+                .post("/")
+                .attach("content", testImagePath)
+                .field("content", "logo.png")
+                .field("type", "file")
+                .field("expires", "never")
+                .field("deleteOnView", "true")
+            const uid = getUidFromText(result.text)
+            result = await supertest(app)
+                .get("/" + uid + "/file?size=100")
+            const image = await sharp(result.body)
+            const metadata = await image.metadata()
+            expect(metadata.width).toBe(100)
+            expect(metadata.height).toBe(100)
         })
     })
 })

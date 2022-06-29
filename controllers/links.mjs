@@ -14,21 +14,6 @@ import { formatBytes, urlIsValid, uidIsValid } from "../utils/tools.mjs"
 const cache = new Cache()
 
 /**
- * Checks for the existence of a file link's file on disk
- * @param {String} link - The link to check
- * @returns true if the file exists
- */
-function fileExists(link) {
-    const fullPath = path.resolve(
-        process.cwd(),
-        "files",
-        link.uid,
-        link.content
-    )
-    return fs.existsSync(fullPath)
-}
-
-/**
  * Load the requested link, carry out expiration and access
  * checks, and render it.
  */
@@ -43,7 +28,7 @@ export const handleLink = async (req, res, next) => {
     await link.checkViewsLeft()
 
     const valid = uidIsValid(uid)
-    const exists = link != "undefined"
+    //const exists = link != "undefined"
     const deleted = link.isDeleted()
     const expired = link.isExpired()
     if (!uidIsValid(uid) || !link || link.isDeleted() || link.isExpired()) {
@@ -66,14 +51,6 @@ export const handleLink = async (req, res, next) => {
             }
             break
         case "file":
-            // Check that file exists
-            if (!fileExists(link)) {
-                return next(
-                    new Error("Server error", {
-                        cause: `File ${link.content} for UID ${link.uid} not found.`,
-                    })
-                )
-            }
 
             // Handle direct downloads
             if (link.raw) {
@@ -134,15 +111,6 @@ export const handleFile = async (req, res, next) => {
         link.type != "file"
     ) {
         return next()
-    }
-
-    // Check that file exists
-    if (!fileExists(link)) {
-        return next(
-            new Error("Server error", {
-                cause: `File ${link.content} for UID ${link.uid} not found.`,
-            })
-        )
     }
 
     // Generate file path
