@@ -46,10 +46,19 @@ afterAll(async () => {
 })
 
 describe("normal pages", () => {
-    test("render home page", async () => {
-        const { status, text } = await supertest(app).get("/")
-        expect(status).toBe(200)
-        expect(text.includes("URL")).toBe(true)
+    describe("given a request for the home page", () => {
+        it("should render the home page", async () => {
+            const { status, text } = await supertest(app).get("/")
+            expect(status).toBe(200)
+            expect(text).toMatch(/URL/)
+        })
+    })
+    describe("given a request for the links page", () => {
+        it("should render the links page", async () => {
+            const { status, text } = await supertest(app).get("/links")
+            expect(status).toBe(200)
+            expect(text).toMatch(/All links/)
+        })
     })
 })
 describe("creating links", () => {
