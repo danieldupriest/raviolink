@@ -16,6 +16,11 @@ describe("missingErrorResponder", () => {
     describe("given a request for a non-existent resource", () => {
         it("should display a 404 error", async () => {
             app.use(missingErrorResponder)
+            app.use((err, req, res, next) => {
+                const statusCode = res.statusCode === 200 ? 500 : res.statusCode
+                res.status(statusCode)
+                return res.send(err.message)
+            })
             const { text, status } = await supertest(app)
                 .get("/abc.html")
             expect(status).toBe(404)

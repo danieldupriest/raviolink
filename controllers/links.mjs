@@ -8,12 +8,14 @@ import { log, debug } from "../utils/logger.mjs"
 import fs from "fs"
 import Clamscan from "clamscan"
 import sharp from "sharp"
-import cache from "../utils/cache.mjs"
+import Cache from "../utils/cache.mjs"
 import { formatBytes, urlIsValid, uidIsValid } from "../utils/tools.mjs"
+
+const cache = new Cache()
 
 /**
  * Checks for the existence of a file link's file on disk
- * @param {} link - The link to check
+ * @param {String} link - The link to check
  * @returns true if the file exists
  */
 function fileExists(link) {
@@ -177,7 +179,7 @@ export const handleFile = async (req, res, next) => {
         }
 
         // Serve data
-        res.contentType("image/jpeg")
+        res.contentType(link.mimeType)
         res.write(buffer)
         return res.end()
     } else {
