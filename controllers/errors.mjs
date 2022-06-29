@@ -29,7 +29,8 @@ export const customErrorResponder = (err, req, res, next) => {
         log(err.message)
         if (err.cause) log(" " + err.cause)
     } else {
-        error(err)
+        if (process.env.NODE_ENV != "test")
+            error(err)
         log(err)
     }
     return res.render("error", {
