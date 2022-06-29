@@ -55,7 +55,8 @@ export const handleLink = async (req, res, next) => {
 
             // Handle direct downloads
             if (link.raw) {
-                const fullPath = path.resolve(
+                return handleFile(req, res, next)
+                /*const fullPath = path.resolve(
                     process.cwd(),
                     "files",
                     link.uid,
@@ -66,7 +67,7 @@ export const handleLink = async (req, res, next) => {
                     if (err) {
                         return next(err)
                     }
-                })
+                })*/
             }
             break
         default:
