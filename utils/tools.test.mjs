@@ -81,7 +81,7 @@ describe("fileExistsRecursive", () => {
         if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir)
     })
     afterEach(() => {
-        if (fs.existsSync(tempDir)) fs.rmdirSync(tempDir, { recursive: true })
+        if (fs.existsSync(tempDir)) fs.rmSync(tempDir, { recursive: true })
     })
     describe("given the search file existing within the root directory", () => {
         it("should return true", () => {
