@@ -6,7 +6,6 @@ import { fileExistsRecursive } from "../utils/tools.mjs"
 import { log } from "../utils/logger.mjs"
 import Link from "../database/Link.mjs"
 import fs from "fs"
-import { formatWithOptions } from "util"
 
 const testImagePath = "./public/images/logo.png"
 
@@ -77,6 +76,80 @@ describe("creating links", () => {
                     .send(data)
                 expect(status).toBe(400)
                 expect(text).toMatch(/parameters/)
+            })
+        })
+        describe("given a request with expiration time set to 300ms", () => {
+            it("should display normally when accessed immediately", async () => {
+                const data = {
+                    content: "http://google.com",
+                    type: "link",
+                    expires: "300",
+                }
+                let result = await supertest(app)
+                    .post("/")
+                    .send(data)
+                const matched = result.text.match(/([a-zA-Z0-9]{7})<\/div>/gm)
+                const uid = matched[0].substr(0, 7)
+                const {status, text} = await supertest(app)
+                        .get("/" + uid)
+                expect(status).toBe(301)
+            })
+            it("should show a 404 error after 350ms", async () => {
+                const data = {
+                    content: "http://google.com",
+                    type: "link",
+                    expires: "300",
+                }
+                let result = await supertest(app)
+                    .post("/")
+                    .send(data)
+                const matched = result.text.match(/([a-zA-Z0-9]{7})<\/div>/gm)
+                const uid = matched[0].substr(0, 7)
+                const sleep = (time) => {
+                    return new Promise((resolve, reject) => {
+                        setTimeout(resolve, time)
+                    })
+                }
+                await sleep(350)
+                const {status, text} = await supertest(app)
+                        .get("/" + uid)
+                expect(status).toBe(404)
+            })
+        })
+        describe("given a link set to delete on view", () => {
+            it("should display normally once", async () => {
+                const data = {
+                    content: "Some sample text",
+                    type: "text",
+                    expires: "never",
+                    deleteOnView: "true",
+                }
+                let result = await supertest(app)
+                    .post("/")
+                    .send(data)
+                const matched = result.text.match(/([a-zA-Z0-9]{7})<\/div>/gm)
+                const uid = matched[0].substr(0, 7)
+                const { status, text } = await supertest(app)
+                    .get("/" + uid)
+                expect(status).toBe(200)
+            })
+            it("should show 404 error on second access", async () => {
+                const data = {
+                    content: "Some sample text",
+                    type: "text",
+                    expires: "never",
+                    deleteOnView: "true",
+                }
+                let result = await supertest(app)
+                    .post("/")
+                    .send(data)
+                const matched = result.text.match(/([a-zA-Z0-9]{7})<\/div>/gm)
+                const uid = matched[0].substr(0, 7)
+                result = await supertest(app)
+                    .get("/" + uid)
+                const { status, text } = await supertest(app)
+                    .get("/" + uid)
+                expect(status).toBe(404)
             })
         })
     })
