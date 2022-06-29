@@ -6,7 +6,7 @@ import { log, debug } from "./logger.mjs"
  * @param {String} text - Message to write
  * @returns
  */
-function logStep(text) {
+export function logStep(text) {
     return (req, res, next) => {
         debug(text)
         next()

@@ -44,11 +44,10 @@ const days = {
  * @returns {Object} A custom date object
  */
 export default function createDate(ms = null) {
-    let d
     if (ms) {
-        d = new Date(ms)
+        var d = new Date(ms)
     } else {
-        d = new Date()
+        var d = new Date()
     }
 
     /**
