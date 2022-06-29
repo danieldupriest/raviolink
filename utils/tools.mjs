@@ -74,13 +74,9 @@ export function genUid(length) {
 export function fileExistsRecursive(filePath, rootPath) {
     if (!fs.existsSync(rootPath))
         throw new Error(`Specified root path does not exist`)
-    log("inside fileExistsRecursive:")
-    log(filePath)
-    log(rootPath)
     const filename = filePath.split("/").pop()
     const dirs = [rootPath]
     while (dirs.length > 0) {
-        log(JSON.stringify(dirs, null, 2))
         const currentDir = dirs.pop()
         const files = fs.readdirSync(currentDir)
         for (const file of files) {

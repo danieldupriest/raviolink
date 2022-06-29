@@ -3,8 +3,10 @@ import createApp from "../app.mjs"
 import Database from "../database/Database.mjs"
 import path from "path"
 import { fileExistsRecursive } from "../utils/tools.mjs"
+import { log } from "../utils/logger.mjs"
 import Link from "../database/Link.mjs"
 import fs from "fs"
+import { formatWithOptions } from "util"
 
 const testImagePath = "./public/images/logo.png"
 
@@ -167,6 +169,47 @@ describe("creating links", () => {
                 )
                 expect(fileExists).toBe(true)
             })
+        })
+        describe("filename sanitization", () => {
+            beforeEach(() => {
+                if (!fs.existsSync("./temp")) fs.mkdirSync("./temp")
+            })
+            afterEach(() => {
+                fs.rmdirSync("./temp", { recursive: true })
+            })
+            const renamedStrings = [
+                ["a\\", "a"],
+                ["a\\\\", "a"],
+                ["a.", "a"],
+                ["<a>", "a"],
+                ["a?", "a"],
+                ["aa:aa", "aaaa"],
+                ['"a', "a"],
+                ['""a', "a"],
+                ["|a", "a"],
+                ["*a", "a"],
+            ]
+            for (const [key, value] of renamedStrings) {
+                describe(`given a request with filename ${key}`, () => {
+                    it(`should sanitize the filename to ${value}`, async () => {
+                        try {
+                            fs.writeFileSync("./temp/" + key, "content")
+                        } catch (err) {
+                            log(err)
+                            expect(true).toBe(true)
+                        }
+                        const { status, text } = await supertest(app)
+                            .post("/")
+                            .attach("content", "./temp/" + key)
+                            .field("content", key)
+                            .field("type", "file")
+                            .field("expires", "never")
+                        const result = fileExistsRecursive(value, "./files/")
+                        if (!result) log("Failed on: " + key)
+                        expect(result).toBe(true)
+                    })
+                })
+            }
         })
         describe("given a request with missing file", () => {
             it("should show 400 error", async () => {

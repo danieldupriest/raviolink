@@ -261,6 +261,7 @@ export const postLink = async (req, res, next) => {
 
             // Check for bad filename
             content = sanitize(req.file.originalname)
+            log("Sanitized content: " + content)
             if (content.length > 255) {
                 res.statusCode = 400
                 return next(
