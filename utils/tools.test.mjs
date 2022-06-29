@@ -1,5 +1,5 @@
 import { integer } from "sharp/lib/is"
-import { formatBytes, urlIsValid, fileExistsRecursive, sleep } from "./tools.mjs"
+import { formatBytes, genUid, uidIsValid, urlIsValid, fileExistsRecursive, sleep } from "./tools.mjs"
 import fs from "fs"
 import { log } from "./logger.mjs"
 
@@ -21,7 +21,51 @@ describe("formatBytes", () => {
     })
 })
 
-describe("validUrl", () => {
+describe("genUid", () => {
+    describe("given a request to generate a 7-character uid", () => {
+        it("should return a 7-character UID", () => {
+            const result = genUid(7)
+            expect(result.length).toBe(7)
+        })
+        it("should return a UID with only upper and lowercase alphanumerics", () => {
+            const result = genUid(7)
+            expect(result).toMatch(/[A-Za-z0-9]{7}/)
+        })
+    })
+})
+
+describe("uidIsValid", () => {
+    describe("given a 7 character alphanumeric UID", () => {
+        it("should return true", () => {
+            const input = "AaBbCc1"
+            const result = uidIsValid(input)
+            expect(result).toBe(true)
+        })
+    })
+    describe("given a 6 character alphanumeric UID", () => {
+        it("should return false", () => {
+            const input = "AaBbCc"
+            const result = uidIsValid(input)
+            expect(result).toBe(false)
+        })
+    })
+    describe("given a 8 character alphanumeric UID", () => {
+        it("should return false", () => {
+            const input = "AaBbCc12"
+            const result = uidIsValid(input)
+            expect(result).toBe(false)
+        })
+    })
+    describe("given a 7 character string with punctuation", () => {
+        it("should return false", () => {
+            const input = "AaBbCc."
+            const result = uidIsValid(input)
+            expect(result).toBe(false)
+        })
+    })
+})
+
+describe("urlIsValid", () => {
     test("URL beginning with http is accepted", () => {
         expect(urlIsValid("http://google.com")).toBe(true)
     })

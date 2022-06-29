@@ -18,16 +18,15 @@ export function formatBytes(bytes, decimals = 2) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i]
 }
 
-const validUrlRegex = new RegExp(
-    `^(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\/\\\+&amp;%\$#_~:=]*)?$`
-)
-
 /**
  * Check if URL is valid and supported by the app
  * @param {String} input - URL to check
  * @returns true if the URL is valid and supported
  */
 export function urlIsValid(input) {
+    const validUrlRegex = new RegExp(
+        `^(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\/\\\+&amp;%\$#_~:=]*)?$`
+    )
     const result = input.match(validUrlRegex)
     if (result) {
         return true
@@ -41,6 +40,7 @@ export function urlIsValid(input) {
  * @returns true if the UID is valid
  */
 export function uidIsValid(uid) {
+    if(uid.length != 7) return false
     const match = uid.match(/[A-Za-z0-9]{7}/)
     if (!match) return false
     return true

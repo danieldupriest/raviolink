@@ -88,7 +88,7 @@ class Access {
  * if the number of accesses during the specified window exceeds
  * the limit, the request will be rejected with a
  * @param {Object} options - Must contain 'window' specifying the time window
- * and 'limit', specifying the maximum number of accesses allowed.
+ * in ms and 'limit', specifying the maximum number of accesses allowed.
  * @returns middleware to be used with express app
  */
 export default function (options = { window: WINDOW, limit: LIMIT }) {
