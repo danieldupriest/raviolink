@@ -6,7 +6,7 @@
   "scripts": {
     "serve": "NODE_ENV=production node index.mjs",
     "dev": "NODE_ENV=development nodemon index.mjs",
-    "test": "NODE_ENV=test npx jest"
+    "test": "NODE_ENV=test npx jest --silent=false"
   },
   "repository": {
     "type": "git",

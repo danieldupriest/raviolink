@@ -127,7 +127,7 @@ describe("fileExistsRecursive", () => {
 describe("sleep", () => {
     const tempDir = "./temporary"
     describe("given a sleep with delay set to 100ms", () => {
-        it("should have at least 100ms elapsed before completing", async() => {
+        it("should have at least 95ms elapsed before completing", async() => {
             function hrTimeToMicroseconds(hrTimeArray) {
                 return hrTimeArray[0] * 1000000 + hrTimeArray[1] / 1000
             }
@@ -136,7 +136,7 @@ describe("sleep", () => {
             const elapsed = process.hrtime(start)
             const elapsedMicroseconds = hrTimeToMicroseconds(elapsed)
             log("elapsedMicroseconds: " + elapsedMicroseconds)
-            expect(elapsedMicroseconds).toBeGreaterThan(100000)
+            expect(elapsedMicroseconds).toBeGreaterThan(95000)
         })
     })
 })

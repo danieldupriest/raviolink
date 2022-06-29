@@ -9,6 +9,26 @@ import fs from "fs"
 
 const testImagePath = "./public/images/logo.png"
 
+function getUidFromText(text) {
+    if (text.includes("content-image")) {
+        try {
+            const matched = text.match(/([a-zA-Z0-9]{7})\/file/gm)
+            const uid = matched[0].substr(0, 7)
+            return uid
+        } catch (err) {
+            return null
+        }
+    } else {
+        try {
+            const matched = text.match(/([a-zA-Z0-9]{7})<\/div>/gm)
+            const uid = matched[0].substr(0, 7)
+            return uid
+        } catch (err) {
+            return null
+        }
+    }
+}
+
 let db, app
 
 beforeAll((done) => {
@@ -76,75 +96,6 @@ describe("creating links", () => {
                     .send(data)
                 expect(status).toBe(400)
                 expect(text).toMatch(/parameters/)
-            })
-        })
-        describe("given a request with expiration time set to 300ms", () => {
-            it("should display normally when accessed immediately", async () => {
-                const data = {
-                    content: "http://google.com",
-                    type: "link",
-                    expires: "300",
-                }
-                let result = await supertest(app)
-                    .post("/")
-                    .send(data)
-                const matched = result.text.match(/([a-zA-Z0-9]{7})<\/div>/gm)
-                const uid = matched[0].substr(0, 7)
-                const {status, text} = await supertest(app)
-                        .get("/" + uid)
-                expect(status).toBe(301)
-            })
-            it("should show a 404 error after 350ms", async () => {
-                const data = {
-                    content: "http://google.com",
-                    type: "link",
-                    expires: "300",
-                }
-                let result = await supertest(app)
-                    .post("/")
-                    .send(data)
-                const matched = result.text.match(/([a-zA-Z0-9]{7})<\/div>/gm)
-                const uid = matched[0].substr(0, 7)
-                await sleep(350)
-                const {status, text} = await supertest(app)
-                        .get("/" + uid)
-                expect(status).toBe(404)
-            })
-        })
-        describe("given a link set to delete on view", () => {
-            it("should display normally once", async () => {
-                const data = {
-                    content: "Some sample text",
-                    type: "text",
-                    expires: "never",
-                    deleteOnView: "true",
-                }
-                let result = await supertest(app)
-                    .post("/")
-                    .send(data)
-                const matched = result.text.match(/([a-zA-Z0-9]{7})<\/div>/gm)
-                const uid = matched[0].substr(0, 7)
-                const { status, text } = await supertest(app)
-                    .get("/" + uid)
-                expect(status).toBe(200)
-            })
-            it("should show 404 error on second access", async () => {
-                const data = {
-                    content: "Some sample text",
-                    type: "text",
-                    expires: "never",
-                    deleteOnView: "true",
-                }
-                let result = await supertest(app)
-                    .post("/")
-                    .send(data)
-                const matched = result.text.match(/([a-zA-Z0-9]{7})<\/div>/gm)
-                const uid = matched[0].substr(0, 7)
-                result = await supertest(app)
-                    .get("/" + uid)
-                const { status, text } = await supertest(app)
-                    .get("/" + uid)
-                expect(status).toBe(404)
             })
         })
     })
@@ -308,6 +259,126 @@ describe("creating links", () => {
                 expect(status).toBe(413)
                 expect(text).toMatch(/too large/)
                 fs.unlinkSync("./files/temp.txt")
+            })
+        })
+    })
+})
+describe("viewing links", () => {
+    describe("given a file link set to display as raw", () => {
+        it.only("should display as the file type, such as png", async() => {
+            let result = await supertest(app)
+                .post("/")
+                .attach("content", testImagePath)
+                .field("content", "logo.png")
+                .field("type", "file")
+                .field("expires", "never")
+                .field("raw", "true")
+            const uid = getUidFromText(result.text)
+            result = await supertest(app)
+                .get("/" + uid)
+            expect(result.status).toBe(200)
+            //console.dir(result)
+            expect(result.headers['content-type']).toBe('image/png')
+        })
+    })
+    describe("given a link with expiration time set to 300ms", () => {
+        it("should display normally when accessed immediately", async () => {
+            const data = {
+                content: "http://google.com",
+                type: "link",
+                expires: "300",
+            }
+            let result = await supertest(app)
+                .post("/")
+                .send(data)
+            const uid = getUidFromText(result.text)
+            const {status, text} = await supertest(app)
+                    .get("/" + uid)
+            expect(status).toBe(301)
+        })
+        it("should show a 404 error after 350ms", async () => {
+            const data = {
+                content: "http://google.com",
+                type: "link",
+                expires: "300",
+            }
+            let result = await supertest(app)
+                .post("/")
+                .send(data)
+            const uid = getUidFromText(result.text)
+            await sleep(350)
+            const {status, text} = await supertest(app)
+                    .get("/" + uid)
+            expect(status).toBe(404)
+        })
+    })
+    describe("given a link set to delete on view", () => {
+        it("should display normally once", async () => {
+            const data = {
+                content: "Some sample text",
+                type: "text",
+                expires: "never",
+                deleteOnView: "true",
+            }
+            let result = await supertest(app)
+                .post("/")
+                .send(data)
+            const uid = getUidFromText(result.text)
+            const { status, text } = await supertest(app)
+                .get("/" + uid)
+            expect(status).toBe(200)
+        })
+        it("should show 404 error on second access", async () => {
+            const data = {
+                content: "Some sample text",
+                type: "text",
+                expires: "never",
+                deleteOnView: "true",
+            }
+            let result = await supertest(app)
+                .post("/")
+                .send(data)
+            const uid = getUidFromText(result.text)
+            result = await supertest(app)
+                .get("/" + uid)
+            const { status, text } = await supertest(app)
+                .get("/" + uid)
+            expect(status).toBe(404)
+        })
+        describe("when file is an image", () => {
+            it("should be accessible as a /file request the first 2 times", async () => {
+                let result = await supertest(app)
+                    .post("/")
+                    .attach("content", testImagePath)
+                    .field("content", "logo.png")
+                    .field("type", "file")
+                    .field("expires", "never")
+                    .field("deleteOnView", "true")
+                expect(result.status).toBe(201)
+                const uid = getUidFromText(result.text)
+                result = await supertest(app)
+                    .get("/" + uid + "/file")
+                expect(result.status).toBe(200)
+                result = await supertest(app)
+                    .get("/" + uid + "/file")
+                expect(result.status).toBe(200)
+            })
+            it("should give a 404 error on the 3rd /file request", async () => {
+                let result = await supertest(app)
+                    .post("/")
+                    .attach("content", testImagePath)
+                    .field("content", "logo.png")
+                    .field("type", "file")
+                    .field("expires", "never")
+                    .field("deleteOnView", "true")
+                const uid = getUidFromText(result.text)
+                result = await supertest(app)
+                    .get("/" + uid + "/file")
+                result = await supertest(app)
+                    .get("/" + uid + "/file")
+                result = await supertest(app)
+                    .get("/" + uid + "/file")
+                expect(result.status).toBe(404)
             })
         })
     })
