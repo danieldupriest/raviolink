@@ -1,5 +1,5 @@
 import { integer } from "sharp/lib/is"
-import { formatBytes, urlIsValid, fileExistsRecursive } from "./tools.mjs"
+import { formatBytes, urlIsValid, fileExistsRecursive, sleep } from "./tools.mjs"
 import fs from "fs"
 import { log } from "./logger.mjs"
 
@@ -42,25 +42,25 @@ describe("validUrl", () => {
         ["-", true],
         [".", true],
         ["_", true],
-        ["!", false],
         ["$", true],
         ["?", true],
         ["&", true],
-        ["'", false],
-        ["(", false],
-        [")", false],
-        ["*", false],
         ["+", true],
         [",", true],
         [";", true],
         ["%", true],
         ["=", true],
         ["#", true],
-        [`"`, false],
         [":", true],
+        ["~", true],
+        ["!", false],
+        ["'", false],
+        ["(", false],
+        [")", false],
+        ["*", false],
+        [`"`, false],
         ["[", false],
         ["]", false],
-        ["~", true],
         ["@", false],
     ]
 
@@ -120,6 +120,23 @@ describe("fileExistsRecursive", () => {
             )
             const result = fileExistsRecursive("tempFile.txt", tempDir)
             expect(result).toBe(false)
+        })
+    })
+})
+
+describe("sleep", () => {
+    const tempDir = "./temporary"
+    describe("given a sleep with delay set to 100ms", () => {
+        it("should have at least 100ms elapsed before completing", async() => {
+            function hrTimeToMicroseconds(hrTimeArray) {
+                return hrTimeArray[0] * 1000000 + hrTimeArray[1] / 1000
+            }
+            const start = process.hrtime()  
+            await sleep(100)
+            const elapsed = process.hrtime(start)
+            const elapsedMicroseconds = hrTimeToMicroseconds(elapsed)
+            log("elapsedMicroseconds: " + elapsedMicroseconds)
+            expect(elapsedMicroseconds).toBeGreaterThan(100000)
         })
     })
 })

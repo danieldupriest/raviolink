@@ -2,7 +2,7 @@ import supertest from "supertest"
 import createApp from "../app.mjs"
 import Database from "../database/Database.mjs"
 import path from "path"
-import { fileExistsRecursive } from "../utils/tools.mjs"
+import { fileExistsRecursive, sleep } from "../utils/tools.mjs"
 import { log } from "../utils/logger.mjs"
 import Link from "../database/Link.mjs"
 import fs from "fs"
@@ -105,11 +105,6 @@ describe("creating links", () => {
                     .send(data)
                 const matched = result.text.match(/([a-zA-Z0-9]{7})<\/div>/gm)
                 const uid = matched[0].substr(0, 7)
-                const sleep = (time) => {
-                    return new Promise((resolve, reject) => {
-                        setTimeout(resolve, time)
-                    })
-                }
                 await sleep(350)
                 const {status, text} = await supertest(app)
                         .get("/" + uid)

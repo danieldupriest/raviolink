@@ -90,3 +90,13 @@ export function fileExistsRecursive(filePath, rootPath) {
     }
     return false
 }
+
+/**
+ * Introduces a configurable delay into the workflow. Must be used with await or then.
+ * @param {Number} time - Time in ms to sleep.
+ */
+export function sleep(time) {
+    return new Promise((resolve, reject) => {
+        setTimeout(resolve, time)
+    })
+}
