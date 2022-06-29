@@ -9,10 +9,26 @@ import fs from "fs"
 import Clamscan from "clamscan"
 import sharp from "sharp"
 import Cache from "../utils/cache.mjs"
-import { formatBytes, urlIsValid, uidIsValid } from "../utils/tools.mjs"
+import { formatBytes, urlIsValid } from "../utils/tools.mjs"
 
 const cache = new Cache()
 const MAXIMUM_IMAGE_RESIZE = 1920
+
+/**
+ * This helper function runs through the necessary checks when accessing a
+ * link. If the link is not accessible for any reason it will return false.
+ * @param {Link} link - link to check. It can be null.
+ * @returns true if the link is valid and accessible.
+ */
+const checkLinkState = async (link) => {
+    if (!link) return false
+    await link.checkExpiration()
+    await link.checkViewsLeft()
+    const deleted = link.isDeleted()
+    const expired = link.isExpired()
+    if (link.isDeleted() || link.isExpired()) return false
+    return true
+}
 
 /**
  * Load the requested link, carry out expiration and access
@@ -22,21 +38,10 @@ export const handleLink = async (req, res, next) => {
     const { uid } = req.params
     const link = await Link.findByUid(uid)
 
-    if (!link) {
-        return next()
-    }
-    await link.checkExpiration()
-    await link.checkViewsLeft()
-
-    const valid = uidIsValid(uid)
-    //const exists = link != "undefined"
-    const deleted = link.isDeleted()
-    const expired = link.isExpired()
-    if (!uidIsValid(uid) || !link || link.isDeleted() || link.isExpired()) {
-        return next()
-    }
-
-    log("Loading link: " + JSON.stringify(link))
+    // Check that link is accessible
+    if (!await checkLinkState(link)) return next()
+    
+    debug("Loaded link: " + JSON.stringify(link))
 
     //Handle redirects and raw links
     switch (link.type) {
@@ -52,27 +57,8 @@ export const handleLink = async (req, res, next) => {
             }
             break
         case "file":
-
-            // Handle direct downloads
-            if (link.raw) {
-                return handleFile(req, res, next)
-                /*const fullPath = path.resolve(
-                    process.cwd(),
-                    "files",
-                    link.uid,
-                    link.content
-                )
-                await link.access()
-                return res.sendFile(fullPath, {}, (err) => {
-                    if (err) {
-                        return next(err)
-                    }
-                })*/
-            }
+            if (link.raw) return handleFile(req, res, next, link)
             break
-        default:
-            res.statusCode = 400
-            return next(new Error("Unsupported link type."))
     }
 
     // Handle display of normal, non-raw links
@@ -88,33 +74,24 @@ export const handleLink = async (req, res, next) => {
  * displaying with the appropriate content type. Images can be resized with
  * the ?size=100 query parameter, and resized images will be cached for later
  * accesses.
+ * @param {Link} preCheckedLink - If a link is passed in with this parameter,
+ * the controller will forgo the link checks and move straight on to serving.
  */
-export const handleFile = async (req, res, next) => {
+export const handleFile = async (req, res, next, preCheckedLink = null) => {
     const { uid } = req.params
     let { size } = req.query
     size = size ? parseInt(size) : null
 
-    const link = await Link.findByUid(uid)
-
-    if (!link) {
-        res.statusCode = 404
-        return next(
-            new Error("Resource not found", {
-                cause: `Link with UID ${uid} not found.`,
-            })
-        )
+    // Either load the link from the database, or if it's being passed in
+    // from another handler, skip the checks.
+    if(preCheckedLink){
+        var link = preCheckedLink
+    } else {
+        var link = await Link.findByUid(uid)
+        if(!await checkLinkState(link))
+            next()
     }
-    await link.checkExpiration()
-    await link.checkViewsLeft()
-    if (
-        !uidIsValid(uid) ||
-        link.isDeleted() ||
-        (await link.isExpired()) ||
-        link.type != "file"
-    ) {
-        return next()
-    }
-
+    
     // Generate file path
     const fullPath = path.resolve(
         process.cwd(),
