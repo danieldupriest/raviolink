@@ -29,13 +29,15 @@ export const customErrorResponder = (err, req, res, next) => {
         log(err.message)
         if (err.cause) log(" " + err.cause)
     } else {
-        if (process.env.NODE_ENV != "test")
-            error(err)
-        log(err)
+        if (process.env.NODE_ENV != "test") error(err)
+        log(err.message)
     }
     return res.render("error", {
         status: statusCode,
-        error: statusCode == 500 ? `A server error occurred while processing this request` : err.message,
+        error:
+            statusCode == 500
+                ? `A server error occurred while processing this request`
+                : err.message,
         ...res.locals.pageData,
     })
 }

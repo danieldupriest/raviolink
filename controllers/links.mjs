@@ -1,5 +1,6 @@
 import config from "dotenv"
 config.config()
+import Joi from "joi"
 import Link from "../database/Link.mjs"
 import Date from "../utils/date.mjs"
 import sanitize from "sanitize-filename"
@@ -10,9 +11,15 @@ import Clamscan from "clamscan"
 import sharp from "sharp"
 import Cache from "../utils/cache.mjs"
 import { formatBytes, urlIsValid } from "../utils/tools.mjs"
+import {
+    ipSchema,
+    uidSchema,
+    sizeSchema,
+    linkPostSchema,
+    linkServeSchema,
+} from "../utils/schemas.mjs"
 
 const cache = new Cache()
-const MAXIMUM_IMAGE_RESIZE = 1920
 
 /**
  * This helper function runs through the necessary checks when accessing a
@@ -35,7 +42,15 @@ const checkLinkState = async (link) => {
  * checks, and render it.
  */
 export const handleLink = async (req, res, next) => {
-    const { uid } = req.params
+    const {
+        error,
+        value: { uid },
+    } = Joi.object({ uid: uidSchema }).validate(req.params)
+    if (error) {
+        res.statusCode = 400
+        return next(new Error("Invalid link UID"))
+    }
+
     const link = await Link.findByUid(uid)
 
     // Check that link is accessible
@@ -62,8 +77,11 @@ export const handleLink = async (req, res, next) => {
     }
 
     // Handle display of normal, non-raw links
+    const { error: linkError, value: linkJson } = linkServeSchema.validate(link)
+    if (linkError) return next(linkError)
+
     res.render("index", {
-        link: link,
+        link: linkJson,
         formattedSize: formatBytes(link.size()),
         ...res.locals.pageData,
     })
@@ -78,9 +96,25 @@ export const handleLink = async (req, res, next) => {
  * the controller will forgo the link checks and move straight on to serving.
  */
 export const handleFile = async (req, res, next, preCheckedLink = null) => {
-    const { uid } = req.params
-    let { size } = req.query
-    size = size ? parseInt(size) : null
+    // Get UID
+    const {
+        error: uidError,
+        value: { uid },
+    } = Joi.object({ uid: uidSchema }).validate(req.params)
+    if (uidError) {
+        res.statusCode = 400
+        return next(new Error("Invalid link UID"))
+    }
+
+    // Get size
+    const {
+        error: sizeError,
+        value: { size },
+    } = Joi.object({ size: sizeSchema }).validate(req.query)
+    if (sizeError) {
+        res.statusCode = 400
+        return next(sizeError)
+    }
 
     // Either load the link from the database, or if it's being passed in
     // from another handler, skip the checks.
@@ -110,10 +144,11 @@ export const handleFile = async (req, res, next, preCheckedLink = null) => {
     }
 
     // Serve error if requested size exceeds limits
-    if (size > MAXIMUM_IMAGE_RESIZE) {
+    const max = parseInt(process.env.MAXIMUM_IMAGE_SIZE)
+    if (size > max) {
         res.statusCode = 400
         return next(
-            new Error("Size parameter must be equal to or smaller than 1920")
+            new Error(`Size parameter must be equal to or smaller than ${max}`)
         )
     }
 
@@ -152,22 +187,15 @@ export const frontPage = (req, res) => {
  * delete-on-view enabled.
  */
 export const postLink = async (req, res, next) => {
-    let { content, type, expires, deleteOnView, raw, textType } = req.body
-
-    // Catch any missing parameters
-    if (
-        (content == undefined && type != "file") ||
-        type == undefined ||
-        expires == undefined
-    ) {
+    // Validate post data
+    let {
+        error: postError,
+        value: { content, type, expires, deleteOnView, raw, textType },
+    } = linkPostSchema.validate(req.body)
+    if (postError) {
         res.statusCode = 400
-        return next(new Error("Request is missing parameters"))
+        return next(postError)
     }
-
-    // Convert parameters
-    deleteOnView = deleteOnView == "true" ? true : false
-    raw = raw == "true" ? true : false
-    textType = textType == undefined ? "plain" : textType
 
     // Calculate expiration date
     let expireDate = null
@@ -317,7 +345,19 @@ export const linkList = async (req, res, next) => {
  * a confirmation step.
  */
 export const deleteLinks = async (req, res, next) => {
-    const { toDelete, password } = req.body
+    // Validate data
+    const {
+        error: error,
+        value: { toDelete, password },
+    } = Joi.object({
+        toDelete: Joi.array().items(Joi.string()).required(),
+        password: Joi.string().required(),
+    }).validate(req.body)
+    if (error) {
+        res.statusCode = 400
+        return next(error)
+    }
+
     let deleted = false
     if (password != process.env.ADMIN_PASSWORD) {
         res.statusCode = 401
@@ -350,7 +390,16 @@ export const deleteLinks = async (req, res, next) => {
  * to the client. The page allows an administrator to delete selected links.
  */
 export const linkListByIp = async (req, res, next) => {
-    const { ip } = req.params
+    // Get IP
+    const {
+        error: ipError,
+        value: { ip },
+    } = Joi.object({ ip: ipSchema }).validate(req.params)
+    if (ipError) {
+        res.statusCode = 400
+        return next(new Error("Invalid IP"))
+    }
+
     let links = await Link.findAllByIp(ip)
 
     // Filter expired and delete-on-view links
@@ -383,7 +432,16 @@ export const linkListByIp = async (req, res, next) => {
  * data of the link regardless of expiration or deletion state.
  */
 export const adminView = async (req, res, next) => {
-    const { uid } = req.params
+    // Get UID
+    const {
+        error: uidError,
+        value: { uid },
+    } = Joi.object({ uid: uidSchema }).validate(req.params)
+    if (uidError) {
+        res.statusCode = 400
+        return next(new Error("Invalid link UID"))
+    }
+
     const link = await Link.findByUid(uid)
     return res.json(link)
 }

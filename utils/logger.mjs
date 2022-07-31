@@ -25,5 +25,5 @@ export const debug = (input) => {
  * @param {String}} input - Message to write
  */
 export const error = (input) => {
-    console.error(input)
+    console.error(input.toString())
 }
