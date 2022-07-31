@@ -39,8 +39,8 @@ export const handleLink = async (req, res, next) => {
     const link = await Link.findByUid(uid)
 
     // Check that link is accessible
-    if (!await checkLinkState(link)) return next()
-    
+    if (!(await checkLinkState(link))) return next()
+
     debug("Loaded link: " + JSON.stringify(link))
 
     //Handle redirects and raw links
@@ -84,14 +84,13 @@ export const handleFile = async (req, res, next, preCheckedLink = null) => {
 
     // Either load the link from the database, or if it's being passed in
     // from another handler, skip the checks.
-    if(preCheckedLink){
+    if (preCheckedLink) {
         var link = preCheckedLink
     } else {
         var link = await Link.findByUid(uid)
-        if(!await checkLinkState(link))
-            next()
+        if (!(await checkLinkState(link))) next()
     }
-    
+
     // Generate file path
     const fullPath = path.resolve(
         process.cwd(),
@@ -113,7 +112,9 @@ export const handleFile = async (req, res, next, preCheckedLink = null) => {
     // Serve error if requested size exceeds limits
     if (size > MAXIMUM_IMAGE_RESIZE) {
         res.statusCode = 400
-        return next(new Error("Size parameter must be equal to or smaller than 1920"))
+        return next(
+            new Error("Size parameter must be equal to or smaller than 1920")
+        )
     }
 
     // Resize requested: make sure link is an image
@@ -127,10 +128,7 @@ export const handleFile = async (req, res, next, preCheckedLink = null) => {
     let buffer = cache.read(key)
     if (!buffer) {
         // Generate resized data if not yet cached
-        buffer = await sharp(fullPath)
-            .resize(size, size)
-            .jpeg()
-            .toBuffer()
+        buffer = await sharp(fullPath).resize(size, size).jpeg().toBuffer()
         // Cache it
         cache.write(key, buffer)
     }
@@ -230,18 +228,31 @@ export const postLink = async (req, res, next) => {
 
             // Perform virus scan when not testing
             if (process.env.NODE_ENV == "test") break
-            const scanner = new Clamscan()
-            await scanner.init()
-            const { _, isInfected, viruses } = await scanner.scanFile(
-                req.file.path
-            )
-            if (isInfected) {
-                fs.unlinkSync(req.file.path)
-                const message = `Virus detected in file: ${viruses.join(", ")}`
-                log(message)
-                debug(message)
-                res.statusCode = 409
-                return next(new Error(message))
+            try {
+                const scanner = new Clamscan()
+                await scanner.init()
+                const { _, isInfected, viruses } = await scanner.scanFile(
+                    req.file.path
+                )
+                if (isInfected) {
+                    fs.unlinkSync(req.file.path)
+                    const message = `Virus detected in file: ${viruses.join(
+                        ", "
+                    )}`
+                    log(message)
+                    debug(message)
+                    res.statusCode = 409
+                    return next(new Error(message))
+                }
+            } catch (err) {
+                try {
+                    log("Error during virus scan. Deleting temp file.")
+                    fs.unlinkSync(req.file.path)
+                } catch (err) {
+                    log("Error deleting temp file.")
+                    return next(err)
+                }
+                return next(err)
             }
             break
         default:
