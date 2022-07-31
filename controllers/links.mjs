@@ -144,7 +144,7 @@ export const handleFile = async (req, res, next, preCheckedLink = null) => {
     }
 
     // Serve error if requested size exceeds limits
-    const max = parseInt(process.env.MAXIMUM_IMAGE_SIZE)
+    const max = parseInt(process.env.MAXIMUM_IMAGE_RESIZE)
     if (size > max) {
         res.statusCode = 400
         return next(
