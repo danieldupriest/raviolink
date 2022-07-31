@@ -1,13 +1,6 @@
 import rateLimiter from "../utils/rateLimiter.mjs"
 import multer from "multer"
 import express from "express"
-import expressJoiValidation from "express-joi-validation"
-import {
-    uidSchema,
-    sizeSchema,
-    ipSchema,
-    linkPostSchema,
-} from "../utils/schemas.mjs"
 
 // Configure a rate limiter for use in certain restricted routes
 const limiter = rateLimiter({ window: 10 * 1000, limit: 2 })
@@ -17,9 +10,6 @@ const upload = multer({
     limits: { fileSize: parseInt(process.env.MAX_UPLOAD_SIZE) },
     dest: "./files",
 }).single("content")
-
-// configure request validator
-const validator = expressJoiValidation.createValidator({})
 
 // Main application routes
 const router = express.Router()
