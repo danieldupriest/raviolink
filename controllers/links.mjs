@@ -390,7 +390,16 @@ export const deleteLinks = async (req, res, next) => {
  * to the client. The page allows an administrator to delete selected links.
  */
 export const linkListByIp = async (req, res, next) => {
-    const { ip } = req.params
+    // Get IP
+    const {
+        error: ipError,
+        value: { ip },
+    } = Joi.object({ ip: ipSchema }).validate(req.params)
+    if (ipError) {
+        res.statusCode = 400
+        return next(new Error("Invalid IP"))
+    }
+
     let links = await Link.findAllByIp(ip)
 
     // Filter expired and delete-on-view links
@@ -423,7 +432,16 @@ export const linkListByIp = async (req, res, next) => {
  * data of the link regardless of expiration or deletion state.
  */
 export const adminView = async (req, res, next) => {
-    const { uid } = req.params
+    // Get UID
+    const {
+        error: uidError,
+        value: { uid },
+    } = Joi.object({ uid: uidSchema }).validate(req.params)
+    if (uidError) {
+        res.statusCode = 400
+        return next(new Error("Invalid link UID"))
+    }
+
     const link = await Link.findByUid(uid)
     return res.json(link)
 }
