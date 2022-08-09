@@ -50,7 +50,7 @@
              */
             function drawCanvas() {
                 const canvas = document.getElementById("qr-code");
-                QRCode.toCanvas(canvas, '{{server}}/{{link.uid}}', (error) => {
+                  QRCode.toCanvas(canvas, '{{{server}}}/{{link.uid}}', (error) => {
                     if(error) console.error(error);
                 });
             }
