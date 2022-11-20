@@ -255,7 +255,7 @@ export const postLink = async (req, res, next) => {
             }
 
             // Perform virus scan when not testing
-            if (process.env.NODE_ENV == "test") break
+            if (process.env.NODE_ENV !== 'production') break
             try {
                 const scanner = new Clamscan()
                 await scanner.init()

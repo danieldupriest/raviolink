@@ -9,8 +9,12 @@ export const ipSchema = Joi.string()
     .required()
 
 export const linkPostSchema = Joi.object({
-    content: Joi.string().required(),
     type: Joi.string().valid("link", "text", "file").required(),
+    content: Joi.string().when('type', {
+      is: 'file',
+      then: Joi.optional(),
+      otherwise: Joi.required(),
+    }),
     expires: Joi.alternatives().try(Joi.string(), Joi.number()).required(),
     deleteOnView: Joi.boolean().default(false),
     raw: Joi.boolean().default(false),
@@ -27,7 +31,7 @@ export const linkServeSchema = Joi.object({
     createdOn: Joi.date().required(),
     uid: uidSchema,
     tempFilename: Joi.string().valid("").required(),
-    mimeType: Joi.string().valid("").required(),
+    mimeType: Joi.string().allow("").required(),
     deleted: Joi.boolean().required(),
     textType: Joi.string().required(),
     ip: Joi.string()

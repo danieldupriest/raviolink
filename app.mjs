@@ -32,7 +32,7 @@ export default function createApp() {
      */
 
     // Load and run helmet for web security
-    app.use(helmet.contentSecurityPolicy())
+    //app.use(helmet.contentSecurityPolicy())
     app.use(helmet.crossOriginEmbedderPolicy())
     app.use(helmet.crossOriginOpenerPolicy())
     //app.use(helmet.crossOriginResourcePolicy()); This seems to hang the server on Google cloud

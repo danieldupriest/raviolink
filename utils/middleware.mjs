@@ -54,7 +54,7 @@ export function setCustomHeaders(req, res, next) {
     res.header("Permissions-Policy", "camera=(), microphone=()")
     res.header(
         "Content-Security-Policy",
-        "default-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com"
+        "default-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; style-src 'self' http://localhost:8080 https://fonts.googleapis.com"
     )
     next()
 }
